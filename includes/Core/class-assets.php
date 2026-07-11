@@ -4,7 +4,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-
 class Juguemos_Assets
 {
 
@@ -18,23 +17,45 @@ class Juguemos_Assets
 
     }
 
-
     public function frontend_assets()
-{
+    {
 
-    wp_enqueue_style(
+        // CSS
+        wp_enqueue_style(
+            'juguemos-wizard',
+            JUGUEMOS_URL . 'public/css/wizard.css',
+            [],
+            JUGUEMOS_VERSION
+        );
 
-        'juguemos-wizard',
+        // AJAX
+        wp_enqueue_script(
+            'juguemos-ajax',
+            JUGUEMOS_URL . 'public/js/ajax.js',
+            [],
+            JUGUEMOS_VERSION,
+            true
+        );
 
-        JUGUEMOS_URL . 'public/css/wizard.css',
+        // APP
+        wp_enqueue_script(
+            'juguemos-app',
+            JUGUEMOS_URL . 'public/js/app.js',
+            ['juguemos-ajax'],
+            JUGUEMOS_VERSION,
+            true
+        );
 
-        [],
+        // Variables para JavaScript
+        wp_localize_script(
+            'juguemos-app',
+            'Juguemos',
+            [
+                'ajax_url' => admin_url('admin-ajax.php'),
+                'nonce'    => wp_create_nonce('juguemos_nonce'),
+            ]
+        );
 
-        JUGUEMOS_VERSION
-
-    );
-
-}
-
+    }
 
 }

@@ -22,6 +22,9 @@ class Juguemos_Loader
         require_once JUGUEMOS_PATH . 'includes/Core/class-assets.php';
         require_once JUGUEMOS_PATH . 'includes/Core/class-shortcodes.php';
         require_once JUGUEMOS_PATH . 'admin/class-admin.php';
+        require_once JUGUEMOS_PATH . 'includes/Ajax/class-ajax.php';
+        require_once JUGUEMOS_PATH . 'includes/Repositories/class-category-repository.php';
+        require_once JUGUEMOS_PATH . 'includes/Repositories/class-deck-repository.php';
 
     }
 
@@ -31,6 +34,7 @@ class Juguemos_Loader
 
         new Juguemos_Core();
         new Juguemos_Shortcodes();
+        new Juguemos_Ajax();
 
     }
 

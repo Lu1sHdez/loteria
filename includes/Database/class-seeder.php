@@ -12,16 +12,77 @@ class Juguemos_Seeder
     {
 
         global $wpdb;
-
-
+        self::categories($wpdb);
         self::cards($wpdb);
-
         self::prices($wpdb);
 
     }
 
 
-
+    private static function categories($wpdb)
+    {
+    
+        $table = $wpdb->prefix . 'juguemos_categories';
+    
+        if (
+            $wpdb->get_var(
+                "SELECT COUNT(*) FROM $table"
+            ) > 0
+        ) {
+            return;
+        }
+    
+        $categories = [
+    
+            'Animadas',
+    
+            'Baby Shower',
+    
+            'Cómica',
+    
+            'Despedida de soltera',
+    
+            'Dulce',
+    
+            'Elegante',
+    
+            'Escuela',
+    
+            'Materiales',
+    
+            'Personajes',
+    
+            'Transparente'
+    
+        ];
+    
+        $orden = 1;
+    
+        foreach ($categories as $category) {
+    
+            $wpdb->insert(
+    
+                $table,
+    
+                [
+    
+                    'nombre' => $category,
+    
+                    'tipo' => 'baraja',
+    
+                    'orden' => $orden,
+    
+                    'activo' => 1
+    
+                ]
+    
+            );
+    
+            $orden++;
+    
+        }
+    
+    }
     private static function cards($wpdb)
     {
 
@@ -123,11 +184,6 @@ class Juguemos_Seeder
 
     }
 
-
-
-
-
-
     private static function prices($wpdb)
     {
 
@@ -224,7 +280,5 @@ class Juguemos_Seeder
 
 
     }
-
-
 
 }
