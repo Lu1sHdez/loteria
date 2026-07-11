@@ -25,6 +25,9 @@ class Juguemos_Loader
         require_once JUGUEMOS_PATH . 'includes/Ajax/class-ajax.php';
         require_once JUGUEMOS_PATH . 'includes/Repositories/class-category-repository.php';
         require_once JUGUEMOS_PATH . 'includes/Repositories/class-deck-repository.php';
+        require_once JUGUEMOS_PATH . 'includes/Repositories/class-price-repository.php';
+        require_once JUGUEMOS_PATH . 'includes/Pricing/class-pricing.php';
+
 
     }
 

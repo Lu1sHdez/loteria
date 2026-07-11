@@ -108,6 +108,31 @@ const JuguemosAjax = {
         });
     
     },
+    loadPrice(pais, modo, cantidad){
+
+        fetch(
+    
+            Juguemos.ajax_url +
+    
+            "?action=juguemos_price" +
+    
+            "&pais=" + encodeURIComponent(pais) +
+    
+            "&modo=" + encodeURIComponent(modo) +
+    
+            "&cantidad=" + cantidad
+    
+        )
+    
+        .then(r => r.json())
+    
+        .then(response => {
+    
+            console.log(response.data);
+    
+        });
+    
+    },
 
     loadPreview(){
 

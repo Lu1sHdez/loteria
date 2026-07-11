@@ -32,6 +32,16 @@ class Juguemos_Ajax
             [$this, 'decks']
         );
 
+        add_action(
+            'wp_ajax_juguemos_price',
+            [$this,'price']
+        );
+        
+        add_action(
+            'wp_ajax_nopriv_juguemos_price',
+            [$this,'price']
+        );
+
     }
 
     public function categories()
@@ -55,6 +65,32 @@ class Juguemos_Ajax
         );
 
         wp_send_json_success($decks);
+
+    }
+
+    
+    public function price()
+    {
+
+        $pais = sanitize_text_field(
+            $_GET['pais'] ?? 'Mexico'
+        );
+
+        $modo = sanitize_text_field(
+            $_GET['modo'] ?? 'sencilla'
+        );
+
+        $cantidad = intval(
+            $_GET['cantidad'] ?? 1
+        );
+
+        $price = Juguemos_Pricing::calculate(
+            $pais,
+            $modo,
+            $cantidad
+        );
+
+        wp_send_json_success($price);
 
     }
 
