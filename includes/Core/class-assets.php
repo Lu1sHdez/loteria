@@ -36,6 +36,25 @@ class Juguemos_Assets
             JUGUEMOS_VERSION,
             true
         );
+        
+        wp_enqueue_script(
+            'juguemos-state',
+            JUGUEMOS_URL.'public/js/state.js',
+            [],
+            JUGUEMOS_VERSION,
+            true
+        );
+        
+        wp_enqueue_script(
+            'juguemos-app',
+            JUGUEMOS_URL.'public/js/app.js',
+            [
+                'juguemos-ajax',
+                'juguemos-state'
+            ],
+            JUGUEMOS_VERSION,
+            true
+        );
 
         // APP
         wp_enqueue_script(

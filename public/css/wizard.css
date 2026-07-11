@@ -285,3 +285,72 @@
     margin:12px auto;
 
 }
+
+
+
+
+.j-order-summary{
+
+    margin-top:30px;
+
+    padding-top:25px;
+
+    border-top:1px solid #ECECEC;
+
+}
+
+.j-order-summary h4{
+
+    margin-bottom:20px;
+
+    color:#1E2249;
+
+    font-size:22px;
+
+}
+
+.summary-row{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    margin-bottom:14px;
+
+    font-size:15px;
+
+}
+
+.summary-row span{
+
+    color:#777;
+
+}
+
+.summary-row strong{
+
+    color:#1E2249;
+
+}
+
+.summary-total{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-top:18px;
+
+    font-size:22px;
+
+    font-weight:bold;
+
+}
+
+.summary-total strong{
+
+    color:#FA299C;
+
+}

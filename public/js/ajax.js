@@ -128,9 +128,27 @@ const JuguemosAjax = {
     
         .then(response => {
     
-            console.log(response.data);
+            if(!response.success){
+                return;
+            }
+    
+            document.getElementById("summary-country").textContent =
+                response.data.pais;
+    
+            document.getElementById("summary-mode").textContent =
+                response.data.modo;
+    
+            document.getElementById("summary-quantity").textContent =
+                response.data.cantidad;
+    
+            document.getElementById("summary-price").textContent =
+                "$" +
+                Number(response.data.total).toFixed(2) +
+                " " +
+                response.data.moneda;
     
         });
+    
     
     },
 
