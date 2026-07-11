@@ -11,8 +11,6 @@ if (!defined('ABSPATH')) {
 
         include JUGUEMOS_PATH . 'public/templates/wizard/step-design.php';
 
-        include JUGUEMOS_PATH . 'public/templates/wizard/step-config.php';
-
         include JUGUEMOS_PATH . 'public/templates/wizard/step-preview.php';
 
         include JUGUEMOS_PATH . 'public/templates/wizard/step-payment.php';

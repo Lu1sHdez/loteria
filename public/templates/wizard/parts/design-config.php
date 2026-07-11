@@ -1,8 +1,6 @@
 <div class="j-quantity">
 
-    <h3 for="tables-range">
-        Número de tablas por hoja
-</h3>
+    <h3>Número de tablas por hoja</h3>
 
     <div class="j-quantity-controls">
 
@@ -46,6 +44,7 @@
     </button>
 
 </div>
+
 
 <h3>Casillas</h3>
 

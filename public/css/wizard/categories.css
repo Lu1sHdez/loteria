@@ -1,0 +1,109 @@
+/* =====================================================
+   CATEGORÍAS
+===================================================== */
+
+#juguemos-categories{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-bottom:25px;
+}
+
+.j-category{
+    font-family:'Cairo',sans-serif;
+    border:2px solid #D7D7D7;
+    background:#FFFFFF;
+    color:#5D5D5D;
+    padding:10px 18px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:600;
+    transition:.25s;
+}
+
+.j-category:hover{
+    background:#FA299C;
+    border-color:#FA299C;
+    color:#FFFFFF;
+}
+
+.j-category.active{
+    background:#FA299C;
+    border-color:#FA299C;
+    color:#FFFFFF;
+}
+
+
+/* =====================================================
+   BARAJAS
+===================================================== */
+
+#juguemos-decks{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+    gap:20px;
+    justify-items:center;
+}
+
+.j-deck{
+    font-family:'Cairo',sans-serif;
+    border:1px solid #EAEAEA;
+    border-radius:12px;
+    overflow:hidden;
+    background:#FFFFFF;
+    transition:.25s;
+    width:180px;
+}
+
+.j-deck:hover{
+    border-color:#FA299C;
+    transform:translateY(-3px);
+}
+
+.j-deck.active{
+    border-color:#FA299C;
+}
+
+.j-deck-image{
+    background:#FFFFFF;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:10px;
+    height:180px;
+    overflow:hidden;
+}
+
+.j-deck-image img{
+    display:block;
+    width:auto;
+    max-width:140px;
+    max-height:160px;
+    height:auto;
+    object-fit:contain;
+    border-radius:8px;
+    transition:.25s;
+}
+
+.j-deck-name{
+    padding:6px 8px 10px;
+    text-align:center;
+    font-weight:bold;
+    color:#1E2249;
+    font-size:14px;
+}
+
+.j-deck.active .j-deck-name{
+    color:#FA299C;
+}
+
+.deck-popular{
+    background:#FA299C;
+    color:#FFFFFF;
+    font-weight:bold;
+    text-align:center;
+    padding:8px;
+    border-radius:12px;
+    width:140px;
+    margin:12px auto;
+}

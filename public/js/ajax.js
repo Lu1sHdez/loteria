@@ -126,27 +126,34 @@ const JuguemosAjax = {
     
         .then(r => r.json())
     
-        .then(response => {
-    
+        .then(response=>{
+
             if(!response.success){
                 return;
             }
-    
-            document.getElementById("summary-country").textContent =
-                response.data.pais;
-    
-            document.getElementById("summary-mode").textContent =
-                response.data.modo;
-    
-            document.getElementById("summary-quantity").textContent =
-                response.data.cantidad;
-    
-            document.getElementById("summary-price").textContent =
-                "$" +
-                Number(response.data.total).toFixed(2) +
-                " " +
+        
+            JuguemosState.unitPrice=response.data.precio_unitario;
+        
+            JuguemosState.total=response.data.total;
+        
+            JuguemosState.currency=response.data.moneda;
+        
+            document.getElementById("summary-country").textContent=response.data.pais;
+        
+            document.getElementById("summary-mode").textContent=response.data.modo;
+        
+            document.getElementById("summary-quantity").textContent=response.data.cantidad;
+        
+            document.getElementById("summary-price").textContent=
+        
+                "$"+
+        
+                Number(response.data.total).toFixed(2)+
+        
+                " "+
+        
                 response.data.moneda;
-    
+        
         });
     
     

@@ -1,0 +1,51 @@
+.juguemos-wizard{
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:20px;
+    padding:30px;
+    background:#fff;
+    border-radius:20px;
+    box-shadow:0 5px 20px rgba(0,0,0,.08);
+    margin-bottom:40px;
+}
+
+.juguemos-step{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    color:#999;
+    transition:.3s;
+}
+
+.juguemos-step.active{
+    color:#FA299C;
+}
+
+.step-number{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:#DDD;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+}
+
+.juguemos-step.active .step-number{
+    background:#FA299C;
+}
+
+.step-text{
+    font-size:17px;
+    font-weight:600;
+}
+
+.juguemos-line{
+    flex:1;
+    height:2px;
+    background:#EEE;
+}
