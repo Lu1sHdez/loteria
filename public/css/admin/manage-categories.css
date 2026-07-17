@@ -1,0 +1,68 @@
+.j-admin-manage-category{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    height:40px;
+    padding:0 18px;
+    border:2px solid #D9D9D9;
+    border-radius:8px;
+    background:#FFFFFF;
+    color:#5D5D5D;
+    text-decoration:none !important;
+    font-weight:600;
+    transition:.2s;
+}
+
+.j-admin-manage-category:hover{
+
+    background:#FA299C;
+    border-color:#FA299C;
+    color:#FFFFFF;
+
+}
+
+.j-category-list{
+    max-height:420px;
+    overflow-y:auto;
+    margin-top:20px;
+    border:1px solid #E8E8E8;
+    border-radius:8px;
+    background:#FFF;
+}
+
+.j-category-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:15px 18px;
+    border-bottom:1px solid #F1F1F1;
+}
+
+.j-category-item:last-child{
+    border-bottom:none;
+}
+.j-category-name{
+
+    font-size:15px;
+    font-weight:600;
+    color:#3B3B3B;
+
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+
+}
+.j-delete-category{
+    border:none;
+    background:none;
+    color:#E53935;
+    font-weight:600;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.j-delete-category:hover{
+
+    color:#E53935;
+
+}

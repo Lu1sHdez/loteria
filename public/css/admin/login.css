@@ -1,0 +1,102 @@
+/* Contenedor principal */
+.j-login {
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #FFFFFF;
+    border: 1px solid #E5E5E5;
+    border-radius: 12px;
+    font-family: 'Cairo', sans-serif;
+}
+
+.j-login h2 {
+    margin: 0 0 20px;
+    text-align: center;
+    font-size: 26px;
+    color: #1E2249;
+}
+
+/* Error: Solo texto rojo directo */
+.j-login-error {
+    color: #e2401c;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+/* Campos de formulario */
+.j-field {
+    margin-bottom: 15px;
+}
+
+.j-field label {
+    display: block;
+    margin-bottom: 5px;
+    color: #444;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.j-field input {
+    width: 100%;
+    height: 45px;
+    padding: 0 12px;
+    border: 1px solid #D9D9D9;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.j-field input::placeholder {
+    color: #a0aec0;
+}
+
+.j-field input:focus {
+    outline: none;
+    border-color: #FA299C;
+}
+
+/* Enlace de olvidar contraseña */
+.j-forgot {
+    text-align: right;
+    margin-bottom: 15px;
+}
+
+.j-forgot a {
+    color: #FA299C;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.j-forgot a:hover {
+    text-decoration: underline;
+}
+
+/* Botón: Mismo rosa para todo, solo cambia la opacidad */
+.j-login-button {
+    width: 100%;
+    height: 45px;
+    border: none;
+    border-radius: 8px;
+    background: #FA299C;
+    color: #FFFFFF;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity 0.2s ease;
+}
+
+.j-login-button:hover,
+.j-login-button:active {
+    background: #FA299C;
+    opacity: 0.9; 
+}
+
+/* Responsivo rápido */
+@media(max-width: 480px) {
+    .j-login {
+        margin: 20px 15px;
+        padding: 20px;
+    }
+}

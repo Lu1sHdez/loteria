@@ -27,6 +27,39 @@ class Juguemos_Assets
             [],
             JUGUEMOS_VERSION
         );
+        wp_enqueue_style(
+            'juguemos-login',
+            JUGUEMOS_URL . 'public/css/admin/login.css',
+            [],
+            JUGUEMOS_VERSION
+        );
+        wp_enqueue_style(
+            'juguemos-admin-agregar',
+            JUGUEMOS_URL . 'public/css/admin/dashboard.css',
+            [],
+            JUGUEMOS_VERSION
+        );
+        //botones globales
+        wp_enqueue_style(
+            'juguemos-botones',
+            JUGUEMOS_URL . 'public/css/botones.css',
+            [],
+            JUGUEMOS_VERSION
+        );
+
+        wp_enqueue_style(
+            'juguemos-admin-manage-category',
+            JUGUEMOS_URL . 'public/css/admin/manage-categories.css',
+            [],
+            JUGUEMOS_VERSION
+        );
+
+        wp_enqueue_style(
+            'juguemos-admin',
+            JUGUEMOS_URL . 'public/css/admin/agregar.css',
+            [],
+            JUGUEMOS_VERSION
+        );
 
         // AJAX
         wp_enqueue_script(

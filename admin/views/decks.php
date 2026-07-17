@@ -4,222 +4,128 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-global $wpdb;
+$categorias = Juguemos_Admin_Categorias::get_all();
 
-$table = $wpdb->prefix . "juguemos_decks";
+$categoria_actual = $categorias[0]->id ?? 0;
 
+$designs = [];
 
-if(isset($_POST['guardar_deck'])){
-
-
-    $wpdb->insert(
-        $table,
-        [
-
-            'nombre' => sanitize_text_field($_POST['nombre']),
-
-            'categoria' => sanitize_text_field($_POST['categoria']),
-
-            'descripcion' => sanitize_textarea_field($_POST['descripcion'])
-
-        ]
-    );
-
-
-    echo "<div class='updated'><p>Baraja guardada</p></div>";
-
+if ($categoria_actual) {
+    $designs = Juguemos_Admin_Designs::get_by_category($categoria_actual);
 }
-
-
-$decks = $wpdb->get_results(
-    "SELECT * FROM $table ORDER BY id DESC"
-);
-
 ?>
 
+<div class="titulo-seccion-contenedor">
+    <img class="destello" src="/wp-content/uploads/2026/07/Destello1.png" alt="">
 
+    <h2 class="titulo-seccion">TUS DISEÑOS DE LOTERÍA</h2>
 
-<div class="wrap">
+    <img class="destello" src="/wp-content/uploads/2026/07/Destello2.png" alt="">
+</div>
 
+<div class="j-admin-filtros-wrapper">
 
-<h1>🎴 Barajas</h1>
+    <div class="j-admin-filtros">
 
+        <div class="j-admin-categorias">
 
-<form method="POST">
+            <?php foreach ($categorias as $index => $categoria): ?>
 
+                <button
+                    type="button"
+                    data-id="<?php echo esc_attr($categoria->id); ?>"
+                    class="j-admin-categoria <?php echo $index === 0 ? 'active' : ''; ?>">
 
-<table class="form-table">
+                    <?php echo esc_html($categoria->nombre); ?>
 
+                </button>
 
-<tr>
+            <?php endforeach; ?>
 
-<th>Nombre</th>
+        </div>
 
-<td>
+        <a
+            href="?view=create-design"
+            class="j-admin-add">
+            + Agregar Nuevo Diseño
+        </a>
 
-<input 
-type="text" 
-name="nombre"
-class="regular-text"
-required>
-
-</td>
-
-</tr>
-
-
-
-<tr>
-
-<th>Categoría</th>
-
-
-<td>
-
-
-<select name="categoria">
-
-
-<option>Animadas</option>
-
-<option>Baby Shower</option>
-
-<option>Cómica</option>
-
-<option>Despedida de soltera</option>
-
-<option>Dulce</option>
-
-<option>Escuela</option>
-
-<option>Elegante</option>
-
-<option>Materiales</option>
-
-<option>Personajes</option>
-
-<option>Transparente</option>
-
-
-</select>
-
-
-</td>
-
-
-</tr>
-
-
-
-
-
-<tr>
-
-
-<th>Descripción</th>
-
-
-<td>
-
-<textarea 
-name="descripcion"
-class="large-text">
-
-</textarea>
-
-</td>
-
-
-</tr>
-
-
-
-</table>
-
-
-<button 
-class="button button-primary"
-name="guardar_deck">
-
-Guardar Baraja
-
-</button>
-
-
-</form>
-
-
-
-
-<hr>
-
-
-
-<h2>Barajas creadas</h2>
-
-
-
-<table class="widefat">
-
-<thead>
-
-<tr>
-
-<th>ID</th>
-
-<th>Nombre</th>
-
-<th>Categoría</th>
-
-
-</tr>
-
-</thead>
-
-
-<tbody>
-
-
-<?php foreach($decks as $deck): ?>
-
-
-<tr>
-
-
-<td>
-
-<?= $deck->id ?>
-
-</td>
-
-
-<td>
-
-<?= esc_html($deck->nombre) ?>
-
-</td>
-
-
-
-<td>
-
-<?= esc_html($deck->categoria) ?>
-
-</td>
-
-
-
-</tr>
-
-
-
-<?php endforeach; ?>
-
-
-</tbody>
-
-
-</table>
-
+    </div>
 
 </div>
+
+<div 
+    id="j-admin-designs" 
+    class="j-admin-designs-grid">
+
+    <?php if (empty($designs)): ?>
+
+        <p>No hay diseños registrados.</p>
+
+    <?php else: ?>
+
+        <?php foreach ($designs as $design): ?>
+
+            <div class="j-admin-design-card">
+
+                <img
+                    src="<?php echo esc_url($design->portada); ?>"
+                    alt="<?php echo esc_attr($design->nombre); ?>">
+                <p>
+                    <?php echo esc_html($design->nombre); ?>
+                </p>
+
+                <a href="#" class="j-admin-edit">
+                    Editar
+                </a>
+
+            </div>
+
+        <?php endforeach; ?>
+
+    <?php endif; ?>
+
+</div>
+<script>
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    const botones = document.querySelectorAll('.j-admin-categoria');
+
+    const grid = document.getElementById('j-admin-designs');
+
+    botones.forEach(function (boton) {
+
+        boton.addEventListener('click', function () {
+
+            botones.forEach(function (btn) {
+                btn.classList.remove('active');
+            });
+
+            boton.classList.add('active');
+
+            const categoria = boton.dataset.id;
+
+            fetch(
+                '<?php echo admin_url("admin-ajax.php"); ?>?action=juguemos_admin_designs&categoria_id=' + categoria
+            )
+
+            .then(res => res.json())
+
+            .then(response => {
+
+                if(response.success){
+
+                    grid.innerHTML = response.data;
+
+                }
+
+            });
+
+        });
+
+    });
+
+});
+
+</script>

@@ -1,0 +1,60 @@
+.j-btn-admin {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    padding: 0 18px;
+    border: 2px solid #D9D9D9;
+    border-radius: 8px;
+    background: #FFFFFF;
+    color: #5D5D5D;
+    text-decoration: none !important;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: .2s;
+}
+
+.j-btn-admin.add {
+    background: #24B8C8;
+    border-color: #24B8C8;
+    color: #FFFFFF;
+}
+
+.j-btn-admin:hover {
+    color: #FFFFFF;
+}
+
+.j-btn-admin.manage:hover {
+    background: #FA299C;
+    border-color: #FA299C;
+}
+
+.j-btn-admin.add:hover {
+    background: #FFFFFF;
+    border-color: #D9D9D9;
+    color: #5D5D5D;
+}
+
+
+
+
+
+/* ELIMINAR CATEGORIA */
+.j-delete-category{
+    background:none;
+    border:none;
+    padding:0;
+    color:#E53935;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.2s;
+
+}
+
+.j-delete-category:hover{
+    color:#E53935;
+    text-decoration:underline;
+    background: none;
+}

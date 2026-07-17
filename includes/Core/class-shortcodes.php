@@ -17,8 +17,28 @@ class Juguemos_Shortcodes
             [
                 $this,
                 'render'
-            ]
+            ]   
         );
+
+        add_shortcode(
+            'juguemos_login',
+            [$this,'login']
+        );
+        add_shortcode(
+            'juguemos_admin',
+            [$this, 'admin']
+        );
+
+    }
+    public function login()
+    {
+
+        ob_start();
+
+        include JUGUEMOS_PATH .
+        'public/templates/login.php';
+
+        return ob_get_clean();
 
     }
 
@@ -38,6 +58,14 @@ class Juguemos_Shortcodes
         return ob_get_clean();
 
 
+    }
+    public function admin()
+    {
+        ob_start();
+
+        include JUGUEMOS_PATH . 'admin/views/dashboard.php';
+
+        return ob_get_clean();
     }
 
 
