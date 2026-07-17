@@ -36,6 +36,8 @@ class Juguemos_Loader
         require_once JUGUEMOS_PATH . 'admin/class-admin-dashboard.php';
         require_once JUGUEMOS_PATH . 'admin/class-admin-designs.php';
         require_once JUGUEMOS_PATH . 'includes/Ajax/class-admin-ajax.php';
+        require_once JUGUEMOS_PATH . 'admin/class-admin-barajas.php';
+        require_once JUGUEMOS_PATH . 'includes/Files/class-files.php';
 
     }
 

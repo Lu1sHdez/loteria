@@ -44,8 +44,6 @@ if(
 
 <div class="j-admin-filtros-wrapper">
 
-    <div class="j-admin-create">
-
             <div class="j-admin-create-header">
 
                 <a
@@ -132,7 +130,7 @@ if(
 
         </form>
 
-    </div>
+   
 
 </div>
 

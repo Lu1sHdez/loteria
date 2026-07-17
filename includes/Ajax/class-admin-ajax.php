@@ -27,6 +27,20 @@ class Juguemos_Admin_Ajax
             'wp_ajax_juguemos_delete_design',
             [$this,'delete_design']
         );
+        add_action(
+            'wp_ajax_juguemos_create_baraja',
+            [$this,'create_baraja']
+        );
+        
+        add_action(
+            'wp_ajax_juguemos_update_baraja',
+            [$this,'update_baraja']
+        );
+        
+        add_action(
+            'wp_ajax_juguemos_delete_baraja',
+            [$this,'delete_baraja']
+        );
 
     }
 
@@ -152,6 +166,109 @@ class Juguemos_Admin_Ajax
             );
         }
         Juguemos_Admin_Designs::delete($id);
+
+        wp_send_json_success();
+
+    }
+    public function create_baraja()
+    {
+
+        check_ajax_referer(
+            'juguemos_admin_baraja',
+            'nonce'
+        );
+
+        $design_id = intval($_POST['design_id'] ?? 0);
+        $numero    = intval($_POST['numero'] ?? 0);
+        $nombre    = sanitize_text_field($_POST['nombre'] ?? '');
+        $imagen    = sanitize_text_field($_POST['imagen'] ?? '');
+
+        if(
+            !$design_id ||
+            !$numero ||
+            empty($nombre)
+        ){
+
+            wp_send_json_error(
+                'Datos incompletos.'
+            );
+
+        }
+
+        $id = Juguemos_Admin_Barajas::create([
+
+            'design_id' => $design_id,
+            'numero'    => $numero,
+            'nombre'    => $nombre,
+            'imagen'    => $imagen
+
+        ]);
+
+        wp_send_json_success([
+
+            'id'=>$id
+
+        ]);
+
+    }
+    public function update_baraja()
+    {
+
+        check_ajax_referer(
+            'juguemos_admin_baraja',
+            'nonce'
+        );
+
+        $id = intval($_POST['id'] ?? 0);
+
+        if(!$id){
+
+            wp_send_json_error(
+                'Baraja inválida.'
+            );
+
+        }
+
+        Juguemos_Admin_Barajas::update(
+
+            $id,
+
+            [
+
+                'nombre' => sanitize_text_field(
+                    $_POST['nombre']
+                ),
+
+                'imagen' => sanitize_text_field(
+                    $_POST['imagen']
+                )
+
+            ]
+
+        );
+
+        wp_send_json_success();
+
+    }
+    public function delete_baraja()
+    {
+
+        check_ajax_referer(
+            'juguemos_admin_baraja',
+            'nonce'
+        );
+
+        $id = intval($_POST['id'] ?? 0);
+
+        if(!$id){
+
+            wp_send_json_error(
+                'Baraja inválida.'
+            );
+
+        }
+
+        Juguemos_Admin_Barajas::delete($id);
 
         wp_send_json_success();
 

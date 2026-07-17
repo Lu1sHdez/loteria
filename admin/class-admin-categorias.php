@@ -51,24 +51,15 @@ class Juguemos_Admin_Categorias
     public static function delete($id)
     {
         global $wpdb;
-
-        return $wpdb->update(
-
-            $wpdb->prefix.'juguemos_categorias',
-
+        return $wpdb->delete(
+            $wpdb->prefix . 'juguemos_categorias',
             [
-
-                'activo'=>0
-
+                'id' => $id
             ],
-
             [
-
-                'id'=>$id
-
+                '%d'
             ]
 
         );
-
     }
 }

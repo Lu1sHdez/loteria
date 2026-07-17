@@ -1,0 +1,103 @@
+.j-admin-design-cards{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+
+    gap:25px;
+
+    margin-top:35px;
+
+}
+
+.j-baraja-card{
+
+    background:#FFF;
+
+    border:1px solid #E5E5E5;
+
+    border-radius:10px;
+
+    padding:18px;
+
+}
+
+.j-baraja-preview{
+
+    height:230px;
+    border:2px dashed #DDD;
+    border-radius:8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    cursor:pointer;
+}
+
+.j-baraja-preview img{
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:cover;
+
+}
+
+.j-baraja-placeholder{
+
+    color:#999;
+
+    font-weight:600;
+
+}
+.j-baraja-numero,
+.j-baraja-nombre {
+    width: 100%;
+    height: 42px;
+    border: 1px solid #DDD;
+    border-radius: 8px;
+    padding: 0 12px;
+    margin-bottom: 15px;
+    background: #FFF;
+    color: #9A9A9A;
+    text-align: center;
+    font-size: 14px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+}
+.j-baraja-numero {
+    margin-top: 15px;
+    color: #9A9A9A;
+    justify-content: center;
+}
+
+.j-baraja-nombre {
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.j-baraja-nombre:focus {
+    border-color: #FA299C;
+}
+.j-baraja-create:focus,
+.j-baraja-update,
+.j-baraja-create {
+    width: 100%;
+    height: 50px;
+    background: #FA299C;
+    color: #FFF;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.2s;
+    justify-content: center;
+}
+
+.j-baraja-create:hover {
+    background: #FFF;
+    border-color: #FA299C;
+    color: #FA299C;
+}

@@ -39,6 +39,12 @@ class Juguemos_Assets
             [],
             JUGUEMOS_VERSION
         );
+        wp_enqueue_style(
+            'juguemos-fuente',
+            JUGUEMOS_URL . 'public/css/fuente.css',
+            [],
+            JUGUEMOS_VERSION
+        );
         //botones globales
         wp_enqueue_style(
             'juguemos-botones',
@@ -46,6 +52,13 @@ class Juguemos_Assets
             [],
             JUGUEMOS_VERSION
         );
+        wp_enqueue_style(
+            'juguemos-diseno-admin-barajas',
+            JUGUEMOS_URL . 'public/css/admin/diseno-barajas.css',
+            [],
+            JUGUEMOS_VERSION
+        );
+
 
         wp_enqueue_style(
             'juguemos-admin-manage-category',

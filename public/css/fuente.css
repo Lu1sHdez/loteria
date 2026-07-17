@@ -1,0 +1,14 @@
+.j-admin-dashboard,
+.j-admin-dashboard *{
+    box-sizing:border-box;
+    font-family:'Cairo',sans-serif; 
+}
+
+.j-admin-dashboard button,
+.j-admin-dashboard input,
+.j-admin-dashboard select,
+.j-admin-dashboard textarea{
+
+    font-family:inherit;
+
+}

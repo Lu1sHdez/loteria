@@ -47,6 +47,11 @@ if (isset($_POST['actualizar_design'])) {
 
 $categorias = Juguemos_Admin_Categorias::get_all();
 
+$barajas = Juguemos_Admin_Barajas::get_by_design(
+    $design->id
+);
+
+
 ?>
 
 <div class="titulo-seccion-contenedor">
@@ -70,10 +75,7 @@ $categorias = Juguemos_Admin_Categorias::get_all();
 </div>
 
 <div class="j-admin-filtros-wrapper">
-
-    <div class="j-admin-create">
-
-        <div class="j-admin-create-header">
+    <div class="j-admin-create-header">
 
             <a
                 href="?view=list"
@@ -173,9 +175,6 @@ $categorias = Juguemos_Admin_Categorias::get_all();
             </button>
 
         </form>
-
-    </div>
-
 </div>
 
 <div class="j-panel-item" style="margin-top:60px;">
@@ -190,11 +189,101 @@ $categorias = Juguemos_Admin_Categorias::get_all();
 
 <div class="j-admin-design-cards">
 
-    <p style="padding:40px;text-align:center;color:#777;">
+    <?php foreach($barajas as $baraja): ?>
 
-        Aquí aparecerán todas las casillas y barajas del diseño.
+        <div
+            class="j-baraja-card"
+            data-id="<?php echo $baraja->id; ?>">
 
-    </p>
+            <div class="j-baraja-preview">
+
+                <?php if(!empty($baraja->imagen)): ?>
+
+                    <img
+                        src="<?php echo esc_url($baraja->imagen); ?>"
+                        alt="<?php echo esc_attr($baraja->nombre); ?>">
+
+                <?php else: ?>
+
+                    <div class="j-baraja-placeholder">
+
+                        + Imagen
+
+                    </div>
+
+                <?php endif; ?>
+
+            </div>
+
+            <div class="j-baraja-numero">
+
+                Baraja #<?php echo $baraja->numero; ?>
+
+            </div>
+
+            <input
+                type="text"
+                class="j-baraja-nombre"
+                value="<?php echo esc_attr($baraja->nombre); ?>">
+
+            <button
+                class="j-baraja-update"
+                data-id="<?php echo $baraja->id; ?>">
+
+                Guardar Cambios
+
+            </button>
+
+        </div>
+
+    <?php endforeach; ?>
+
+
+    <?php
+
+    $siguiente = empty($barajas)
+        ? 1
+        : end($barajas)->numero + 1;
+
+    ?>
+
+    <div
+        class="j-baraja-card j-baraja-new">
+
+        <div class="j-baraja-preview j-baraja-upload">
+
+            <div class="j-baraja-placeholder">
+
+                + Agregar Imagen
+
+            </div>
+
+        </div>
+
+        <div class="j-baraja-numero">
+
+            Baraja #<?php echo $siguiente; ?>
+
+        </div>
+
+        <input
+            type="text"
+            class="j-baraja-nombre"
+            placeholder="Nombre de la carta">
+
+        <button
+
+            class="j-baraja-create"
+
+            data-design="<?php echo $design->id; ?>"
+
+            data-numero="<?php echo $siguiente; ?>">
+
+            Agregar Baraja
+
+        </button>
+
+    </div>
 
 </div>
 
