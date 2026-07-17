@@ -12,11 +12,17 @@ $view = $_GET['view'] ?? 'list';
 
 <?php
 
-switch($view){
+switch ($view) {
 
     case 'create-design':
 
         include JUGUEMOS_PATH.'admin/views/design-create.php';
+
+    break;
+
+    case 'edit-design':
+
+        include JUGUEMOS_PATH.'admin/views/design-edit.php';
 
     break;
 

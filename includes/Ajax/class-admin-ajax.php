@@ -23,6 +23,10 @@ class Juguemos_Admin_Ajax
             'wp_ajax_juguemos_delete_category',
             [$this,'delete_category']
         );
+        add_action(
+            'wp_ajax_juguemos_delete_design',
+            [$this,'delete_design']
+        );
 
     }
 
@@ -63,9 +67,26 @@ class Juguemos_Admin_Ajax
                         <?php echo esc_html($design->nombre); ?>
                     </p>
         
-                    <a href="#" class="j-admin-edit">
-                        Editar
-                    </a>
+                    <div class="j-admin-card-actions">
+
+                        <a
+                            href="?view=edit-design&id=<?php echo $design->id; ?>"
+                            class="j-admin-edit">
+
+                            Editar
+
+                        </a>
+
+                        <button
+                            type="button"
+                            class="j-admin-delete"
+                            data-id="<?php echo $design->id; ?>">
+
+                            Eliminar
+
+                        </button>
+
+                    </div>
         
                 </div>
         
@@ -109,6 +130,28 @@ class Juguemos_Admin_Ajax
         Juguemos_Admin_Categorias::delete(
             intval($_POST['id'])
         );
+
+        wp_send_json_success();
+
+
+
+    }
+
+    public function delete_design()
+    {
+        check_ajax_referer(
+            'juguemos_admin_design',
+            'nonce'
+        );
+
+        $id = intval($_POST['id'] ?? 0);
+
+        if(!$id){
+            wp_send_json_error(
+                'Diseño inválido.'
+            );
+        }
+        Juguemos_Admin_Designs::delete($id);
 
         wp_send_json_success();
 

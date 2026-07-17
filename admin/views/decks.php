@@ -75,9 +75,25 @@ if ($categoria_actual) {
                     <?php echo esc_html($design->nombre); ?>
                 </p>
 
-                <a href="#" class="j-admin-edit">
-                    Editar
-                </a>
+                <div class="j-admin-card-actions">
+                    <a
+                        href="?view=edit-design&id=<?php echo $design->id; ?>"
+                        class="j-admin-edit">
+
+                        Editar
+
+                    </a>
+
+                    <button
+                        type="button"
+                        class="j-admin-delete"
+                        data-id="<?php echo $design->id; ?>">
+
+                        Eliminar
+
+                    </button>
+
+                </div>
 
             </div>
 
@@ -127,5 +143,58 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 });
+document.addEventListener('click', function(e){
 
+if(!e.target.classList.contains('j-admin-delete')){
+    return;
+}
+
+if(!confirm('¿Eliminar este diseño?')){
+    return;
+}
+
+const card = e.target.closest('.j-admin-design-card');
+
+const data = new FormData();
+
+data.append('action','juguemos_delete_design');
+
+data.append('id',e.target.dataset.id);
+
+data.append(
+    'nonce',
+    '<?php echo wp_create_nonce("juguemos_admin_design"); ?>'
+);
+
+fetch('<?php echo admin_url("admin-ajax.php"); ?>',{
+
+    method:'POST',
+
+    body:data
+
+})
+
+.then(r=>r.json())
+
+.then(r=>{
+
+    if(r.success){
+
+    card.remove();
+
+    if(!grid.querySelector('.j-admin-design-card')){
+
+        grid.innerHTML = '<p>No hay diseños registrados.</p>';
+
+    }
+
+    }else{
+
+    alert(r.data);
+
+    }
+
+});
+
+});
 </script>
