@@ -195,15 +195,36 @@ $barajas = Juguemos_Admin_Barajas::get_by_design(
             class="j-baraja-card"
             data-id="<?php echo $baraja->id; ?>">
 
-            <div class="j-baraja-preview">
+            <div class="j-baraja-preview j-baraja-upload">
+                <input
+                    type="file"
+                    class="j-baraja-file"
+                    accept=".webp,image/webp"
+                    hidden>
 
-                <?php if(!empty($baraja->imagen)): ?>
+                <?php if (!empty($baraja->imagen)): ?>
 
                     <img
-                        src="<?php echo esc_url($baraja->imagen); ?>"
+                        class="j-baraja-preview-image"
+                        src="<?php echo esc_url(
+                            Juguemos_Files::preview_url($design->id) . $baraja->imagen
+                        ); ?>"
                         alt="<?php echo esc_attr($baraja->nombre); ?>">
 
+                    <div
+                        class="j-baraja-placeholder"
+                        style="display:none;">
+
+                        + Imagen
+
+                    </div>
+
                 <?php else: ?>
+
+                    <img
+                        class="j-baraja-preview-image"
+                        style="display:none;"
+                        alt="">
 
                     <div class="j-baraja-placeholder">
 
@@ -230,7 +251,16 @@ $barajas = Juguemos_Admin_Barajas::get_by_design(
                 class="j-baraja-update"
                 data-id="<?php echo $baraja->id; ?>">
 
-                Guardar Cambios
+                Actualizar
+
+            </button>
+            <button
+                type="button"
+                class="j-baraja-delete"
+                data-id="<?php echo $baraja->id; ?>"
+                data-nonce="<?php echo wp_create_nonce('juguemos_admin_baraja'); ?>">
+
+                Eliminar
 
             </button>
 
@@ -248,39 +278,39 @@ $barajas = Juguemos_Admin_Barajas::get_by_design(
     ?>
 
     <div
+        id="j-new-baraja"
         class="j-baraja-card j-baraja-new">
 
         <div class="j-baraja-preview j-baraja-upload">
-
+            <input
+                type="file"
+                class="j-baraja-file"
+                accept=".webp,image/webp"
+                hidden>
             <div class="j-baraja-placeholder">
-
                 + Agregar Imagen
-
             </div>
-
+            <img
+                class="j-baraja-preview-image"
+                style="display:none;"
+                alt="Vista previa">
         </div>
 
         <div class="j-baraja-numero">
-
             Baraja #<?php echo $siguiente; ?>
-
         </div>
-
         <input
             type="text"
             class="j-baraja-nombre"
-            placeholder="Nombre de la carta">
+            placeholder="Nombre de la carta"
+            autocomplete="off">
 
         <button
-
+            type="button"
             class="j-baraja-create"
-
             data-design="<?php echo $design->id; ?>"
-
             data-numero="<?php echo $siguiente; ?>">
-
             Agregar Baraja
-
         </button>
 
     </div>
@@ -290,3 +320,231 @@ $barajas = Juguemos_Admin_Barajas::get_by_design(
 <?php
 include JUGUEMOS_PATH . 'admin/views/category-modals.php';
 ?>
+
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+const card = document.getElementById('j-new-baraja');
+
+if (!card) {
+    return;
+}
+
+const upload = card.querySelector('.j-baraja-upload');
+const input = card.querySelector('.j-baraja-file');
+const preview = card.querySelector('.j-baraja-preview-image');
+const placeholder = card.querySelector('.j-baraja-placeholder');
+const createButton = card.querySelector('.j-baraja-create');
+
+upload.addEventListener('click', function () {
+
+    input.click();
+
+});
+
+input.addEventListener('change', function () {
+
+    if (!input.files.length) {
+        return;
+    }
+
+    const file = input.files[0];
+
+    if (file.type !== 'image/webp') {
+
+        alert('Solo se permiten imágenes WebP.');
+
+        input.value = '';
+
+        return;
+
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+
+        preview.src = e.target.result;
+
+        preview.style.display = 'block';
+
+        placeholder.style.display = 'none';
+
+    };
+
+    reader.readAsDataURL(file);
+
+});
+
+createButton.addEventListener('click', function () {
+
+    if (!input.files.length) {
+
+        alert('Selecciona una imagen.');
+
+        return;
+
+    }
+
+    const nombre = card.querySelector('.j-baraja-nombre').value.trim();
+
+    if (nombre === '') {
+
+        alert('Escribe el nombre de la carta.');
+
+        return;
+
+    }
+
+    const formData = new FormData();
+
+    formData.append('action', 'juguemos_create_baraja');
+    formData.append('nonce', Juguemos.nonce);
+    formData.append('design_id', this.dataset.design);
+    formData.append('numero', this.dataset.numero);
+    formData.append('nombre', nombre);
+    formData.append('imagen', input.files[0]);
+
+    fetch(Juguemos.ajax_url, {
+
+        method: 'POST',
+        body: formData
+
+    })
+    .then(r => r.json())
+    .then(response => {
+
+        console.log(response);
+
+        if (response.success) {
+
+            alert('Baraja creada.');
+
+            location.reload();
+
+        } else {
+
+            alert(response.data);
+
+        }
+
+    });
+
+});
+
+});
+
+
+
+
+document.querySelectorAll('.j-baraja-update').forEach(function(button){
+
+button.addEventListener('click',function(){
+
+    const card=this.closest('.j-baraja-card');
+
+    const nombre=card.querySelector('.j-baraja-nombre').value;
+
+    const input=card.querySelector('.j-baraja-file');
+
+    const formData=new FormData();
+
+    formData.append(
+        'action',
+        'juguemos_update_baraja'
+    );
+
+    formData.append(
+        'nonce',
+        Juguemos.nonce
+    );
+
+    formData.append(
+        'id',
+        this.dataset.id
+    );
+
+    formData.append(
+        'nombre',
+        nombre
+    );
+
+    if(input.files.length){
+
+        formData.append(
+            'imagen',
+            input.files[0]
+        );
+
+    }
+
+    fetch(Juguemos.ajax_url,{
+
+        method:'POST',
+
+        body:formData
+
+    })
+    .then(r=>r.json())
+    .then(response=>{
+
+        if(response.success){
+
+            alert('Baraja actualizada');
+
+        }else{
+
+            alert(response.data);
+
+        }
+
+    });
+
+});
+
+});
+
+document.querySelectorAll('.j-baraja-delete').forEach(function(button){
+
+button.addEventListener('click', function(){
+
+    if (!confirm('¿Eliminar esta baraja?')) {
+        return;
+    }
+
+    const card = this.closest('.j-baraja-card');
+
+    const formData = new FormData();
+
+    formData.append('action', 'juguemos_delete_baraja');
+    formData.append('nonce', this.dataset.nonce);
+    formData.append('id', this.dataset.id);
+
+    fetch(Juguemos.ajax_url, {
+
+        method: 'POST',
+        body: formData
+
+    })
+    .then(r => r.json())
+    .then(response => {
+
+        if (response.success) {
+
+            card.remove();
+
+        } else {
+
+            alert(response.data);
+
+        }
+
+    });
+
+});
+
+});
+
+</script>

@@ -89,13 +89,9 @@ class Juguemos_Admin_Barajas
             $wpdb->prefix . 'juguemos_barajas',
 
             [
-
                 'nombre' => sanitize_text_field($data['nombre']),
-
                 'slug'   => sanitize_title($data['nombre']),
-
                 'imagen' => sanitize_text_field($data['imagen'])
-
             ],
 
             [
@@ -121,7 +117,7 @@ class Juguemos_Admin_Barajas
 
             ],
 
-            [
+            [   
 
                 'id' => intval($id)
 

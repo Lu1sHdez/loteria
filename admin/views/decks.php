@@ -69,9 +69,10 @@ if ($categoria_actual) {
             <div class="j-admin-design-card">
 
                 <img
-                    src="<?php echo esc_url($design->portada); ?>"
+                    src="<?php echo Juguemos_Admin_Designs::get_portada($design); ?>"
                     alt="<?php echo esc_attr($design->nombre); ?>">
-                <p>
+                
+                <p class="j-admin-design-nombre">
                     <?php echo esc_html($design->nombre); ?>
                 </p>
 

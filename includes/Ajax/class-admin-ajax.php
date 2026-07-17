@@ -74,10 +74,10 @@ class Juguemos_Admin_Ajax
                 <div class="j-admin-design-card">
         
                     <img
-                        src="<?php echo esc_url($design->portada); ?>"
+                        src="<?php echo Juguemos_Admin_Designs::get_portada($design); ?>"
                         alt="<?php echo esc_attr($design->nombre); ?>">
         
-                    <p>
+                    <p class="j-admin-design-nombre">
                         <?php echo esc_html($design->nombre); ?>
                     </p>
         
@@ -174,20 +174,19 @@ class Juguemos_Admin_Ajax
     {
 
         check_ajax_referer(
-            'juguemos_admin_baraja',
+            'juguemos_nonce',
             'nonce'
         );
 
         $design_id = intval($_POST['design_id'] ?? 0);
         $numero    = intval($_POST['numero'] ?? 0);
         $nombre    = sanitize_text_field($_POST['nombre'] ?? '');
-        $imagen    = sanitize_text_field($_POST['imagen'] ?? '');
 
-        if(
+        if (
             !$design_id ||
             !$numero ||
             empty($nombre)
-        ){
+        ) {
 
             wp_send_json_error(
                 'Datos incompletos.'
@@ -195,18 +194,57 @@ class Juguemos_Admin_Ajax
 
         }
 
+        if (
+            empty($_FILES['imagen']) ||
+            $_FILES['imagen']['error'] !== UPLOAD_ERR_OK
+        ) {
+
+            wp_send_json_error(
+                'No se recibió la imagen.'
+            );
+
+        }
+
+        $archivo = sprintf(
+            '%02d.webp',
+            $numero
+        );
+
+        $resultado = Juguemos_Files::upload_preview(
+
+            $design_id,
+        
+            $_FILES['imagen'],
+        
+            $archivo
+        
+        );
+        
+        if (is_wp_error($resultado)) {
+        
+            wp_send_json_error(
+                $resultado->get_error_message()
+            );
+        
+        }
+
         $id = Juguemos_Admin_Barajas::create([
 
             'design_id' => $design_id,
+
             'numero'    => $numero,
+
             'nombre'    => $nombre,
-            'imagen'    => $imagen
+
+            'imagen'    => $archivo
 
         ]);
 
         wp_send_json_success([
 
-            'id'=>$id
+            'id'      => $id,
+
+            'imagen'  => $archivo
 
         ]);
 
@@ -215,17 +253,58 @@ class Juguemos_Admin_Ajax
     {
 
         check_ajax_referer(
-            'juguemos_admin_baraja',
+            'juguemos_nonce',
             'nonce'
         );
 
         $id = intval($_POST['id'] ?? 0);
 
-        if(!$id){
+        if (!$id) {
 
             wp_send_json_error(
                 'Baraja inválida.'
             );
+
+        }
+
+        $baraja = Juguemos_Admin_Barajas::get($id);
+
+        if (!$baraja) {
+
+            wp_send_json_error(
+                'La baraja no existe.'
+            );
+
+        }
+
+        $nombre = sanitize_text_field(
+            $_POST['nombre'] ?? ''
+        );
+
+        $imagen = $baraja->imagen;
+
+        if (
+            !empty($_FILES['imagen']) &&
+            $_FILES['imagen']['error'] === UPLOAD_ERR_OK
+        ) {
+
+            $resultado = Juguemos_Files::upload_preview(
+
+                $baraja->design_id,
+
+                $_FILES['imagen'],
+
+                $baraja->imagen
+
+            );
+
+            if (is_wp_error($resultado)) {
+
+                wp_send_json_error(
+                    $resultado->get_error_message()
+                );
+
+            }
 
         }
 
@@ -235,13 +314,9 @@ class Juguemos_Admin_Ajax
 
             [
 
-                'nombre' => sanitize_text_field(
-                    $_POST['nombre']
-                ),
+                'nombre' => $nombre,
 
-                'imagen' => sanitize_text_field(
-                    $_POST['imagen']
-                )
+                'imagen' => $imagen
 
             ]
 
@@ -264,6 +339,29 @@ class Juguemos_Admin_Ajax
 
             wp_send_json_error(
                 'Baraja inválida.'
+            );
+
+            return;
+
+        }
+
+        $baraja = Juguemos_Admin_Barajas::get($id);
+
+        if (!$baraja) {
+
+            wp_send_json_error(
+                'La baraja no existe.'
+            );
+
+            return;
+
+        }
+
+        if (!empty($baraja->imagen)) {
+
+            Juguemos_Files::delete_preview(
+                $baraja->design_id,
+                $baraja->imagen
             );
 
         }

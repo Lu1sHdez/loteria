@@ -119,3 +119,53 @@
     border: none ;
 
 }
+
+
+
+
+
+
+
+.j-baraja-update,
+.j-baraja-update:focus,
+.j-baraja-create:focus,
+.j-baraja-create {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 44px;
+    border: 2px solid #D9D9D9;
+    border-radius: 8px;
+    background: #FFFFFF;
+    color: #5D5D5D;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: .2s;
+}
+
+.j-baraja-create {
+    background: #24B8C8;
+    border-color: #24B8C8;
+    color: #FFFFFF;
+}
+
+.j-baraja-create:hover {
+    background: #FFFFFF;
+    border-color: #D9D9D9;
+    color: #5D5D5D;
+}
+
+/* Actualizar -> rosa sólido por defecto */
+.j-baraja-update {
+    background: #FA299C;
+    border-color: #FA299C;
+    color: #FFFFFF;
+}
+
+.j-baraja-update:hover {
+    background: #FFFFFF;
+    border-color: #D9D9D9;
+    color: #5D5D5D;
+}

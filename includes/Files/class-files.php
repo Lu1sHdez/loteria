@@ -63,4 +63,91 @@ class Juguemos_Files
 
         return $preview;
     }
+
+
+    /**
+     * Guarda una imagen preview dentro del diseño.
+     */
+    public static function upload_preview($design_id, $file, $filename = null)
+    {
+        if (empty($file['tmp_name']) || !file_exists($file['tmp_name'])) {
+            return new WP_Error(
+                'file_not_found',
+                'Archivo no encontrado.'
+            );
+        }
+
+        self::create_design_directory($design_id);
+
+        $extension = strtolower(
+            pathinfo($file['name'], PATHINFO_EXTENSION)
+        );
+
+        if ($extension !== 'webp') {
+            return new WP_Error(
+                'invalid_extension',
+                'Solo se permiten imágenes WebP.'
+            );
+        }
+
+        if ($filename === null) {
+            $filename = sanitize_file_name($file['name']);
+        }
+
+        $destination = self::preview_path($design_id) . $filename;
+
+        if (!move_uploaded_file($file['tmp_name'], $destination)) {
+            return new WP_Error(
+                'upload_error',
+                'No fue posible guardar la imagen.'
+            );
+        }
+
+        return $filename;
+    }
+    /**
+     * Elimina una imagen preview.
+     */
+    public static function delete_preview($design_id, $filename)
+    {
+        $file = self::preview_path($design_id) . $filename;
+
+        if (file_exists($file)) {
+            unlink($file);
+        }
+
+        return true;
+    }
+
+    /**
+     * Elimina completamente la carpeta del diseño.
+     */
+    public static function delete_design_directory($design_id)
+    {
+        $directory = self::design_path($design_id);
+
+        if (!is_dir($directory)) {
+            return;
+        }
+
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator(
+                $directory,
+                RecursiveDirectoryIterator::SKIP_DOTS
+            ),
+            RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($iterator as $item) {
+
+            if ($item->isDir()) {
+                rmdir($item->getPathname());
+            } else {
+                unlink($item->getPathname());
+            }
+
+        }
+
+        rmdir($directory);
+    }
 }

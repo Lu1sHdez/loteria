@@ -23,33 +23,23 @@
 }
 
 .j-baraja-preview{
-
     height:230px;
+
     border:2px dashed #DDD;
     border-radius:8px;
+
     display:flex;
     align-items:center;
     justify-content:center;
+
     overflow:hidden;
-    cursor:pointer;
-}
 
-.j-baraja-preview img{
-
-    width:100%;
-
-    height:100%;
-
-    object-fit:cover;
-
+    background:#FFF;
 }
 
 .j-baraja-placeholder{
-
     color:#999;
-
     font-weight:600;
-
 }
 .j-baraja-numero,
 .j-baraja-nombre {
@@ -81,23 +71,41 @@
 .j-baraja-nombre:focus {
     border-color: #FA299C;
 }
-.j-baraja-create:focus,
-.j-baraja-update,
-.j-baraja-create {
-    width: 100%;
-    height: 50px;
-    background: #FA299C;
-    color: #FFF;
-    border: 2px solid transparent;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: 0.2s;
-    justify-content: center;
+.j-baraja-preview img,
+.j-baraja-preview-image{
+
+    display:block;
+
+    max-width:100%;
+    max-height:100%;
+
+    width:100%;
+    height:100%;
+
+    object-fit:contain;
+
 }
 
-.j-baraja-create:hover {
-    background: #FFF;
-    border-color: #FA299C;
-    color: #FA299C;
+
+.j-baraja-delete {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 36px;
+    margin-top: 10px;
+    background: #FFFFFF;
+    border: 1px solid #D9D9D9;
+    border-radius: 8px;
+    color: #E53935;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.j-baraja-delete:hover {
+    background: #E53935;
+    border-color: #E53935;
+    color: #FFFFFF;
 }
