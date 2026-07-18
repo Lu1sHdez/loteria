@@ -4,18 +4,14 @@ if (!defined('ABSPATH')) {
 }
 ?>
 
-<section id="juguemos-design" class="j-step active">
-
-    <div class="juguemos-left">
-
-        <div class="titulo-seccion-contenedor">
+<div class="titulo-seccion-contenedor">
             <img
                 class="destello"
                 src="http://loteria-la-dama.local/wp-content/uploads/2026/07/Destello1.png"
                 alt="">
 
             <h2 class="titulo-seccion">
-                CÓMO FUNCIONA
+                PERSONALIZA TU LOTERÍA
             </h2>
 
             <img
@@ -23,6 +19,11 @@ if (!defined('ABSPATH')) {
                 src="http://loteria-la-dama.local/wp-content/uploads/2026/07/Destello2.png"
                 alt="">
         </div>
+<section id="juguemos-design" class="j-step active">
+
+    <div class="juguemos-left">
+
+        
 
         <!-- ========================= -->
         <!-- 1. Estilo de barajas -->
@@ -66,6 +67,24 @@ if (!defined('ABSPATH')) {
             <?php include __DIR__ . '/parts/design-config.php'; ?>
 
         </div>
+
+        
+        <div class="j-section">
+            <?php include __DIR__ . '/parts/casillas-definir.php'; ?>
+
+        </div>
+
+
+        <div class="j-section">
+            <div class="j-panel-item">
+                <div class="subtitulo-aqua">
+                    3. Color y Estilo
+                </div>
+            </div>
+            <?php include __DIR__ . '/parts/color-style.php'; ?>
+
+        </div>
+
 
     </div>
 

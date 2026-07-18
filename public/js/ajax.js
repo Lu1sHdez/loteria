@@ -74,29 +74,48 @@ const JuguemosAjax = {
     
             container.innerHTML = html;
     
-            // Selección automática al hacer clic en la tarjeta
             container.querySelectorAll(".j-deck").forEach(card => {
                 card.addEventListener("click", function() {
                     container
                         .querySelectorAll(".j-deck")
                         .forEach(c => c.classList.remove("active"));
                     this.classList.add("active");
-                    JuguemosState.deck = this.dataset.id;
-                    JuguemosAjax.loadDesignPreview(this.dataset.id);
+            
+                    JuguemosAjax.seleccionarDiseno(this.dataset.id);
                 });
             });
-    
-            // Cargar automáticamente el primer diseño
+            
             const firstDeck = container.querySelector('.j-deck');
             if (firstDeck) {
-                JuguemosState.deck = firstDeck.dataset.id;
-                JuguemosAjax.loadDesignPreview(firstDeck.dataset.id);
+                JuguemosAjax.seleccionarDiseno(firstDeck.dataset.id);
             }
         })
         .catch(error => {
             console.error('Error loading decks:', error);
             container.innerHTML = "<p>Error al cargar los diseños.</p>";
         });
+    },
+
+
+    seleccionarDiseno(designId) {
+        JuguemosState.deck = designId;
+        JuguemosState.barajas = [];
+    
+        JuguemosAjax.loadDesignPreview(designId);
+        JuguemosAjax.loadBarajas(designId); 
+    
+        const btnAleatoria = document.querySelector(".j-casilla-btn");
+        if (btnAleatoria) {
+            btnAleatoria.classList.remove('active');
+            btnAleatoria.classList.add('inactive');
+            btnAleatoria.textContent = 'Selección Aleatoria';
+        }
+        if (typeof limpiarCasillas === 'function') {
+            limpiarCasillas();
+        }
+        if (typeof drawMarcosPreview === 'function') {  
+            drawMarcosPreview();
+        }
     },
 
     loadDesignPreview(designId) {
@@ -119,7 +138,7 @@ const JuguemosAjax = {
                     <img src="${design.portada}" alt="${design.nombre}">
                 </div>
                 <div class="j-preview-title">
-                    <h3>${design.nombre}</h3>
+                    <p>${design.nombre}</p>
                 </div>
             `;
             
@@ -132,7 +151,7 @@ const JuguemosAjax = {
 
     // Carga las barajas en el estado (sin mostrarlas en el preview)
     loadBarajas(designId) {
-        fetch(
+        return fetch(
             Juguemos.ajax_url +
             "?action=juguemos_barajas&design_id=" +
             encodeURIComponent(designId)
@@ -143,7 +162,6 @@ const JuguemosAjax = {
                 JuguemosState.barajas = [];
                 return;
             }
-
             JuguemosState.barajas = response.data;
         })
         .catch(error => {

@@ -1,6 +1,6 @@
 <div class="j-quantity">
 
-    <p class="texto-conf-tablas">Número de tablas por hoja</p>
+    <p class="text-p-negrita">Número de tablas por hoja</p>
 
     <div class="j-quantity-controls-wrapper">
 
@@ -43,7 +43,7 @@
 </div>
 
 
-<p class="texto-conf-tablas">Número de casillas por tabla</p>
+<p class="text-p-negrita">Número de casillas por tabla</p>
 
 <div class="j-grids">
 
@@ -74,7 +74,7 @@
 
 </div>
 
-<p class="texto-conf-tablas">Tipo de tablas</p>
+<p class="text-p-negrita">Tipo de tablas</p>
 
 
 <div class="j-modes">

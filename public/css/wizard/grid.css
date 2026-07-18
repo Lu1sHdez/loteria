@@ -1,0 +1,92 @@
+/* =====================================================
+   VISTA PREVIA DE UBICACIÓN (GRID)
+===================================================== */
+.j-grid-preview {
+    display: grid;
+    gap: 4px;
+    margin: 0 auto;
+    padding: 8px;
+    border-radius: 8px;
+    max-width: 100%;
+}
+
+.j-grid-preview .cell {
+    background: #DDDDDD;
+    border-radius: 4px;
+    aspect-ratio: 2 / 3;
+    width: 100%;
+    height: auto;
+    min-height: 40px;
+    transition: background 0.2s;
+}
+
+/* 🔥 Grid 4x4 (16 casillas) */
+.j-grid-preview[data-grid="4x4"] {
+    grid-template-columns: repeat(4, 1fr);
+    max-width: 280px;
+}
+
+/* 🔥 Grid 5x5 (25 casillas) */
+.j-grid-preview[data-grid="5x5"] {
+    grid-template-columns: repeat(5, 1fr);
+    max-width: 350px;
+}
+
+/* 🔥 Pocitos 4 (4 casillas en forma de pocito) */
+.j-grid-preview[data-grid="pocitos4"] {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 200px;
+}
+
+.j-grid-preview[data-grid="pocitos4"] .cell:nth-child(1) { grid-column: 1; }
+.j-grid-preview[data-grid="pocitos4"] .cell:nth-child(2) { grid-column: 3; }
+.j-grid-preview[data-grid="pocitos4"] .cell:nth-child(3) { grid-column: 1; }
+.j-grid-preview[data-grid="pocitos4"] .cell:nth-child(4) { grid-column: 3; }
+
+/* 🔥 Pocitos 3 (3 casillas) */
+.j-grid-preview[data-grid="pocitos3"] {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 180px;
+}
+
+.j-grid-preview[data-grid="pocitos3"] .cell:nth-child(1) { grid-column: 1; }
+.j-grid-preview[data-grid="pocitos3"] .cell:nth-child(2) { grid-column: 3; }
+.j-grid-preview[data-grid="pocitos3"] .cell:nth-child(3) { grid-column: 2; grid-row: 2; }
+
+/* 🔥 Cruzadas (2 diagonales) */
+.j-grid-preview[data-grid="cruzadas"] {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 180px;
+}
+
+.j-grid-preview[data-grid="cruzadas"] .cell:nth-child(1) { grid-column: 1; grid-row: 1; }
+.j-grid-preview[data-grid="cruzadas"] .cell:nth-child(2) { grid-column: 3; grid-row: 1; }
+.j-grid-preview[data-grid="cruzadas"] .cell:nth-child(3) { grid-column: 2; grid-row: 2; }
+.j-grid-preview[data-grid="cruzadas"] .cell:nth-child(4) { grid-column: 1; grid-row: 3; }
+.j-grid-preview[data-grid="cruzadas"] .cell:nth-child(5) { grid-column: 3; grid-row: 3; }
+
+/* 🔥 Animación suave al cambiar */
+.j-grid-preview .cell {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.j-grid-preview .cell {
+    background: #DDDDDD;
+    border-radius: 4px;
+    aspect-ratio: 2 / 3;
+    width: 100%;
+    height: auto;
+    min-height: 50px;
+    transition: background 0.2s;
+}

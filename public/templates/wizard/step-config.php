@@ -1,4 +1,4 @@
-<div class="j-quantity">
+<!-- <div class="j-quantity">
 
     <h3 for="tables-range">
         Número de tablas por hoja
@@ -104,4 +104,4 @@
         Cruzadas
     </button>
 
-</div>
+</div> -->

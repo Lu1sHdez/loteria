@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-// ========== SELECTOR DE PAÍS ==========
+    // ========== SELECTOR DE PAÍS ==========
     document.querySelectorAll(".country").forEach(button => {
         button.addEventListener("click", () => {
             document
@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
             button.classList.add("active");
             JuguemosState.country = button.dataset.country;
             JuguemosState.currency = button.dataset.currency;
-            updatePrice();  // ← ¡ESTA LÍNEA ES CRUCIAL!
+            updatePrice();
         });
     });
 
@@ -27,16 +27,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const input = document.getElementById("tables-number");
 
     if (range && input) {
-        // Función para actualizar el color del rango
         function updateRangeColor() {
             const min = parseInt(range.min) || 0;
             const max = parseInt(range.max) || 30;
             const value = parseInt(range.value) || 0;
             const percentage = ((value - min) / (max - min)) * 100;
-            range.style.background = `linear-gradient(to right, #24B8C8 0%, #24B8C8 ${percentage}%, ${percentage}%, #E5E5E5 100%)`;
+            range.style.background = `linear-gradient(to right, #24B8C8 0%, #24B8C8 ${percentage}%, #E5E5E5 ${percentage}%, #E5E5E5 100%)`;
         }
 
-        // Evento del RANGE
         range.addEventListener("input", () => {
             input.value = range.value;
             JuguemosState.quantity = parseInt(range.value);
@@ -44,21 +42,15 @@ document.addEventListener("DOMContentLoaded", () => {
             updatePrice();
         });
 
-        // Evento del INPUT NUMBER
         input.addEventListener("input", () => {
             let value = parseInt(input.value);
-            
-            // Validar que sea un número
             if (isNaN(value)) {
                 value = parseInt(range.min) || 0;
             }
-            
-            // Validar límites
             const min = parseInt(range.min) || 0;
             const max = parseInt(range.max) || 30;
             if (value < min) value = min;
             if (value > max) value = max;
-            
             range.value = value;
             input.value = value;
             JuguemosState.quantity = value;
@@ -66,7 +58,6 @@ document.addEventListener("DOMContentLoaded", () => {
             updatePrice();
         });
 
-        // ========== BOTONES + y - ==========
         const btnPlus = document.querySelector(".j-number-btn.plus");
         const btnMinus = document.querySelector(".j-number-btn.minus");
 
@@ -74,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
             btnPlus.addEventListener("click", function() {
                 input.stepUp();
                 input.dispatchEvent(new Event("input"));
-                this.blur(); // Quita el foco del botón
+                this.blur();
             });
         }
 
@@ -82,11 +73,10 @@ document.addEventListener("DOMContentLoaded", () => {
             btnMinus.addEventListener("click", function() {
                 input.stepDown();
                 input.dispatchEvent(new Event("input"));
-                this.blur(); // Quita el foco del botón
+                this.blur();
             });
         }
 
-        // Inicializar el color del rango
         updateRangeColor();
     }
 
@@ -111,8 +101,41 @@ document.addEventListener("DOMContentLoaded", () => {
             button.classList.add("active");
             JuguemosState.grid = button.dataset.grid;
             drawGrid();
+            limpiarCasillas(); 
         });
     });
+    drawGrid();
+
+
+
+
+        // ========== COLOR DE MARCO ==========
+    document.querySelectorAll(".j-color-swatch").forEach(swatch => {
+        swatch.addEventListener("click", () => {
+            document
+                .querySelectorAll(".j-color-swatch")
+                .forEach(s => s.classList.remove("active"));
+            swatch.classList.add("active");
+            JuguemosState.marcoColor = swatch.dataset.color;
+            aplicarColores();
+        });
+    });
+
+    // ========== COLOR DE FONDO DE TABLA ==========
+    document.querySelectorAll(".j-fondo-card").forEach(card => {
+        card.addEventListener("click", () => {
+            document
+                .querySelectorAll(".j-fondo-card")
+                .forEach(c => c.classList.remove("active"));
+            card.classList.add("active");
+            card.querySelector('input[type="radio"]').checked = true;
+            JuguemosState.fondoColor = card.dataset.color;
+            aplicarColores();
+        });
+    });
+
+    // Aplicar los colores iniciales (por defecto) al cargar la página
+    aplicarColores();
 
     // ========== BOTÓN INCLUIR BARAJAS (TOGGLE) ==========
     const btnIncluir = document.getElementById("j-incluir-barajas");
@@ -133,16 +156,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 this.classList.remove('inactive');
                 this.innerHTML = 'Incluir barajas';
                 JuguemosState.barajasIncluidas = true;
-                
                 if (statusMsg) {
                     statusMsg.style.display = 'none';
                 }
-
             } else {
                 this.classList.add('inactive');
                 this.innerHTML = 'No incluir barajas';
                 JuguemosState.barajasIncluidas = false;
-                
                 if (statusMsg) {
                     statusMsg.textContent = 'Barajas no incluidas';
                     statusMsg.style.display = 'block';
@@ -150,14 +170,71 @@ document.addEventListener("DOMContentLoaded", () => {
                     statusMsg.style.color = '#898989';
                 }
             }
-
             console.log('Barajas incluidas:', JuguemosState.barajasIncluidas);
         });
     }
 
-});
+    // ========== BOTÓN SELECCIÓN ALEATORIA ==========
+    const btnAleatoria = document.querySelector(".j-casilla-btn");
+    if (btnAleatoria) {
+        btnAleatoria.classList.remove('active');
+        btnAleatoria.classList.add('inactive');
+        btnAleatoria.textContent = 'Selección Aleatoria';
+    
+        btnAleatoria.addEventListener("click", function() {
+    
+            const isActive = this.classList.toggle('active');
+    
+            if (isActive) {
+                this.textContent = 'Selección Aleatoria';
+                this.classList.remove('inactive');
+                this.classList.add('active');
+    
+                if (JuguemosState.deck) {
+                    if (JuguemosState.barajas.length === 0) {
+                       
+                        JuguemosAjax.loadBarajas(JuguemosState.deck).then(() => {
+                            llenarCasillasAleatorio();
+                        });
+                    } else {
+                        llenarCasillasAleatorio();
+                    }
+                } else {
+                    alert('Primero selecciona un diseño.');
+                    this.classList.remove('active');
+                    this.classList.add('inactive');
+                    this.textContent = 'Selección Aleatoria';
+                }
+            } else {
+                this.textContent = 'Selección Aleatoria';
+                this.classList.remove('active');
+                this.classList.add('inactive');
+                limpiarCasillas();
+            }
+        });
+    }
 
-// ========== FUNCIONES GLOBALES ==========
+    // Inicializar casillas vacías
+    limpiarCasillas();
+
+
+
+    document.querySelectorAll(".j-grid").forEach(button => {
+        button.addEventListener("click", () => {
+            document
+                .querySelectorAll(".j-grid")
+                .forEach(b => b.classList.remove("active"));
+            button.classList.add("active");
+            JuguemosState.grid = button.dataset.grid;
+            drawGrid();
+            drawMarcosPreview();   
+            limpiarCasillas();
+        });
+    });
+    drawGrid();
+    drawMarcosPreview();   
+
+});
 
 function updatePrice() {
     if (typeof JuguemosAjax !== 'undefined' && typeof JuguemosState !== 'undefined') {
@@ -170,5 +247,147 @@ function updatePrice() {
 }
 
 function drawGrid() {
-    console.log('Grid seleccionado:', JuguemosState.grid);
+    const grid = JuguemosState.grid || '4x4';
+    const container = document.getElementById('j-grid-preview');
+    
+    if (!container) return;
+    
+    container.dataset.grid = grid;
+    
+    let cells = 0;
+    let label = '';
+    
+    switch(grid) {
+        case '4x4': cells = 16; label = '4x4'; break;
+        case '5x5': cells = 25; label = '5x5'; break;
+        case 'pocitos4': cells = 4; label = 'Pocitos 4'; break;
+        case 'pocitos3': cells = 3; label = 'Pocitos 3'; break;
+        case 'cruzadas': cells = 5; label = 'Cruzadas'; break;
+        default: cells = 16; label = '4x4';
+    }
+    
+    let html = '';
+    for (let i = 0; i < cells; i++) {
+        html += `<div class="cell"></div>`;
+    }
+    
+    container.innerHTML = html;
+    console.log(`Grid dibujado: ${label} (${cells} casillas)`);
+}
+
+// ========== FUNCIONES PARA CASILLAS ==========
+
+function getTotalCasillas(grid) {
+    switch(grid) {
+        case '4x4': return 16;
+        case '5x5': return 25;
+        case 'pocitos4': return 4;
+        case 'pocitos3': return 3;
+        case 'cruzadas': return 5;
+        default: return 16;
+    }
+}
+
+function llenarCasillasAleatorio() {
+    if (!JuguemosState.deck) {
+        alert('Primero selecciona un diseño.');
+        return;
+    }
+
+    if (!JuguemosState.barajas || JuguemosState.barajas.length === 0) {
+        alert('No hay barajas disponibles para este diseño.');
+        return;
+    }
+
+    const grid = JuguemosState.grid || '4x4';
+    const totalCasillas = getTotalCasillas(grid);
+    
+    if (totalCasillas === 0) {
+        alert('Configuración de casillas no válida.');
+        return;
+    }
+
+    const barajasDisponibles = [...JuguemosState.barajas];
+    
+    // Fisher-Yates shuffle
+    for (let i = barajasDisponibles.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [barajasDisponibles[i], barajasDisponibles[j]] = [barajasDisponibles[j], barajasDisponibles[i]];
+    }
+
+    const casillasSeleccionadas = barajasDisponibles.slice(0, totalCasillas);
+    
+    while (casillasSeleccionadas.length < totalCasillas) {
+        const barajaExtra = barajasDisponibles[Math.floor(Math.random() * barajasDisponibles.length)];
+        casillasSeleccionadas.push(barajaExtra);
+    }
+
+    actualizarPreviewCasillas(casillasSeleccionadas);
+    JuguemosState.casillasAsignadas = casillasSeleccionadas;
+    
+    console.log(`Casillas llenadas: ${casillasSeleccionadas.length} barajas asignadas`);
+}
+
+function actualizarPreviewCasillas(casillas) {
+    const container = document.getElementById('j-casilla-preview-grid');
+    if (!container) return;
+    
+    const grid = JuguemosState.grid || '4x4';
+    container.dataset.grid = grid;
+    
+    let html = '';
+    casillas.forEach((casilla, index) => {
+        html += `
+            <div class="cell" data-index="${index}" title="${casilla.nombre}">
+                <img src="${casilla.imagen}" alt="${casilla.nombre}" loading="lazy">
+                <span class="cell-number">${index + 1}</span>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+    console.log(`Preview actualizado con ${casillas.length} casillas`);
+}
+
+function limpiarCasillas() {
+    const container = document.getElementById('j-casilla-preview-grid');
+    if (!container) return;
+    
+    const grid = JuguemosState.grid || '4x4';
+    container.dataset.grid = grid;
+    
+    const totalCasillas = getTotalCasillas(grid);
+    
+    let html = '';
+    for (let i = 0; i < totalCasillas; i++) {
+        html += `<div class="cell empty" data-index="${i}"></div>`;
+    }
+    
+    container.innerHTML = html;
+    JuguemosState.casillasAsignadas = [];
+    console.log('Casillas limpiadas');
+}
+
+
+function aplicarColores() {
+    document.documentElement.style.setProperty('--j-marco-color', JuguemosState.marcoColor || '#FA299C');
+    document.documentElement.style.setProperty('--j-fondo-color', JuguemosState.fondoColor || '#FFFFFF');
+}
+
+function drawMarcosPreview() {
+    const grid = JuguemosState.grid || '4x4';
+    const container = document.getElementById('j-marcos-preview-grid');
+
+    if (!container) return;
+
+    container.dataset.grid = grid;
+
+    const totalCasillas = getTotalCasillas(grid);
+
+    let html = '';
+    for (let i = 0; i < totalCasillas; i++) {
+        html += `<div class="cell"></div>`;
+    }
+
+    container.innerHTML = html;
 }

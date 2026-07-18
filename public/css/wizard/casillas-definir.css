@@ -1,0 +1,165 @@
+/* =====================================================
+   CASILLAS POR DEFINIR
+===================================================== */
+
+.j-casillas-definir {
+    margin-top: 10px;
+}
+
+.j-casilla-option {
+    background: #FFFFFF;
+    border-radius: 12px;
+    padding: 16px 20px;
+    text-align: center;
+}
+
+.text-p-negrita {
+    font-family: 'Cairo', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1E2249;
+    margin-bottom: 12px;
+}
+
+.j-casilla-desc {
+    font-family: 'Cairo', sans-serif;
+    font-size: 16px;
+    color: #5D5D5D;
+    margin-top: 10px;
+    line-height: 1.4;
+}
+
+.j-casilla-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 44px;
+    padding: 0 20px;
+    border: 2px solid #FA299C;
+    border-radius: 8px;
+    background: #FA299C;
+    color: #FFFFFF;
+    font-family: 'Cairo', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    gap: 8px;
+}
+
+.j-casilla-btn:hover {
+    background: #FFFFFF;
+    border-color: #FA299C;
+    color: #FA299C;
+}
+
+/* Estado activo (por defecto) */
+.j-casilla-btn.active {
+    background: #FA299C;
+    border-color: #FA299C;
+    color: #FFFFFF;
+}
+
+.j-casilla-btn.active:hover {
+    background: #E91E8C;
+    border-color: #E91E8C;
+    color: #FFFFFF;
+}
+
+.j-casilla-btn.inactive {
+    background: #FFFFFF;
+    border-color: #D9D9D9;
+    color: #999999;
+}
+
+.j-casilla-btn.inactive:hover {
+    background: #F5F5F5;
+    border-color: #D9D9D9;
+    color: #666666;
+}
+
+
+
+
+/* =====================================================
+   VISTA PREVIA DE CASILLAS (en el aside)
+===================================================== */
+
+
+.j-casilla-preview-grid {
+    display: grid;
+    gap: 4px;
+    margin: 0 auto;
+    padding: 8px;
+    background: #f8f8f8;
+    border-radius: 8px;
+    max-width: 100%;
+}
+
+.j-casilla-preview-grid .cell {
+    background: #DDDDDD;
+    border-radius: 4px;
+    aspect-ratio: 2 / 3;
+    width: 100%;
+    height: auto;
+    min-height: 35px;
+    transition: background 0.2s;
+}
+
+/* Grid 4x4 (por defecto) */
+.j-casilla-preview-grid[data-grid="4x4"] {
+    grid-template-columns: repeat(4, 1fr);
+    max-width: 240px;
+}
+
+.j-casilla-preview-grid[data-grid="5x5"] {
+    grid-template-columns: repeat(5, 1fr);
+    max-width: 300px;
+}
+
+.j-casilla-preview-grid[data-grid="pocitos4"] {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 180px;
+}
+
+.j-casilla-preview-grid[data-grid="pocitos4"] .cell:nth-child(1) { grid-column: 1; }
+.j-casilla-preview-grid[data-grid="pocitos4"] .cell:nth-child(2) { grid-column: 3; }
+.j-casilla-preview-grid[data-grid="pocitos4"] .cell:nth-child(3) { grid-column: 1; }
+.j-casilla-preview-grid[data-grid="pocitos4"] .cell:nth-child(4) { grid-column: 3; }
+
+.j-casilla-preview-grid[data-grid="pocitos3"] {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 160px;
+}
+
+.j-casilla-preview-grid[data-grid="pocitos3"] .cell:nth-child(1) { grid-column: 1; }
+.j-casilla-preview-grid[data-grid="pocitos3"] .cell:nth-child(2) { grid-column: 3; }
+.j-casilla-preview-grid[data-grid="pocitos3"] .cell:nth-child(3) { grid-column: 2; grid-row: 2; }
+
+.j-casilla-preview-grid[data-grid="cruzadas"] {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 160px;
+}
+
+.j-casilla-preview-grid[data-grid="cruzadas"] .cell:nth-child(1) { grid-column: 1; grid-row: 1; }
+.j-casilla-preview-grid[data-grid="cruzadas"] .cell:nth-child(2) { grid-column: 3; grid-row: 1; }
+.j-casilla-preview-grid[data-grid="cruzadas"] .cell:nth-child(3) { grid-column: 2; grid-row: 2; }
+.j-casilla-preview-grid[data-grid="cruzadas"] .cell:nth-child(4) { grid-column: 1; grid-row: 3; }
+.j-casilla-preview-grid[data-grid="cruzadas"] .cell:nth-child(5) { grid-column: 3; grid-row: 3; }
+
+/* Animación */
+.j-casilla-preview-grid .cell {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

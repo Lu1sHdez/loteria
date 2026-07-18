@@ -27,6 +27,13 @@ class Juguemos_Assets
             [],
             JUGUEMOS_VERSION
         );
+        // CSS
+        wp_enqueue_style(
+            'juguemos-css-reutilizar',
+            JUGUEMOS_URL . 'public/css/reutilizar.css',
+            [],
+            JUGUEMOS_VERSION
+        );
         wp_enqueue_style(
             'juguemos-login',
             JUGUEMOS_URL . 'public/css/admin/login.css',

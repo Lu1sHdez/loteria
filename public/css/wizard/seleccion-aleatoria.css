@@ -1,0 +1,373 @@
+/* =====================================================
+   CASILLAS POR DEFINIR
+===================================================== */
+
+.j-casillas-definir {
+    margin-top: 10px;
+}
+
+
+
+.text-p-negrita {
+    font-family: 'Cairo', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1E2249;
+    margin-bottom: 12px;
+}
+
+.j-casilla-desc {
+    font-family: 'Cairo', sans-serif;
+    font-size: 13px;
+    color: #999;
+    margin-top: 10px;
+    line-height: 1.4;
+}
+
+/* 🔥 Botón Selección Aleatoria */
+.j-casilla-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 44px;
+    padding: 0 20px;
+    border: 2px solid #FA299C;
+    border-radius: 8px;
+    background: #FA299C;
+    color: #FFFFFF;
+    font-family: 'Cairo', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    gap: 8px;
+}
+
+.j-casilla-btn:hover {
+    background: #FA299C;
+    border-color: #FA299C;
+    color: #FA299C;
+}
+
+.j-casilla-btn.active {
+    background: #FA299C;
+    border-color: #FA299C;
+    color: #FFFFFF;
+}
+
+.j-casilla-btn.active:hover {
+    background: #E91E8C;
+    border-color: #E91E8C;
+    color: #FFFFFF;
+}
+
+.j-casilla-btn.inactive {
+    background: #E91E8C;
+    border-color: #E91E8C;
+    color: #FFFFFF;
+}
+
+.j-casilla-btn.inactive:hover {
+    background: #F5F5F5;
+    border-color: #D9D9D9;
+    color: #666666;
+}
+
+/* =====================================================
+   VISTA PREVIA DE UBICACIÓN
+===================================================== */
+
+
+.j-grid-preview {
+    display: grid;
+    gap: 4px;
+    margin: 0 auto;
+    padding: 8px;
+    background: #f8f8f8;
+    border-radius: 8px;
+    max-width: 100%;
+}
+
+.j-grid-preview .cell {
+    background: #DDDDDD;
+    border-radius: 4px;
+    aspect-ratio: 2 / 3;
+    width: 100%;
+    height: auto;
+    min-height: 35px;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.j-grid-preview .cell.empty {
+    background: #DDDDDD;
+}
+
+.j-grid-preview .cell.empty::after {
+    content: '?';
+    font-size: 24px;
+    font-weight: 700;
+    color: #aaa;
+    font-family: 'Cairo', sans-serif;
+}
+
+.j-grid-preview .cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.j-grid-preview .cell .cell-number {
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    font-size: 9px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.85);
+    background: rgba(0, 0, 0, 0.5);
+    padding: 0 4px;
+    border-radius: 3px;
+    font-family: 'Cairo', sans-serif;
+    line-height: 1.4;
+}
+
+.j-grid-preview .cell:not(.empty):hover {
+    transform: scale(1.08);
+    z-index: 2;
+    box-shadow: 0 4px 16px rgba(250, 41, 156, 0.3);
+    border: 2px solid #FA299C;
+}
+
+/* Grids - Ubicación */
+.j-grid-preview[data-grid="4x4"] {
+    grid-template-columns: repeat(4, 1fr);
+    max-width: 240px;
+}
+
+.j-grid-preview[data-grid="5x5"] {
+    grid-template-columns: repeat(5, 1fr);
+    max-width: 300px;
+}
+
+.j-grid-preview[data-grid="pocitos4"] {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 180px;
+}
+
+.j-grid-preview[data-grid="pocitos4"] .cell:nth-child(1) { grid-column: 1; grid-row: 1; }
+.j-grid-preview[data-grid="pocitos4"] .cell:nth-child(2) { grid-column: 3; grid-row: 1; }
+.j-grid-preview[data-grid="pocitos4"] .cell:nth-child(3) { grid-column: 1; grid-row: 3; }
+.j-grid-preview[data-grid="pocitos4"] .cell:nth-child(4) { grid-column: 3; grid-row: 3; }
+
+.j-grid-preview[data-grid="pocitos3"] {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 160px;
+}
+
+.j-grid-preview[data-grid="pocitos3"] .cell:nth-child(1) { grid-column: 1; grid-row: 1; }
+.j-grid-preview[data-grid="pocitos3"] .cell:nth-child(2) { grid-column: 3; grid-row: 1; }
+.j-grid-preview[data-grid="pocitos3"] .cell:nth-child(3) { grid-column: 2; grid-row: 2; }
+
+.j-grid-preview[data-grid="cruzadas"] {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 160px;
+}
+
+.j-grid-preview[data-grid="cruzadas"] .cell:nth-child(1) { grid-column: 1; grid-row: 1; }
+.j-grid-preview[data-grid="cruzadas"] .cell:nth-child(2) { grid-column: 3; grid-row: 1; }
+.j-grid-preview[data-grid="cruzadas"] .cell:nth-child(3) { grid-column: 2; grid-row: 2; }
+.j-grid-preview[data-grid="cruzadas"] .cell:nth-child(4) { grid-column: 1; grid-row: 3; }
+.j-grid-preview[data-grid="cruzadas"] .cell:nth-child(5) { grid-column: 3; grid-row: 3; }
+
+/* =====================================================
+   VISTA PREVIA DE CASILLAS
+===================================================== */
+
+.j-casilla-preview-grid {
+    display: grid;
+    gap: 4px;
+    margin: 0 auto;
+    padding: 8px;
+    background: #f8f8f8;
+    border-radius: 8px;
+    max-width: 100%;
+}
+
+.j-casilla-preview-grid .cell {
+    background: #DDDDDD;
+    border-radius: 4px;
+    aspect-ratio: 2 / 3;
+    width: 100%;
+    height: auto;
+    min-height: 35px;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.j-casilla-preview-grid .cell.empty {
+    background: #DDDDDD;
+}
+
+.j-casilla-preview-grid .cell.empty::after {
+    content: '?';
+    font-size: 24px;
+    font-weight: 700;
+    color: #aaa;
+    font-family: 'Cairo', sans-serif;
+}
+
+.j-casilla-preview-grid .cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.j-casilla-preview-grid .cell .cell-number {
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    font-size: 9px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.85);
+    background: rgba(0, 0, 0, 0.5);
+    padding: 0 4px;
+    border-radius: 3px;
+    font-family: 'Cairo', sans-serif;
+    line-height: 1.4;
+}
+
+.j-casilla-preview-grid .cell:not(.empty):hover {
+    transform: scale(1.08);
+    z-index: 2;
+    box-shadow: 0 4px 16px rgba(250, 41, 156, 0.3);
+    border: 2px solid #FA299C;
+}
+
+/* Grids - Casillas */
+.j-casilla-preview-grid[data-grid="4x4"] {
+    grid-template-columns: repeat(4, 1fr);
+    max-width: 240px;
+}
+
+.j-casilla-preview-grid[data-grid="5x5"] {
+    grid-template-columns: repeat(5, 1fr);
+    max-width: 300px;
+}
+
+.j-casilla-preview-grid[data-grid="pocitos4"] {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 180px;
+}
+
+.j-casilla-preview-grid[data-grid="pocitos4"] .cell:nth-child(1) { grid-column: 1; grid-row: 1; }
+.j-casilla-preview-grid[data-grid="pocitos4"] .cell:nth-child(2) { grid-column: 3; grid-row: 1; }
+.j-casilla-preview-grid[data-grid="pocitos4"] .cell:nth-child(3) { grid-column: 1; grid-row: 3; }
+.j-casilla-preview-grid[data-grid="pocitos4"] .cell:nth-child(4) { grid-column: 3; grid-row: 3; }
+
+.j-casilla-preview-grid[data-grid="pocitos3"] {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 160px;
+}
+
+.j-casilla-preview-grid[data-grid="pocitos3"] .cell:nth-child(1) { grid-column: 1; grid-row: 1; }
+.j-casilla-preview-grid[data-grid="pocitos3"] .cell:nth-child(2) { grid-column: 3; grid-row: 1; }
+.j-casilla-preview-grid[data-grid="pocitos3"] .cell:nth-child(3) { grid-column: 2; grid-row: 2; }
+
+.j-casilla-preview-grid[data-grid="cruzadas"] {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 160px;
+}
+
+.j-casilla-preview-grid[data-grid="cruzadas"] .cell:nth-child(1) { grid-column: 1; grid-row: 1; }
+.j-casilla-preview-grid[data-grid="cruzadas"] .cell:nth-child(2) { grid-column: 3; grid-row: 1; }
+.j-casilla-preview-grid[data-grid="cruzadas"] .cell:nth-child(3) { grid-column: 2; grid-row: 2; }
+.j-casilla-preview-grid[data-grid="cruzadas"] .cell:nth-child(4) { grid-column: 1; grid-row: 3; }
+.j-casilla-preview-grid[data-grid="cruzadas"] .cell:nth-child(5) { grid-column: 3; grid-row: 3; }
+
+/* =====================================================
+   ANIMACIONES
+===================================================== */
+
+.j-grid-preview .cell,
+.j-casilla-preview-grid .cell {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 768px) {
+    .j-casilla-option {
+        padding: 12px 14px;
+    }
+
+    .text-p-negrita {
+        font-size: 15px;
+    }
+
+    .j-casilla-desc {
+        font-size: 12px;
+    }
+
+    .j-casilla-btn {
+        height: 40px;
+        font-size: 14px;
+    }
+
+    .j-grid-preview,
+    .j-casilla-preview-grid {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .j-casilla-option {
+        padding: 10px 12px;
+    }
+
+    .text-p-negrita {
+        font-size: 14px;
+    }
+
+    .j-casilla-desc {
+        font-size: 11px;
+    }
+
+    .j-casilla-btn {
+        height: 36px;
+        font-size: 13px;
+    }
+
+    .j-grid-preview .cell,
+    .j-casilla-preview-grid .cell {
+        min-height: 25px;
+    }
+
+    .j-grid-preview .cell .cell-number,
+    .j-casilla-preview-grid .cell .cell-number {
+        font-size: 7px;
+    }
+}

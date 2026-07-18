@@ -1,0 +1,172 @@
+/* =====================================================
+   3. COLOR Y ESTILO
+===================================================== */
+
+.j-color-style {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.j-fondo-title {
+    margin-top: 15px;
+}
+
+/* ---- Swatches de color de marco ---- */
+
+.j-marco-colores {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.j-color-swatch {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    cursor: pointer;
+    padding: 0;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.j-color-swatch:hover {
+    transform: scale(1.1);
+}
+
+.j-color-swatch.active {
+    border-color: #FFFFFF;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 0 0 3px #1E2249;
+}
+
+/* ---- Opciones de fondo de tabla ---- */
+
+.j-fondo-opciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.j-fondo-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 2px solid #EAEAEA;
+    border-radius: 12px;
+    cursor: pointer;
+    min-width: 160px;
+    transition: border-color 0.25s ease;
+    font-family: 'Cairo', sans-serif;
+}
+
+.j-fondo-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.j-fondo-card .j-fondo-swatch {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid #EAEAEA;
+    flex-shrink: 0;
+}
+
+.j-fondo-card .j-fondo-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.j-fondo-card .j-fondo-name {
+    font-weight: 700;
+    font-size: 14px;
+    color: #1E2249;
+}
+
+.j-fondo-card .j-fondo-hex {
+    font-size: 12px;
+    color: #999999;
+}
+
+.j-fondo-card.active {
+    border-color: #FA299C;
+}
+
+.j-fondo-card.active .j-fondo-swatch {
+    border-color: #FA299C;
+}
+
+
+
+
+
+
+/* =====================================================
+   VISTA PREVIA DE MARCOS
+===================================================== */
+
+.j-marcos-preview-grid {
+    display: grid;
+    gap: 4px;
+    margin: 0 auto;
+    padding: 8px;
+    background: #f8f8f8;
+    border-radius: 8px;
+    max-width: 100%;
+}
+
+.j-marcos-preview-grid .cell {
+    border-radius: 4px;
+    aspect-ratio: 2 / 3;
+    width: 100%;
+    height: auto;
+    min-height: 35px;
+    transition: background 0.2s ease, border-color 0.2s ease;
+    border: 3px solid var(--j-marco-color, #FA299C);
+    background: var(--j-fondo-color, #FFFFFF);
+}
+
+/* Mismos layouts de grid que ya usas en los otros previews */
+.j-marcos-preview-grid[data-grid="4x4"] {
+    grid-template-columns: repeat(4, 1fr);
+    max-width: 240px;
+}
+
+.j-marcos-preview-grid[data-grid="5x5"] {
+    grid-template-columns: repeat(5, 1fr);
+    max-width: 300px;
+}
+
+.j-marcos-preview-grid[data-grid="pocitos4"] {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 180px;
+}
+
+.j-marcos-preview-grid[data-grid="pocitos4"] .cell:nth-child(1) { grid-column: 1; grid-row: 1; }
+.j-marcos-preview-grid[data-grid="pocitos4"] .cell:nth-child(2) { grid-column: 3; grid-row: 1; }
+.j-marcos-preview-grid[data-grid="pocitos4"] .cell:nth-child(3) { grid-column: 1; grid-row: 3; }
+.j-marcos-preview-grid[data-grid="pocitos4"] .cell:nth-child(4) { grid-column: 3; grid-row: 3; }
+
+.j-marcos-preview-grid[data-grid="pocitos3"] {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 160px;
+}
+
+.j-marcos-preview-grid[data-grid="pocitos3"] .cell:nth-child(1) { grid-column: 1; grid-row: 1; }
+.j-marcos-preview-grid[data-grid="pocitos3"] .cell:nth-child(2) { grid-column: 3; grid-row: 1; }
+.j-marcos-preview-grid[data-grid="pocitos3"] .cell:nth-child(3) { grid-column: 2; grid-row: 2; }
+
+.j-marcos-preview-grid[data-grid="cruzadas"] {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 160px;
+}
+
+.j-marcos-preview-grid[data-grid="cruzadas"] .cell:nth-child(1) { grid-column: 1; grid-row: 1; }
+.j-marcos-preview-grid[data-grid="cruzadas"] .cell:nth-child(2) { grid-column: 3; grid-row: 1; }
+.j-marcos-preview-grid[data-grid="cruzadas"] .cell:nth-child(3) { grid-column: 2; grid-row: 2; }
+.j-marcos-preview-grid[data-grid="cruzadas"] .cell:nth-child(4) { grid-column: 1; grid-row: 3; }
+.j-marcos-preview-grid[data-grid="cruzadas"] .cell:nth-child(5) { grid-column: 3; grid-row: 3; }

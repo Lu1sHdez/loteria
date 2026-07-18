@@ -17,6 +17,10 @@ const JuguemosState = {
 
     // Precio
     unitPrice: 0,
-    total: 0
+    total: 0,
+
+
+    marcoColor: '#FA299C',
+    fondoColor: '#FFFFFF',
 
 };
