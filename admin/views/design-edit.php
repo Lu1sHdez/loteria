@@ -270,12 +270,8 @@ $barajas = Juguemos_Admin_Barajas::get_by_design(
 
 
     <?php
-
-    $siguiente = empty($barajas)
-        ? 1
-        : end($barajas)->numero + 1;
-
-    ?>
+        $siguiente = Juguemos_Admin_Barajas::get_next_number($design->id);
+        ?>
 
     <div
         id="j-new-baraja"
@@ -321,230 +317,153 @@ $barajas = Juguemos_Admin_Barajas::get_by_design(
 include JUGUEMOS_PATH . 'admin/views/category-modals.php';
 ?>
 
-
 <script>
+document.addEventListener('DOMContentLoaded', function () {
 
-    document.addEventListener('DOMContentLoaded', function () {
+    // ========== CREAR NUEVA BARAJA ==========
+    const card = document.getElementById('j-new-baraja');
 
-const card = document.getElementById('j-new-baraja');
+    if (card) {
+        const upload = card.querySelector('.j-baraja-upload');
+        const input = card.querySelector('.j-baraja-file');
+        const preview = card.querySelector('.j-baraja-preview-image');
+        const placeholder = card.querySelector('.j-baraja-placeholder');
+        const createButton = card.querySelector('.j-baraja-create');
 
-if (!card) {
-    return;
-}
+        upload.addEventListener('click', function () {
+            input.click();
+        });
 
-const upload = card.querySelector('.j-baraja-upload');
-const input = card.querySelector('.j-baraja-file');
-const preview = card.querySelector('.j-baraja-preview-image');
-const placeholder = card.querySelector('.j-baraja-placeholder');
-const createButton = card.querySelector('.j-baraja-create');
+        input.addEventListener('change', function () {
+            if (!input.files.length) return;
 
-upload.addEventListener('click', function () {
+            const file = input.files[0];
 
-    input.click();
+            if (file.type !== 'image/webp') {
+                alert('Solo se permiten imágenes WebP.');
+                input.value = '';
+                return;
+            }
 
-});
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                placeholder.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        });
 
-input.addEventListener('change', function () {
+        createButton.addEventListener('click', function () {
+            if (!input.files.length) {
+                alert('Selecciona una imagen.');
+                return;
+            }
 
-    if (!input.files.length) {
-        return;
+            const nombre = card.querySelector('.j-baraja-nombre').value.trim();
+            if (nombre === '') {
+                alert('Escribe el nombre de la carta.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('action', 'juguemos_create_baraja');
+            formData.append('nonce', '<?php echo wp_create_nonce("juguemos_nonce"); ?>');
+            formData.append('design_id', this.dataset.design);
+            formData.append('numero', this.dataset.numero);
+            formData.append('nombre', nombre);
+            formData.append('imagen', input.files[0]);
+
+            fetch('<?php echo admin_url("admin-ajax.php"); ?>', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(response => {
+                console.log(response);
+                if (response.success) {
+                    alert('Baraja creada correctamente.');
+                    location.reload();
+                } else {
+                    alert(response.data || 'Error al crear la baraja.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error de conexión.');
+            });
+        });
     }
 
-    const file = input.files[0];
+    // ========== ACTUALIZAR BARAJA ==========
+    document.querySelectorAll('.j-baraja-update').forEach(function(button) {
+        button.addEventListener('click', function() {
+            const card = this.closest('.j-baraja-card');
+            const nombre = card.querySelector('.j-baraja-nombre').value;
+            const input = card.querySelector('.j-baraja-file');
 
-    if (file.type !== 'image/webp') {
+            const formData = new FormData();
+            formData.append('action', 'juguemos_update_baraja');
+            formData.append('nonce', '<?php echo wp_create_nonce("juguemos_nonce"); ?>');
+            formData.append('id', this.dataset.id);
+            formData.append('nombre', nombre);
 
-        alert('Solo se permiten imágenes WebP.');
+            if (input.files.length) {
+                formData.append('imagen', input.files[0]);
+            }
 
-        input.value = '';
+            fetch('<?php echo admin_url("admin-ajax.php"); ?>', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(response => {
+                if (response.success) {
+                    alert('Baraja actualizada correctamente.');
+                    location.reload();
+                } else {
+                    alert(response.data || 'Error al actualizar.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error de conexión.');
+            });
+        });
+    });
 
-        return;
+    // ========== ELIMINAR BARAJA ==========
+    document.querySelectorAll('.j-baraja-delete').forEach(function(button) {
+        button.addEventListener('click', function() {
+            if (!confirm('¿Eliminar esta baraja?')) {
+                return;
+            }
 
-    }
+            const card = this.closest('.j-baraja-card');
+            const formData = new FormData();
 
-    const reader = new FileReader();
+            formData.append('action', 'juguemos_delete_baraja');
+            formData.append('nonce', this.dataset.nonce);
+            formData.append('id', this.dataset.id);
 
-    reader.onload = function (e) {
-
-        preview.src = e.target.result;
-
-        preview.style.display = 'block';
-
-        placeholder.style.display = 'none';
-
-    };
-
-    reader.readAsDataURL(file);
-
-});
-
-createButton.addEventListener('click', function () {
-
-    if (!input.files.length) {
-
-        alert('Selecciona una imagen.');
-
-        return;
-
-    }
-
-    const nombre = card.querySelector('.j-baraja-nombre').value.trim();
-
-    if (nombre === '') {
-
-        alert('Escribe el nombre de la carta.');
-
-        return;
-
-    }
-
-    const formData = new FormData();
-
-    formData.append('action', 'juguemos_create_baraja');
-    formData.append('nonce', Juguemos.nonce);
-    formData.append('design_id', this.dataset.design);
-    formData.append('numero', this.dataset.numero);
-    formData.append('nombre', nombre);
-    formData.append('imagen', input.files[0]);
-
-    fetch(Juguemos.ajax_url, {
-
-        method: 'POST',
-        body: formData
-
-    })
-    .then(r => r.json())
-    .then(response => {
-
-        console.log(response);
-
-        if (response.success) {
-
-            alert('Baraja creada.');
-
-            location.reload();
-
-        } else {
-
-            alert(response.data);
-
-        }
-
+            fetch('<?php echo admin_url("admin-ajax.php"); ?>', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(response => {
+                if (response.success) {
+                    window.location.reload();
+                } else {
+                    alert(response.data || 'Error al eliminar.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error de conexión.');
+            });
+        });
     });
 
 });
-
-});
-
-
-
-
-document.querySelectorAll('.j-baraja-update').forEach(function(button){
-
-button.addEventListener('click',function(){
-
-    const card=this.closest('.j-baraja-card');
-
-    const nombre=card.querySelector('.j-baraja-nombre').value;
-
-    const input=card.querySelector('.j-baraja-file');
-
-    const formData=new FormData();
-
-    formData.append(
-        'action',
-        'juguemos_update_baraja'
-    );
-
-    formData.append(
-        'nonce',
-        Juguemos.nonce
-    );
-
-    formData.append(
-        'id',
-        this.dataset.id
-    );
-
-    formData.append(
-        'nombre',
-        nombre
-    );
-
-    if(input.files.length){
-
-        formData.append(
-            'imagen',
-            input.files[0]
-        );
-
-    }
-
-    fetch(Juguemos.ajax_url,{
-
-        method:'POST',
-
-        body:formData
-
-    })
-    .then(r=>r.json())
-    .then(response=>{
-
-        if(response.success){
-
-            alert('Baraja actualizada');
-
-        }else{
-
-            alert(response.data);
-
-        }
-
-    });
-
-});
-
-});
-
-document.querySelectorAll('.j-baraja-delete').forEach(function(button){
-
-button.addEventListener('click', function(){
-
-    if (!confirm('¿Eliminar esta baraja?')) {
-        return;
-    }
-
-    const card = this.closest('.j-baraja-card');
-
-    const formData = new FormData();
-
-    formData.append('action', 'juguemos_delete_baraja');
-    formData.append('nonce', this.dataset.nonce);
-    formData.append('id', this.dataset.id);
-
-    fetch(Juguemos.ajax_url, {
-
-        method: 'POST',
-        body: formData
-
-    })
-    .then(r => r.json())
-    .then(response => {
-
-        if (response.success) {
-
-            card.remove();
-
-        } else {
-
-            alert(response.data);
-
-        }
-
-    });
-
-});
-
-});
-
 </script>

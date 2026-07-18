@@ -21,7 +21,7 @@ class Juguemos_Ajax
             [$this, 'categories']
         );
 
-        // Barajas
+        // Diseños (antes "barajas" por categoría)
         add_action(
             'wp_ajax_juguemos_decks',
             [$this, 'decks']
@@ -32,14 +32,34 @@ class Juguemos_Ajax
             [$this, 'decks']
         );
 
+        // Barajas (las 54 cartas de un diseño)
+        add_action(
+            'wp_ajax_juguemos_barajas',
+            [$this, 'barajas']
+        );
+
+        add_action(
+            'wp_ajax_nopriv_juguemos_barajas',
+            [$this, 'barajas']
+        );
+
         add_action(
             'wp_ajax_juguemos_price',
             [$this,'price']
         );
-        
+
         add_action(
             'wp_ajax_nopriv_juguemos_price',
             [$this,'price']
+        );
+        add_action(
+            'wp_ajax_juguemos_get_design',
+            [$this, 'get_design']
+        );
+    
+        add_action(
+            'wp_ajax_nopriv_juguemos_get_design',
+            [$this, 'get_design']
         );
 
     }
@@ -47,28 +67,103 @@ class Juguemos_Ajax
     public function categories()
     {
 
-        $categories = Juguemos_Category_Repository::get_all();
+        $categorias = Juguemos_Admin_Categorias::get_all();
 
-        wp_send_json_success($categories);
+        $data = array_map(function ($categoria) {
+
+            return [
+
+                'id'     => $categoria->id,
+
+                'nombre' => $categoria->nombre
+
+            ];
+
+        }, $categorias);
+
+        wp_send_json_success($data);
 
     }
 
     public function decks()
     {
 
-        $category = sanitize_text_field(
-            $_GET['category'] ?? ''
+        $categoria_id = intval(
+            $_GET['categoria_id'] ?? 0
         );
 
-        $decks = Juguemos_Deck_Repository::get_by_category(
-            $category
-        );
+        if (!$categoria_id) {
 
-        wp_send_json_success($decks);
+            wp_send_json_error(
+                'Categoría inválida.'
+            );
+
+            return;
+
+        }
+
+        $designs = Juguemos_Admin_Designs::get_by_category($categoria_id);
+
+        $data = array_map(function ($design) {
+
+            return [
+
+                'id'      => $design->id,
+
+                'nombre'  => $design->nombre,
+
+                'portada' => Juguemos_Admin_Designs::get_portada($design)
+
+            ];
+
+        }, $designs);
+
+        wp_send_json_success($data);
 
     }
 
-    
+    public function barajas()
+    {
+
+        $design_id = intval(
+            $_GET['design_id'] ?? 0
+        );
+
+        if (!$design_id) {
+
+            wp_send_json_error(
+                'Diseño inválido.'
+            );
+
+            return;
+
+        }
+
+        $barajas = Juguemos_Admin_Barajas::get_by_design($design_id);
+
+        $preview_url = Juguemos_Files::preview_url($design_id);
+
+        $data = array_map(function ($baraja) use ($preview_url) {
+
+            return [
+
+                'id'     => $baraja->id,
+
+                'numero' => $baraja->numero,
+
+                'nombre' => $baraja->nombre,
+
+                'imagen' => esc_url($preview_url . $baraja->imagen)
+
+            ];
+
+        }, $barajas);
+
+        wp_send_json_success($data);
+
+    }
+
+
     public function price()
     {
 
@@ -92,6 +187,29 @@ class Juguemos_Ajax
 
         wp_send_json_success($price);
 
+    }
+
+    public function get_design()
+    {
+        $design_id = intval($_GET['design_id'] ?? 0);
+
+        if (!$design_id) {
+            wp_send_json_error('Diseño inválido.');
+            return;
+        }
+
+        $design = Juguemos_Admin_Designs::get($design_id);
+
+        if (!$design) {
+            wp_send_json_error('Diseño no encontrado.');
+            return;
+        }
+
+        wp_send_json_success([
+            'id'       => $design->id,
+            'nombre'   => $design->nombre,
+            'portada'  => Juguemos_Admin_Designs::get_portada($design)
+        ]);
     }
 
 }

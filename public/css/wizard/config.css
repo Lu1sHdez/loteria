@@ -1,91 +1,266 @@
 /* =====================================================
-   CONFIGURACIÓN
+   CONFIGURACIÓN - Número de tablas por hoja
 ===================================================== */
 
-.j-quantity{
-    margin-bottom:30px;
+.j-quantity {
+    margin-bottom: 30px;
 }
 
-.j-quantity-controls{
-    display:flex;
-    align-items:center;
-    gap:15px;
+.texto-conf-tablas {
+    font-family: 'Cairo', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #5D5D5D;
+    margin-bottom: 15px;
 }
 
-.j-quantity-controls input[type="range"]{
-    flex:1;
+.j-quantity-controls-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    max-width: 400px;
 }
 
-.j-quantity-controls input[type="number"]{
-    width:80px;
-    text-align:center;
-    padding:8px;
-    border:2px solid #DDD;
-    border-radius:8px;
-    font-size:16px;
+/* =====================================================
+   RANGO
+===================================================== */
+
+.j-quantity-controls-range {
+    flex: 1;
+    display: flex;
+    align-items: center;
 }
 
+.j-quantity-controls-range input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 4px;
+    background: #E5E5E5;
+    outline: none;
+}
+
+.j-quantity-controls-range input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #1FAFB4;
+    cursor: pointer;
+    border: 2px solid #FFFFFF;
+    box-shadow: 0 2px 8px rgba(31, 175, 180, 0.3);
+    transition: 0.2s;
+}
+
+.j-quantity-controls-range input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(31, 175, 180, 0.4);
+}
+
+.j-quantity-controls-range input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #1FAFB4;
+    cursor: pointer;
+    border: 2px solid #FFFFFF;
+    box-shadow: 0 2px 8px rgba(31, 175, 180, 0.3);
+}
+
+.j-quantity-controls-range input[type="range"]::-moz-range-track {
+    height: 6px;
+    border-radius: 4px;
+    background: #E5E5E5;
+}
+
+/* =====================================================
+   INPUT NUMÉRICO CON BOTONES + / -
+===================================================== */
+
+/* 🔥 Contenedor principal */
+.j-quantity-controls-number {
+    display: flex;
+    align-items: center;
+    width: 120px;
+    height: 40px;
+    border: 2px solid #FF4FB2;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #FFFFFF;
+    flex-shrink: 0;
+}
+
+/* 🔥 Input numérico */
+.j-quantity-controls-number input[type="number"] {
+    flex: 1;
+    height: 100%;
+    border: 0;
+    outline: none;
+    text-align: center;
+    font-family: 'Cairo', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1E2249;
+    background: #FFFFFF;
+    padding: 0 4px;
+}
+
+/* Ocultar flechas nativas del input number */
+.j-quantity-controls-number input::-webkit-outer-spin-button,
+.j-quantity-controls-number input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.j-quantity-controls-number input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+/* 🔥 Botones + y - */
+.j-number-btn {
+    width: 38px;
+    height: 100%;
+    border: 0;
+    background: #FF2C98;
+    color: #FFFFFF;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+    outline: none;
+    box-shadow: none;
+    font-family: 'Cairo', sans-serif;
+    padding: 0;
+    line-height: 1;
+}
+
+.j-number-btn:hover {
+    background: #E91E8C;
+}
+
+.j-number-btn:focus,
+.j-number-btn:focus-visible,
+.j-number-btn:active {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.j-number-btn::-moz-focus-inner {
+    border: 0;
+}
 
 /* =====================================================
    TIPO DE TABLAS
 ===================================================== */
 
-.j-modes{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    margin-bottom:20px;
+.j-modes {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
-.j-mode{
-    padding:10px 18px;
-    border:2px solid #DDD;
-    background:#FFF;
-    cursor:pointer;
-    border-radius:10px;
-    transition:.3s;
-    font-family:'Cairo',sans-serif;
-    font-weight:600;
+.j-mode {
+    padding: 10px 18px;
+    border: 2px solid #DDD;
+    background: #FFF;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: .3s;
+    font-family: 'Cairo', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: #5D5D5D;
 }
 
-.j-mode:hover{
-    border-color:#FA299C;
+.j-mode:hover {
+    border-color: #FA299C; 
+    color: #FFFFFF;
+    background: #FA299C;
 }
 
-.j-mode.active{
-    background:#FA299C;
-    color:#FFF;
-    border-color:#FA299C;
+.j-mode.active {
+    background: #FA299C;
+    color: #FFF;
+    border-color: #FA299C;
+}
+
+
+.j-grids {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.j-grid {
+    padding: 10px 18px;
+    border: 2px solid #DDD;
+    background: #FFF;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: .3s;
+    font-family: 'Cairo', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: #5D5D5D;
+}
+
+.j-grid span {
+    font-size: 11px;
+    font-weight: 400;
+    color: #5D5D5D;
+    display: block;
+    transition: color 0.3s;
+}
+
+.j-grid:hover {
+    border-color: #FA299C;
+    color: #FFFFFF;
+    background: #FA299C;
+}
+
+.j-grid:hover span {
+    color: #FFFFFF;
+}
+
+.j-grid.active {
+    background: #FA299C;
+    color: #FFF;
+    border-color: #FA299C;
+}
+
+.j-grid.active span {
+    color: #FFFFFF;
 }
 
 
 /* =====================================================
-   CASILLAS
+   MENSAJE DE ESTADO - INCLUIR BARAJAS
 ===================================================== */
 
-.j-grids{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
+.j-incluir-status {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 8px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    display: none;
+    transition: all 0.3s ease;
 }
 
-.j-grid{
-    padding:10px 18px;
-    border:2px solid #DDD;
-    background:#FFF;
-    cursor:pointer;
-    border-radius:10px;
-    transition:.3s;
-    font-family:'Cairo',sans-serif;
-    font-weight:600;
-}
-
-.j-grid:hover{
-    border-color:#FA299C;
-}
-
-.j-grid.active{
-    background:#FA299C;
-    color:#FFF;
-    border-color:#FA299C;
+.j-incluir-status.inactive {
+    display: block;
+    color: #898989;
+    background: #f5f5f5;
+    border: 1px solid #e0e0e0;
 }

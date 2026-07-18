@@ -4,6 +4,39 @@
         Número de tablas por hoja
 </h3>
 
+
+<div class="j-quantity-controls-wrapper">
+
+<div class="j-quantity-controls-range">
+    <input
+        id="tables-range"
+        type="range"
+        min="1"
+        max="30"
+        value="18">
+</div>
+
+<div class="j-quantity-controls-number">
+
+    <button type="button" class="j-number-btn minus">
+        ▼
+    </button>
+
+    <input
+        id="tables-number"
+        type="number"
+        min="1"
+        max="30"
+        value="18">
+
+    <button type="button" class="j-number-btn plus">
+        ▲
+    </button>
+
+</div>
+
+</div>
+
     <div class="j-quantity-controls">
 
         <input
@@ -25,7 +58,7 @@
 </div>
 
 
-<h3>Tipo de tablas</h3>
+<p class="text-conf-tablas" >Tipo de tablas</p>
 
 <div class="j-modes">
 

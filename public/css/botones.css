@@ -169,3 +169,78 @@
     border-color: #D9D9D9;
     color: #5D5D5D;
 }
+
+
+
+/* =====================================================
+   BOTÓN INCLUIR BARAJAS
+===================================================== */
+
+#j-incluir-barajas {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 200px; /* Ancho fijo más corto */
+    height: 40px;
+    margin: 20px auto 0; /* Centrado */
+    border: 2px solid #FA299C;
+    border-radius: 10px;
+    background: #FA299C;
+    color: #FFFFFF;
+    font-family: 'Cairo', sans-serif;
+    font-weight: 700;
+    font-size: 16px; /* Letra más grande */
+    cursor: pointer;
+    transition: .25s;
+    padding: 0 20px;
+}
+
+#j-incluir-barajas:hover {
+    background: #FFFFFF;
+    color: #FA299C;
+}
+
+/* Estado INACTIVO - Blanco */
+#j-incluir-barajas.inactive {
+    background: #FFFFFF;
+    border-color: #D9D9D9;
+    color: #999999;
+}
+
+#j-incluir-barajas.inactive:hover {
+    background: #F5F5F5;
+    border-color: #D9D9D9;
+    color: #666666;
+}
+
+/* Estado cuando ya se incluyeron (confirmado) */
+#j-incluir-barajas.included {
+    background: #24B8C8;
+    border-color: #24B8C8;
+    color: #FFFFFF;
+    cursor: default;
+}
+
+#j-incluir-barajas.included:hover {
+    background: #24B8C8;
+    color: #FFFFFF;
+}
+
+.j-incluir-status {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 8px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    display: inline-block;
+    width: 100%;
+}
+
+.j-incluir-status.active {
+    color: #1FAFB4;
+}
+
+.j-incluir-status.inactive {
+    color: #FF9800;
+}

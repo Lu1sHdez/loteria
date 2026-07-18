@@ -67,35 +67,24 @@ if ($categoria_actual) {
         <?php foreach ($designs as $design): ?>
 
             <div class="j-admin-design-card">
-
-                <img
-                    src="<?php echo Juguemos_Admin_Designs::get_portada($design); ?>"
-                    alt="<?php echo esc_attr($design->nombre); ?>">
+                <div class="j-design-image-wrapper">
+                    <img
+                        src="<?php echo Juguemos_Admin_Designs::get_portada($design); ?>"
+                        alt="<?php echo esc_attr($design->nombre); ?>">
+                </div>
                 
                 <p class="j-admin-design-nombre">
                     <?php echo esc_html($design->nombre); ?>
                 </p>
 
                 <div class="j-admin-card-actions">
-                    <a
-                        href="?view=edit-design&id=<?php echo $design->id; ?>"
-                        class="j-admin-edit">
-
+                    <a href="?view=edit-design&id=<?php echo $design->id; ?>" class="j-admin-edit">
                         Editar
-
                     </a>
-
-                    <button
-                        type="button"
-                        class="j-admin-delete"
-                        data-id="<?php echo $design->id; ?>">
-
+                    <button type="button" class="j-admin-delete" data-id="<?php echo $design->id; ?>">
                         Eliminar
-
                     </button>
-
                 </div>
-
             </div>
 
         <?php endforeach; ?>

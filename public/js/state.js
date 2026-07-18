@@ -7,6 +7,8 @@ const JuguemosState = {
     // Diseño
     deck: null,
     category: null,
+    barajas: [],
+    barajasIncluidas: false,
 
     // Configuración
     quantity: 18,

@@ -1,29 +1,81 @@
 <div class="j-quantity">
 
-    <h3>Número de tablas por hoja</h3>
+    <p class="texto-conf-tablas">Número de tablas por hoja</p>
 
-    <div class="j-quantity-controls">
+    <div class="j-quantity-controls-wrapper">
 
-        <input
-            id="tables-range"
-            type="range"
-            min="1"
-            max="30"
-            value="18">
+        <!-- RANGO -->
+        <div class="j-quantity-controls-range">
+            <input
+                id="tables-range"
+                type="range"
+                min="1"
+                max="30"
+                value="18">
+        </div>
 
-        <input
-            id="tables-number"
-            type="number"
-            min="1"
-            max="30"
-            value="18">
+
+        
+        <!-- INPUT NUMÉRICO CON BOTONES + / - -->
+        <div class="j-quantity-controls-number">
+            <button type="button" class="j-number-btn minus">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M2 6H10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </button>
+
+            <input
+                id="tables-number"
+                type="number"
+                min="1"
+                max="30"
+                value="18">
+
+            <button type="button" class="j-number-btn plus">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M2 6H10M6 2V10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </button>
+        </div>
 
     </div>
 
 </div>
 
 
-<h3>Tipo de tablas</h3>
+<p class="texto-conf-tablas">Número de casillas por tabla</p>
+
+<div class="j-grids">
+
+    <button class="j-grid active" data-grid="4x4">
+        4x4
+        <span>16 casillas</span>
+    </button>
+
+    <button class="j-grid" data-grid="5x5">
+        5x5
+        <span>25 casillas</span>
+    </button>
+
+    <button class="j-grid" data-grid="pocitos4">
+        Pocitos 4
+        <span>4 casillas</span>
+    </button>
+
+    <button class="j-grid" data-grid="pocitos3">
+        Pocitos 3
+        <span>3 casillas</span>
+    </button>
+
+    <button class="j-grid" data-grid="cruzadas">
+        Cruzadas
+        <span>2 diagonales</span>
+    </button>
+
+</div>
+
+<p class="texto-conf-tablas">Tipo de tablas</p>
+
 
 <div class="j-modes">
 
@@ -45,29 +97,3 @@
 
 </div>
 
-
-<h3>Casillas</h3>
-
-<div class="j-grids">
-
-    <button class="j-grid active" data-grid="4x4">
-        4x4
-    </button>
-
-    <button class="j-grid" data-grid="5x5">
-        5x5
-    </button>
-
-    <button class="j-grid" data-grid="pocitos4">
-        Pocitos 4
-    </button>
-
-    <button class="j-grid" data-grid="pocitos3">
-        Pocitos 3
-    </button>
-
-    <button class="j-grid" data-grid="cruzadas">
-        Cruzadas
-    </button>
-
-</div>

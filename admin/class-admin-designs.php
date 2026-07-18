@@ -127,25 +127,37 @@ class Juguemos_Admin_Designs
 
 
     public static function get_portada($design)
-    {
-        if (!empty($design->portada)) {
-
-            return esc_url($design->portada);
-
-        }
-
-        $barajas = Juguemos_Admin_Barajas::get_by_design($design->id);
-
-        if (!empty($barajas)) {
-
-            return esc_url(
-                Juguemos_Files::preview_url($design->id) . $barajas[0]->imagen
-            );
-
-        }
-
-        return esc_url(JUGUEMOS_URL . 'assets/img/default-portada.png');
+{
+    // Siempre buscar la baraja número 3 (La Dama)
+    global $wpdb;
+    
+    $baraja = $wpdb->get_row($wpdb->prepare(
+        "SELECT imagen 
+        FROM {$wpdb->prefix}juguemos_barajas 
+        WHERE design_id = %d 
+        AND numero = 3 
+        AND activo = 1",
+        $design->id
+    ));
+    
+    if ($baraja && !empty($baraja->imagen)) {
+        return esc_url(
+            Juguemos_Files::preview_url($design->id) . $baraja->imagen
+        );
     }
+    
+    // Si no existe la baraja #3, usar la primera baraja disponible
+    $barajas = Juguemos_Admin_Barajas::get_by_design($design->id);
+    
+    if (!empty($barajas)) {
+        return esc_url(
+            Juguemos_Files::preview_url($design->id) . $barajas[0]->imagen
+        );
+    }
+    
+    // Si no hay barajas, usar imagen por defecto
+    return esc_url(JUGUEMOS_URL . 'assets/img/default-portada.png');
+}
 }
 
 

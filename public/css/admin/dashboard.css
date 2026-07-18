@@ -1,140 +1,171 @@
-.j-admin-designs{
-
-    max-width:1200px;
-    margin:40px auto;
-    font-family:'Cairo',sans-serif;
-
+.j-admin-designs {
+    max-width: 1200px;
+    margin: 40px auto;
+    font-family: 'Cairo', sans-serif;
 }
 
-.j-admin-filtros-wrapper{
-    margin-top:50px;
+.j-admin-filtros-wrapper {
+    margin-top: 50px;
     margin-bottom: 50px;
 }
 
-.j-admin-filtros{
-
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:20px;
-    margin-bottom:35px;
-
+.j-admin-filtros {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 35px;
 }
 
-/* Contenedor de categorías */
-.j-admin-categorias{
-
-    display:flex;
-    flex-wrap:wrap;
-    gap:12px;
-    flex:1;
-
+.j-admin-categorias {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    flex: 1;
 }
 
-/* Botones de categoría */
-.j-admin-categoria{
-
-    height:40px;
-    padding:0 20px;
-    border:1px solid #D9D9D9;
-    background:#FFFFFF;
-    border-radius:8px;
+.j-admin-categoria {
+    height: 40px;
+    padding: 0 20px;
+    border: 1px solid #D9D9D9;
+    background: #FFFFFF;
+    border-radius: 8px;
     color: #5D5D5D;
-    font-size:14px;
-    font-weight:600;
-    cursor:pointer;
-    transition:.2s;
-
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s;
 }
 
-.j-admin-categoria:hover{
-
-    background:#FA299C;
-    border-color:#FA299C;
-    color:#FFFFFF;
-
+.j-admin-categoria:hover {
+    background: #FA299C;
+    border-color: #FA299C;
+    color: #FFFFFF;
 }
 
-.j-admin-categoria.active{
-
-    background:#FA299C;
-    border-color:#FA299C;
-    color:#FFFFFF;
-
+.j-admin-categoria.active {
+    background: #FA299C;
+    border-color: #FA299C;
+    color: #FFFFFF;
 }
 
-/* Botón Agregar */
-.j-admin-add{
-
-    flex-shrink:0;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    height:40px;
-    padding:0 22px;
-
-    background:#FA299C;
-    color:#FFFFFF;
-
-    text-decoration:none!important;
-
-    border-radius:8px;
-
-    font-size:14px;
-    font-weight:700;
-
-    white-space:nowrap;
-
-    transition:.2s;
-
+.j-admin-add {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    padding: 0 22px;
+    background: #FA299C;
+    color: #FFFFFF;
+    text-decoration: none !important;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: .2s;
 }
 
 .j-admin-add:hover,
 .j-admin-add:active,
 .j-admin-add:focus {
-
     background: #FA299C !important;
     color: #FFFFFF !important;
     text-decoration: none !important;
-
 }
 
 
-.j-admin-designs-grid{
-
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
-    gap:25px;
-
+.j-admin-designs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 25px;
 }
 
-.j-admin-design-card{
-    width:100%;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:flex-start;
-    text-align:center;
-
+.j-admin-design-card {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
 }
 
-.j-admin-design-card img{
-    width:170px;
-    height:255px;
-    object-fit:cover;
-    display:block;
-    border-radius:6px;
-    box-shadow:0 6px 18px rgba(0,0,0,.15);
-    transition:.25s;
+.j-admin-design-card .j-design-image-wrapper {
+    width: 170px;
+    height: 255px;
+    overflow: hidden;
+    border-radius: 6px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .15);
+    flex-shrink: 0;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.j-admin-design-card:hover img{
+.j-admin-design-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
 
-    transform:translateY(1px);
-    box-shadow:0 12px 26px rgba(0,0,0,.22);
+.j-admin-design-card:hover img {
+    transform: none;
+}
 
+.j-admin-design-nombre {
+    margin-top: 12px;
+    color: #24B8C8;
+    font-size: 15px;
+    font-weight: 700;
 }
 
 
+
+.j-admin-card-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.j-admin-edit,
+.j-admin-edit:hover {
+    width: 170px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    border-radius: 6px;
+    color: #FFFFFF !important;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none !important;
+    transition: .2s;
+}
+
+.j-admin-delete {
+    width: 170px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    border: 1px solid #D9D9D9;
+    border-radius: 6px;
+    color: #E53935;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.j-admin-delete:hover {
+    color: #E53935;
+    background: none !important;
+    border: none;
+}

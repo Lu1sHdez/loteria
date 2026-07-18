@@ -16,7 +16,106 @@
     margin-top:30px;
     min-height:450px;
     display:flex;
+    flex-direction:column;
+    color:#999;
+}
+
+#deck-preview:empty,
+#deck-preview.j-preview-empty{
     justify-content:center;
     align-items:center;
-    color:#999;
+    text-align:center;
+}
+
+#j-incluir-barajas{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    height:46px;
+    margin-top:20px;
+    border:2px solid #FA299C;
+    border-radius:10px;
+    background:#FA299C;
+    color:#FFFFFF;
+    font-family:'Cairo',sans-serif;
+    font-weight:700;
+    font-size:15px;
+    cursor:pointer;
+    transition:.25s;
+}
+
+#j-incluir-barajas:hover{
+    background:#FFFFFF;
+    color:#FA299C;
+}
+
+#j-incluir-barajas.j-incluidas{
+    background:#24B8C8;
+    border-color:#24B8C8;
+    cursor:default;
+}
+
+#j-incluir-barajas.j-incluidas:hover{
+    background:#24B8C8;
+    color:#FFFFFF;
+}
+
+.j-strip-confirmed{
+    outline:2px solid #24B8C8;
+    outline-offset:6px;
+    border-radius:8px;
+}
+
+
+
+
+#juguemos-decks {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+    justify-items: center;
+}
+
+.j-deck {
+    font-family: 'Cairo', sans-serif;
+    border: 2px solid #EAEAEA;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #FFFFFF;
+    transition: border-color .25s;
+    width: 180px;
+    cursor: pointer;
+}
+
+.j-deck.active {
+    border-color: #FA299C;
+}
+
+.j-deck-image {
+    background: #FFFFFF;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    height: 180px;
+    overflow: hidden;
+}
+
+.j-deck-image img {
+    display: block;
+    width: auto;
+    max-width: 140px;
+    max-height: 160px;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.j-deck-name {
+    padding: 6px 8px 10px;
+    text-align: center;
+    font-weight: bold;
+    color: #1E2249;
+    font-size: 14px;
 }
