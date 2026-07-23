@@ -311,109 +311,101 @@
 
     z-index:2;
 }
-
 /* ==========================================
-   Marcas de corte
+   Marcas de corte - Vista previa
 ========================================== */
 
-.j-crop{
+.j-crop-preview{
+    position: relative;
+    display: inline-block;
+    padding: 30px;
+    margin-top: 20px;
 
-    position:absolute;
-
-    width:18px;
-    height:18px;
+    transform: translateX(-50px);
 }
 
-.j-crop::before,
-.j-crop::after{
-
-    content:"";
-
-    position:absolute;
-
-    background:#7d7d7d;
+.j-crop-preview-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 52px);
+    grid-template-rows: repeat(3, 52px);
+    gap: 18px;
+    position: relative;
+    z-index: 2;
 }
 
-/* Horizontal */
-
-.j-crop::before{
-
-    width:18px;
-    height:2px;
+.j-crop-preview-grid div{
+    width: 52px;
+    height: 52px;
+    background: #DEF5F3;
 }
 
-/* Vertical */
+/* ==========================================
+   Líneas guía
+========================================== */
 
-.j-crop::after{
-
-    width:2px;
-    height:18px;
+.j-line{
+    position: absolute;
+    z-index: 1;
 }
 
-/* Superior izquierda */
+/* =========================
+   Horizontales
+========================= */
 
-.j-crop.top-left{
-    top:0;
-    left:0;
+.j-line.h{
+    left: 16px;
+    right: 16px;
+    height: 2px;
+    background: repeating-linear-gradient(
+        to right,
+        #BFC5CC 0 8px,
+        transparent 8px 14px
+    );
 }
 
-.j-crop.top-left::before{
-    top:0;
-    left:0;
+.j-line.h.top{
+    top: 16px;
 }
 
-.j-crop.top-left::after{
-    top:0;
-    left:0;
+.j-line.h.middle-1{
+    top: 90px;
 }
 
-/* Superior derecha */
-
-.j-crop.top-right{
-    top:0;
-    right:0;
+.j-line.h.middle-2{
+    top: 160px;
 }
 
-.j-crop.top-right::before{
-    top:0;
-    right:0;
+.j-line.h.bottom{
+    bottom: 16px;
 }
 
-.j-crop.top-right::after{
-    top:0;
-    right:0;
+/* =========================
+   Verticales
+========================= */
+
+.j-line.v{
+    top: 16px;
+    bottom: 16px;
+    width: 2px;
+    background: repeating-linear-gradient(
+        to bottom,
+        #BFC5CC 0 8px,
+        transparent 8px 14px
+    );
 }
 
-/* Inferior izquierda */
-
-.j-crop.bottom-left{
-    bottom:0;
-    left:0;
+.j-line.v.left{
+    left: 16px;
 }
 
-.j-crop.bottom-left::before{
-    bottom:0;
-    left:0;
+.j-line.v.center-1{
+    left: 90px;
 }
 
-.j-crop.bottom-left::after{
-    bottom:0;
-    left:0;
+.j-line.v.center-2{
+    left: 160px;
 }
 
-/* Inferior derecha */
-
-.j-crop.bottom-right{
-    bottom:0;
-    right:0;
-}
-
-.j-crop.bottom-right::before{
-    bottom:0;
-    right:0;
-}
-
-.j-crop.bottom-right::after{
-    bottom:0;
-    right:0;
+.j-line.v.right{
+    right: 16px;
 }

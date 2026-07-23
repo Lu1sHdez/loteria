@@ -212,29 +212,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
-    // =========================
-    // MARCAS DE CORTE
-    // =========================
-
-    const cutMarks = document.getElementById("j-cut-marks");
-
-    if (cutMarks) {
-
-        cutMarks.checked = JuguemosState.cutMarks;
-
-        drawCutMarks(); // ← Agregar aquí
-
-        cutMarks.addEventListener("change", () => {
-
-            JuguemosState.cutMarks = cutMarks.checked;
-
-            drawCutMarks();
-
-        });
-
-    }
-
-
         // ========== COLOR DE MARCO ==========
     document.querySelectorAll(".j-color-swatch").forEach(swatch => {
         swatch.addEventListener("click", () => {
@@ -654,9 +631,3 @@ function drawMarcosPreview() {
     container.innerHTML = html;
 }
 
-function drawCutMarks() {
-    const sheet = document.getElementById("j-preview-sheet");
-    if (!sheet) return;
-
-    sheet.classList.toggle("cut-marks-active", JuguemosState.cutMarks);
-}
