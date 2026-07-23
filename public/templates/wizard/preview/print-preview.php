@@ -21,22 +21,37 @@ if (!defined('ABSPATH')) {
         </p>
 
     </div>
-    <div class="j-print-paper-info">
-
-        <div class="j-paper-name" id="j-paper-name">
-            Carta
-        </div>
-
-        <div class="j-paper-size" id="j-paper-size-info">
-            215.9 × 279.4 mm (8.5 × 11")
-        </div>
-
-    </div>
 
     <div class="j-print-preview-wrapper">
 
-        <!-- El motor de impresión agregará aquí las hojas -->
-        <div class="j-print-workspace"></div>
+        <!-- Aquí JavaScript podrá crear una o varias hojas -->
+        <div class="j-print-workspace">
+
+            <div class="j-print-sheet">
+
+                <div class="j-print-margin">
+
+                    <div class="j-print-cropmarks"></div>
+
+                    <div class="j-print-grid"></div>
+
+                </div>
+
+            </div>
+
+            <div class="j-print-sheet">
+
+                <div class="j-print-margin">
+
+                    <div class="j-print-cropmarks"></div>
+
+                    <div class="j-print-grid"></div>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 

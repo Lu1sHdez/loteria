@@ -431,7 +431,7 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
             if (step3) {
-                step3.classList.add("active");  
+                step3.classList.add("active");
             }
 
             window.scrollTo({
