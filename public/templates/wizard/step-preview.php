@@ -92,7 +92,16 @@ if (!defined('ABSPATH')) {
                         Activa para mostrar marcas de corte en la vista previa e impresión.
                     </p>
 
-                    <div class="j-crop-preview">
+                    <label class="j-switch">
+                        <input type="checkbox" id="j-cut-marks-toggle" checked>
+                        <span class="j-switch-slider">
+                            <span class="j-switch-thumb">
+                                ✂
+                            </span>
+                        </span>
+                    </label>
+
+                    <div class="j-crop-preview" id="j-cut-marks-preview">
 
                         <!-- Horizontales -->
                         <span class="j-line h top"></span>
@@ -121,14 +130,86 @@ if (!defined('ABSPATH')) {
                 
 
             </div> <!-- Cierre de j-section -->
+            <!-- ==========================================
+
+
+            2. Resumen de pedido
+            ========================================== -->
+
+            <div class="j-section">
+
+                <div class="j-panel-item">
+                    <div class="subtitulo-aqua">2. Resumen de pedido</div>
+                </div>
+
+                <div class="j-order-summary">
+
+                    <p class="j-order-summary-title">
+                        Tu lotería incluye:
+                    </p>
+
+                    <div class="j-order-summary-items">
+
+                        <div class="j-summary-chip">
+                            <i class="icon-tablas"></i>
+                            <span id="j-summary-tables"></span>
+                        </div>
+
+                        <div class="j-summary-chip">
+                            <i class="icon-cartas"></i>
+                            <span id="j-summary-cards"></span>
+                        </div>
+
+                        <div class="j-summary-chip">
+                            <i class="icon-paper"></i>
+                            <span id="j-summary-paper"></span>
+                        </div>
+
+                        <div class="j-summary-chip">
+                            <i class="icon-orientation"></i>
+                            <span id="j-summary-orientation"></span>
+                        </div>
+
+                        <div class="j-summary-chip">
+                            <i class="icon-pages"></i>
+                            <span id="j-summary-pages"></span>
+                        </div>
+
+                        <div class="j-summary-chip">
+                            <i class="icon-grid"></i>
+                            <span id="j-summary-grid"></span>
+                        </div>
+
+                        <div class="j-summary-chip">
+                            <i class="icon-mode"></i>
+                            <span id="j-summary-mode"></span>
+                        </div>
+
+                        <div class="j-summary-chip">
+                            <i class="icon-cut"></i>
+                            <span id="j-summary-cutmarks"></span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+            <?php require __DIR__ . '/preview/print-preview.php'; ?>
 
             <div class="j-preview-header">
                 <button type="button" id="j-edit-order" class="j-btn-back">
                     <span>←</span>
                     <span>Editar pedido</span>
                 </button>
-            </div>
 
+                <button
+                    type="button"
+                    id="j-confirm-order"
+                    class="j-btn-next">
+                    Confirmar pedido →
+                </button>
+            </div>
         </div> <!-- Cierre de juguemos-left -->
     </div> <!-- Cierre de j-step-body -->
 

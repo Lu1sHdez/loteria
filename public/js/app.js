@@ -4,6 +4,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (paperSelect) {
         paperSelect.addEventListener("change", function () {
             JuguemosState.paper = this.value;
+            updateOrderSummary();
+
         });
     }
 
@@ -31,7 +33,10 @@ document.addEventListener("DOMContentLoaded", () => {
     
             updatePaperOptions(); // ← actualiza el select
     
+
             updatePrice();
+
+            updateOrderSummary();
         });
     });
 
@@ -53,6 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
             JuguemosState.quantity = parseInt(range.value);
             updateRangeColor();
             updatePrice();
+            updateOrderSummary();
         }); 
 
         input.addEventListener("input", () => {
@@ -69,6 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
             JuguemosState.quantity = value;
             updateRangeColor();
             updatePrice();
+            updateOrderSummary();
         });
 
         const btnPlus = document.querySelector(".j-number-btn.plus");
@@ -102,6 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
             button.classList.add("active");
             JuguemosState.mode = button.dataset.mode;
             updatePrice();
+            updateOrderSummary();
         });
     });
 
@@ -133,6 +141,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             JuguemosState.orientation = button.dataset.orientation;
 
+            updateOrderSummary();
+
+
         });
 
     });
@@ -155,6 +166,8 @@ document.addEventListener("DOMContentLoaded", () => {
             tablesPerPageInput.stepUp();
 
             JuguemosState.quantity = parseInt(tablesPerPageInput.value);
+            updateOrderSummary();
+
 
         });
 
@@ -163,12 +176,15 @@ document.addEventListener("DOMContentLoaded", () => {
             tablesPerPageInput.stepDown();
 
             JuguemosState.quantity = parseInt(tablesPerPageInput.value);
+            updateOrderSummary();
+
 
         });
 
         tablesPerPageInput.addEventListener("input", () => {
             JuguemosState.quantity  =
                 parseInt(tablesPerPageInput.value) || 1;
+            updateOrderSummary();
 
         });
 
@@ -207,10 +223,44 @@ document.addEventListener("DOMContentLoaded", () => {
 
             pagesInput.value = value;
             JuguemosState.pages = value;
+            updateOrderSummary();
+        });
+
+    }
+
+
+    // =========================
+    // MARCAS DE CORTE
+    // =========================
+
+    const cutMarksToggle = document.getElementById("j-cut-marks-toggle");
+    const cutMarksLines = document.querySelectorAll("#j-cut-marks-preview .j-line");
+
+    if (cutMarksToggle) {
+
+        cutMarksToggle.checked = JuguemosState.cutMarks;
+
+        cutMarksLines.forEach(line => {
+            line.style.display = JuguemosState.cutMarks ? "" : "none";
+        });
+
+        cutMarksToggle.addEventListener("change", () => {
+
+            JuguemosState.cutMarks = cutMarksToggle.checked;
+
+            updateOrderSummary();
+
+            cutMarksLines.forEach(line => {
+                line.style.display = JuguemosState.cutMarks ? "" : "none";
+            });
 
         });
 
     }
+
+
+
+
 
         // ========== COLOR DE MARCO ==========
     document.querySelectorAll(".j-color-swatch").forEach(swatch => {
@@ -239,6 +289,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Aplicar los colores iniciales (por defecto) al cargar la página
     aplicarColores();
+    updateOrderSummary();
 
     // ========== BOTÓN INCLUIR BARAJAS (TOGGLE) ==========
     const btnIncluir = document.getElementById("j-incluir-barajas");
@@ -247,6 +298,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (btnIncluir) {
         btnIncluir.classList.add('active');
         JuguemosState.barajasIncluidas = true;
+        
+        
         
         if (statusMsg) {
             statusMsg.style.display = 'none';
@@ -273,6 +326,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     statusMsg.style.color = '#898989';
                 }
             }
+            updateOrderSummary(); 
             console.log('Barajas incluidas:', JuguemosState.barajasIncluidas);
         });
     }
@@ -298,9 +352,11 @@ document.addEventListener("DOMContentLoaded", () => {
                        
                         JuguemosAjax.loadBarajas(JuguemosState.deck).then(() => {
                             llenarCasillasAleatorio();
+                            updateOrderSummary(); 
                         });
                     } else {
                         llenarCasillasAleatorio();
+                        updateOrderSummary(); 
                     }
                 } else {
                     alert('Primero selecciona un diseño.');
@@ -331,6 +387,7 @@ document.addEventListener("DOMContentLoaded", () => {
             JuguemosState.grid = button.dataset.grid;
             drawGrid();
             drawMarcosPreview();   
+            updateOrderSummary();
             limpiarCasillas();
         });
     });
@@ -346,6 +403,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (btnGoPreview) {
 
         btnGoPreview.addEventListener("click", () => {
+            updateOrderSummary();
 
             // Ocultar todos los pasos
             document.querySelectorAll(".j-step").forEach(step => {
@@ -373,13 +431,14 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
             if (step3) {
-                step3.classList.add("active");
+                step3.classList.add("active");  
             }
 
             window.scrollTo({
                 top: 0,
                 behavior: "smooth"
             });
+            PrintPreview.refresh();
 
         });
 
@@ -629,5 +688,49 @@ function drawMarcosPreview() {
     }
 
     container.innerHTML = html;
+}
+
+
+function updateOrderSummary(){
+
+    document.getElementById("j-summary-tables").textContent =
+        `${JuguemosState.quantity} tablas por hoja`;
+
+    document.getElementById("j-summary-cards").textContent =
+        `${JuguemosState.barajas.length} barajas`;
+
+    document.getElementById("j-summary-paper").textContent =
+        JuguemosState.paper;
+
+    document.getElementById("j-summary-orientation").textContent =
+        JuguemosState.orientation === "vertical"
+            ? "Vertical"
+            : "Horizontal";
+
+    document.getElementById("j-summary-pages").textContent =
+        `${JuguemosState.pages} páginas`;
+
+    document.getElementById("j-summary-grid").textContent = {
+
+        "4x4":"4x4 · 16 casillas",
+        "5x5":"5x5 · 25 casillas",
+        "pocitos4":"Pocitos 4",
+        "pocitos3":"Pocitos 3",
+        "cruzadas":"Cruzadas"
+
+    }[JuguemosState.grid];
+
+    document.getElementById("j-summary-mode").textContent =
+
+        JuguemosState.mode === "favoritas"
+            ? "7 Favoritas"
+            : JuguemosState.mode;
+
+    document.getElementById("j-summary-cutmarks").textContent =
+
+        JuguemosState.cutMarks
+            ? "Líneas de corte"
+            : "Sin líneas de corte";
+
 }
 

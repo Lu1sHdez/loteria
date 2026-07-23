@@ -1,0 +1,38 @@
+.j-print-grid{
+
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+
+    justify-content:center;
+    align-content:flex-start;
+
+}
+
+.j-print-board{
+
+    width:150px;
+
+}
+
+.j-board-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:3px;
+
+}
+
+.j-board-cell{
+
+    aspect-ratio:1;
+
+    border:1px solid #DDD;
+
+    border-radius:4px;
+
+    background:white;
+
+}
