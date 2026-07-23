@@ -21,13 +21,6 @@
     margin-bottom: 12px;
 }
 
-.j-casilla-desc {
-    font-family: 'Cairo', sans-serif;
-    font-size: 16px;
-    color: #5D5D5D;
-    margin-top: 10px;
-    line-height: 1.4;
-}
 
 .j-casilla-btn {
     display: flex;

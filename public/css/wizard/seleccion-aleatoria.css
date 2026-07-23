@@ -16,13 +16,7 @@
     margin-bottom: 12px;
 }
 
-.j-casilla-desc {
-    font-family: 'Cairo', sans-serif;
-    font-size: 13px;
-    color: #999;
-    margin-top: 10px;
-    line-height: 1.4;
-}
+
 
 /* 🔥 Botón Selección Aleatoria */
 .j-casilla-btn {
@@ -328,7 +322,7 @@
         font-size: 15px;
     }
 
-    .j-casilla-desc {
+    .j-texto-normal {
         font-size: 12px;
     }
 
@@ -352,7 +346,7 @@
         font-size: 14px;
     }
 
-    .j-casilla-desc {
+    .j-texto-normal {
         font-size: 11px;
     }
 

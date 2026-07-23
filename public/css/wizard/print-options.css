@@ -1,0 +1,471 @@
+/* =====================================================
+   PASO 3 - OPCIONES DE IMPRESIÓN (fila única, 5 columnas)
+===================================================== */
+
+.j-print-options,
+.j-order-summary-chips {
+    margin-bottom: 25px;
+}
+
+.j-print-options-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 22px;
+    margin-top: 20px;
+}
+
+.j-print-option-block {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.j-print-option-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Cairo', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: #1E2249;
+    margin: 0;
+}
+
+.j-print-icon {
+    font-size: 15px;
+    line-height: 1;
+    color: #1FAFB4;
+}
+
+.j-print-option-desc {
+    font-family: 'Cairo', sans-serif;
+    font-size: 11.5px;
+    color: #9A9A9A;
+    margin: 0 0 8px 0;
+    line-height: 1.4;
+}
+
+/* =====================================================
+   TAMAÑO DE PAPEL
+===================================================== */
+
+.j-select {
+    width: 100%;
+    height: 44px;
+    padding: 0 12px;
+    border: 2px solid #E5E5E5;
+    border-radius: 10px;
+    background: #FFFFFF;
+    font-family: 'Cairo', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    color: #1E2249;
+    cursor: pointer;
+    transition: border-color .25s;
+    appearance: auto;
+}
+
+.j-select:hover,
+.j-select:focus {
+    border-color: #1FAFB4;
+    outline: none;
+}
+
+/* =====================================================
+   ORIENTACIÓN
+===================================================== */
+
+.j-orientation-options {
+    display: flex;
+    gap: 8px;
+}
+
+.j-orientation-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 8px;
+    border: 2px solid #E5E5E5;
+    border-radius: 10px;
+    background: #FFFFFF;
+    font-family: 'Cairo', sans-serif;
+    font-weight: 700;
+    font-size: 12.5px;
+    color: #9A9A9A;
+    cursor: pointer;
+    transition: all .25s;
+}
+
+.j-orientation-btn:hover {
+    border-color: #1FAFB4;
+    color: #1FAFB4;
+}
+
+.j-orientation-btn.active {
+    border-color: #1FAFB4;
+    background: #EEF9F8;
+    color: #1FAFB4;
+}
+
+.j-orientation-shape {
+    display: block;
+    border: 2px solid currentColor;
+    border-radius: 3px;
+    background: rgba(255,255,255,.5);
+}
+
+.j-orientation-vertical {
+    width: 22px;
+    height: 30px;
+}
+
+.j-orientation-horizontal {
+    width: 30px;
+    height: 22px;
+    border-color: #C9C9C9;
+}
+
+.j-orientation-btn:not(.active) .j-orientation-horizontal,
+.j-orientation-btn:not(.active) .j-orientation-vertical {
+    border-color: #C9C9C9;
+}
+
+.j-orientation-btn.active .j-orientation-shape {
+    border-color: #1FAFB4;
+}
+
+/* =====================================================
+   STEPPERS (tablas por hoja y páginas)
+===================================================== */
+
+.j-stepper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 110px;
+    height: 42px;
+    border: 2px solid #1FAFB4;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #FFFFFF;
+}
+
+.j-stepper input[type="number"] {
+    flex: 1;
+    width: 40px;
+    height: 100%;
+    border: 0;
+    outline: none;
+    text-align: center;
+    font-family: 'Cairo', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1E2249;
+    background: #FFFFFF;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.j-stepper input::-webkit-outer-spin-button,
+.j-stepper input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.j-stepper-btn {
+    width: 30px;
+    height: 100%;
+    border: 0;
+    background: #FFFFFF;
+    color: #1FAFB4;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .2s;
+}
+
+.j-stepper-btn:hover {
+    background: #EEF9F8;
+}
+
+/* =====================================================
+   MARCAS DE CORTE (switch + mini preview)
+===================================================== */
+
+.j-switch-inline {
+    margin-left: auto;
+}
+
+.j-switch {
+    position: relative;
+    display: inline-block;
+    width: 42px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.j-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.j-switch-slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: #DDD;
+    border-radius: 28px;
+    transition: .3s;
+}
+
+.j-switch-slider::before {
+    content: "";
+    position: absolute;
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background: #FFFFFF;
+    border-radius: 50%;
+    transition: .3s;
+    box-shadow: 0 2px 6px rgba(0,0,0,.2);
+}
+
+.j-switch input:checked + .j-switch-slider {
+    background: #24B8C8;
+}
+
+.j-switch input:checked + .j-switch-slider::before {
+    transform: translateX(18px);
+}
+
+.j-marcas-corte-preview {
+    position: relative;
+    padding: 10px 12px;
+    width: fit-content;
+}
+
+.j-crop-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+}
+
+.j-crop-cell {
+    width: 22px;
+    height: 28px;
+    background: #EEF9F8;
+    border-radius: 2px;
+}
+
+.j-crop-corner {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-color: #B7B7B7;
+    border-style: dashed;
+    border-width: 0;
+}
+
+.j-crop-tl { top: 2px; left: 2px; border-top-width: 1px; border-left-width: 1px; }
+.j-crop-tr { top: 2px; right: 2px; border-top-width: 1px; border-right-width: 1px; }
+.j-crop-bl { bottom: 2px; left: 2px; border-bottom-width: 1px; border-left-width: 1px; }
+.j-crop-br { bottom: 2px; right: 2px; border-bottom-width: 1px; border-right-width: 1px; }
+
+/* =====================================================
+   RESUMEN DE PEDIDO - CHIPS
+===================================================== */
+
+.j-summary-chips-box {
+    background: #EEF9F8;
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-top: 15px;
+}
+
+.j-summary-chips-title {
+    font-family: 'Cairo', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: #1E2249;
+    margin: 0 0 12px 0;
+}
+
+.j-summary-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.j-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: #FFFFFF;
+    border-radius: 20px;
+    font-family: 'Cairo', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: #1E2249;
+    box-shadow: 0 2px 6px rgba(0,0,0,.06);
+}
+
+.j-chip-icon {
+    font-size: 14px;
+}
+
+/* =====================================================
+   VISTA PREVIA DE LA HOJA
+===================================================== */
+
+.j-sheet-preview-wrapper {
+    margin-top: 25px;
+}
+
+.j-sheet-preview-title {
+    font-family: 'Cairo', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: #1E2249;
+    margin: 0 0 12px 0;
+}
+
+.j-sheet-preview {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    background: #FFFFFF;
+    border: 1px solid #E5E5E5;
+    border-radius: 8px;
+    padding: 25px;
+    width: 100%;
+    box-shadow: 0 4px 16px rgba(0,0,0,.05);
+}
+
+.j-sheet-preview.j-sheet-horizontal {
+    grid-template-columns: repeat(6, 1fr);
+}
+
+.j-sheet-card {
+    aspect-ratio: 2 / 3;
+    border: 3px solid #FA299C;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #F8F8F8;
+    position: relative;
+}
+
+.j-sheet-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.j-sheet-preview.j-sheet-corte .j-sheet-card {
+    outline: 1px dashed #AAAAAA;
+    outline-offset: 3px;
+}
+
+/* =====================================================
+   BOTONES INFERIORES - PASO 3
+===================================================== */
+
+.j-preview-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 30px;
+    gap: 20px;
+}
+
+.j-preview-actions .j-admin-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 26px;
+    background: #FFFFFF;
+    border: 2px solid #DDD;
+    border-radius: 12px;
+    font-family: 'Cairo', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: #5D5D5D;
+    cursor: pointer;
+    transition: .25s;
+}
+
+.j-preview-actions .j-admin-back:hover {
+    border-color: #FA299C;
+    color: #FA299C;
+}
+
+.j-preview-actions .j-wizard-next {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 34px;
+    background: #24B8C8;
+    border: 2px solid #24B8C8;
+    border-radius: 12px;
+    font-family: 'Cairo', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: #FFFFFF;
+    cursor: pointer;
+    transition: .25s;
+}
+
+.j-preview-actions .j-wizard-next:hover {
+    background: #FFFFFF;
+    color: #24B8C8;
+}
+
+.j-btn-arrow {
+    font-size: 16px;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 1200px) {
+    .j-print-options-row {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .j-print-options-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .j-sheet-preview {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .j-preview-actions {
+        flex-direction: column;
+    }
+
+    .j-preview-actions .j-admin-back,
+    .j-preview-actions .j-wizard-next {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .j-print-options-row {
+        grid-template-columns: 1fr;
+    }
+}

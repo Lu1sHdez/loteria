@@ -1,0 +1,419 @@
+.j-section-next{
+    display:flex;
+    justify-content:center;
+    margin-top:10px;
+}
+
+.j-btn-primary{
+    min-width:220px;
+    height:48px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:0 26px;
+
+    border:none;
+    border-radius:8px;
+
+    background:#FA299C;
+    color:#FFF;
+
+    font-size:16px;
+    font-weight:700;    
+
+    cursor:pointer;
+    transition:.2s;
+}
+.j-btn-primary:focus,
+.j-btn-primary:hover{
+    background:#FA299C;
+}
+.j-print-options-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(180px,1fr));
+    gap:28px;
+    align-items:start;
+}
+
+.j-select{
+    font-size:12px;
+}
+
+
+
+
+/* ==========================
+   ORIENTACIÓN
+========================== */
+
+.j-orientation-options{
+    display:flex;
+    gap:16px;
+    margin-top:8px;
+}
+
+.j-orientation{
+    width:130px;
+    height:150px;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+
+    background:#FFF;
+    border:1px solid #D0D0D0;
+    border-radius:18px;
+
+    cursor:pointer;
+    transition:.2s;
+
+    padding:15px;
+}
+.j-orientation:hover,
+.j-orientation.active{
+    background:#DEF5F3;
+    border-color:#08ADA1;
+}
+
+.j-orientation:hover .j-orientation-label,
+.j-orientation.active .j-orientation-label{
+    color:#08ADA1;
+}
+
+.j-orientation:hover .j-orientation-icon,
+.j-orientation.active .j-orientation-icon{
+    border-color:#08ADA1;
+}
+
+.j-orientation-label{
+    font-family:'Cairo',sans-serif;
+    font-size:16px;
+    font-weight:700;
+    color:#8A8A8A;
+}
+
+.j-orientation.active .j-orientation-label{
+    color:#08ADA1;
+}
+
+/* ==========================
+   ICONOS
+========================== */
+
+.j-orientation-icon{
+    border:4px solid #9D9D9D;
+    transition:.2s;
+}
+
+.j-orientation.active .j-orientation-icon{
+    border-color:#08ADA1;
+}
+
+.j-orientation-icon.vertical{
+    width:42px;
+    height:82px;
+}
+
+.j-orientation-icon.horizontal{
+    width:82px;
+    height:42px;
+}
+
+
+/* =====================================================
+   CANTIDAD DE TABLAS POR HOJA
+===================================================== */
+
+.j-tables-per-page-control{
+    display:flex;
+    align-items:center;
+
+    width:140px;
+    height:40px;
+
+    border:2px solid #1FAFB4;
+    border-radius:10px;
+
+    overflow:hidden;
+
+    background:#FFFFFF;
+    flex-shrink:0;
+}
+
+.j-tables-per-page-input{
+    flex:1;
+
+    height:100%;
+
+    border:0;
+    outline:none;
+
+    text-align:center;
+
+    font-family:'Cairo',sans-serif;
+    font-size:20px;
+    font-weight:700;
+
+    color:#5D5D5D;
+    background:#FFFFFF;
+
+    padding:0 4px;
+
+    appearance:textfield;
+    -moz-appearance:textfield;
+}
+
+.j-tables-per-page-input::-webkit-outer-spin-button,
+.j-tables-per-page-input::-webkit-inner-spin-button{
+    -webkit-appearance:none;
+    margin:0;
+}
+
+.j-tables-per-page-btn{
+
+    width:38px;
+    height:100%;
+
+    border:0;
+
+    background:#1FAFB4;
+    color:#FFFFFF;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+    padding:0;
+
+    line-height:1;
+}
+
+.j-tables-per-page-btn:hover{
+
+    background:#179B95;
+
+}
+
+.j-tables-per-page-btn:focus,
+.j-tables-per-page-btn:focus-visible,
+.j-tables-per-page-btn:active{
+
+    outline:none;
+    box-shadow:none;
+
+}
+
+.j-tables-per-page-btn::-moz-focus-inner{
+
+    border:0;
+
+}
+
+
+
+
+
+
+/* ==========================================
+   Vista previa de la hoja
+========================================== */
+
+.j-preview-sheet{
+    position: relative;
+    width: 300px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+/* ==========================================
+   Grid
+========================================== */
+
+.j-preview-grid{
+
+    position: relative;
+
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+
+    padding: 12px;
+
+    border: 2px dashed #d5d5d5;
+}
+
+/* Línea horizontal */
+
+.j-preview-grid::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:-2px;
+    right:-2px;
+    top:50%;
+
+    border-top:2px dashed #d5d5d5;
+
+    transform:translateY(-50%);
+}
+
+/* Líneas verticales */
+
+.j-preview-grid::after{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:
+        linear-gradient(
+            to right,
+
+            transparent 33.333%,
+            #d5d5d5 33.333%,
+            #d5d5d5 calc(33.333% + 2px),
+            transparent calc(33.333% + 2px),
+
+            transparent 66.666%,
+            #d5d5d5 66.666%,
+            #d5d5d5 calc(66.666% + 2px),
+            transparent calc(66.666% + 2px)
+        );
+
+    pointer-events:none;
+}
+
+/* ==========================================
+   Cartas
+========================================== */
+
+.j-preview-cell{
+
+    aspect-ratio:63/88;
+
+    background:#dff7f6;
+
+    border-radius:5px;
+
+    z-index:2;
+}
+
+/* ==========================================
+   Marcas de corte
+========================================== */
+
+.j-crop{
+
+    position:absolute;
+
+    width:18px;
+    height:18px;
+}
+
+.j-crop::before,
+.j-crop::after{
+
+    content:"";
+
+    position:absolute;
+
+    background:#7d7d7d;
+}
+
+/* Horizontal */
+
+.j-crop::before{
+
+    width:18px;
+    height:2px;
+}
+
+/* Vertical */
+
+.j-crop::after{
+
+    width:2px;
+    height:18px;
+}
+
+/* Superior izquierda */
+
+.j-crop.top-left{
+    top:0;
+    left:0;
+}
+
+.j-crop.top-left::before{
+    top:0;
+    left:0;
+}
+
+.j-crop.top-left::after{
+    top:0;
+    left:0;
+}
+
+/* Superior derecha */
+
+.j-crop.top-right{
+    top:0;
+    right:0;
+}
+
+.j-crop.top-right::before{
+    top:0;
+    right:0;
+}
+
+.j-crop.top-right::after{
+    top:0;
+    right:0;
+}
+
+/* Inferior izquierda */
+
+.j-crop.bottom-left{
+    bottom:0;
+    left:0;
+}
+
+.j-crop.bottom-left::before{
+    bottom:0;
+    left:0;
+}
+
+.j-crop.bottom-left::after{
+    bottom:0;
+    left:0;
+}
+
+/* Inferior derecha */
+
+.j-crop.bottom-right{
+    bottom:0;
+    right:0;
+}
+
+.j-crop.bottom-right::before{
+    bottom:0;
+    right:0;
+}
+
+.j-crop.bottom-right::after{
+    bottom:0;
+    right:0;
+}

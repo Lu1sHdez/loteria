@@ -1,11 +1,30 @@
 .j-step{
-    display:flex;
-    gap:40px;
+    display:none;
     margin-top:40px;
 }
 
+.j-step.active{
+    display:block;
+}
+
+.j-step-header{
+    width:100%;
+    display:flex;
+    justify-content:center;
+    margin-bottom:35px;
+}
+
+.j-step-body{
+    display:flex;
+    gap:40px;
+    margin-top: 20px;
+    align-items:flex-start;
+}
+
+
 .juguemos-left{
     flex:1;
+    min-width:0; /* Evita problemas de desbordamiento */
     display:flex;
     flex-direction:column;
     gap:35px;
@@ -13,12 +32,13 @@
 
 .juguemos-right{
     width:420px;
+    flex-shrink:0; /* Evita que se encoja */
 }
 
-.j-section {
-    background: #fff;
-    border-radius: 15px;
-    padding: 25px;
-    border: 1px solid #E5E5E5;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+.j-section{
+    background:#fff;
+    border-radius:15px;
+    padding:25px;
+    border:1px solid #E5E5E5;
+    box-shadow:0 10px 20px rgba(0,0,0,.05);
 }

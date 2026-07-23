@@ -1,23 +1,36 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+    const paperSelect = document.getElementById("j-paper-size");
+    if (paperSelect) {
+        paperSelect.addEventListener("change", function () {
+            JuguemosState.paper = this.value;
+        });
+    }
+
     // ========== INICIALIZACIÓN ==========
     if (typeof JuguemosAjax !== 'undefined' && typeof JuguemosState !== 'undefined') {
         JuguemosAjax.loadCategories();
         updatePrice();
+        updatePaperOptions();
     } else {
         console.error('JuguemosAjax o JuguemosState no están definidos');
         return;
     }
 
-    // ========== SELECTOR DE PAÍS ==========
     document.querySelectorAll(".country").forEach(button => {
         button.addEventListener("click", () => {
+    
             document
                 .querySelectorAll(".country")
                 .forEach(b => b.classList.remove("active"));
+    
             button.classList.add("active");
+    
             JuguemosState.country = button.dataset.country;
             JuguemosState.currency = button.dataset.currency;
+    
+            updatePaperOptions(); // ← actualiza el select
+    
             updatePrice();
         });
     });
@@ -40,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
             JuguemosState.quantity = parseInt(range.value);
             updateRangeColor();
             updatePrice();
-        });
+        }); 
 
         input.addEventListener("input", () => {
             let value = parseInt(input.value);
@@ -107,6 +120,119 @@ document.addEventListener("DOMContentLoaded", () => {
     drawGrid();
 
 
+    // ========== ORIENTACIÓN ==========
+    document.querySelectorAll(".j-orientation").forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            document
+                .querySelectorAll(".j-orientation")
+                .forEach(b => b.classList.remove("active"));
+
+            button.classList.add("active");
+
+            JuguemosState.orientation = button.dataset.orientation;
+
+        });
+
+    });
+
+    // =========================
+    // TABLAS POR HOJA
+    // =========================
+
+    const tablesPerPageInput = document.getElementById("j-tables-per-page");
+
+    if (tablesPerPageInput) {
+
+        tablesPerPageInput.value = JuguemosState.quantity;
+
+        const btnPlus = document.querySelector(".j-tables-per-page-plus");
+        const btnMinus = document.querySelector(".j-tables-per-page-minus");
+
+        btnPlus.addEventListener("click", () => {
+
+            tablesPerPageInput.stepUp();
+
+            JuguemosState.quantity = parseInt(tablesPerPageInput.value);
+
+        });
+
+        btnMinus.addEventListener("click", () => {
+
+            tablesPerPageInput.stepDown();
+
+            JuguemosState.quantity = parseInt(tablesPerPageInput.value);
+
+        });
+
+        tablesPerPageInput.addEventListener("input", () => {
+            JuguemosState.quantity  =
+                parseInt(tablesPerPageInput.value) || 1;
+
+        });
+
+    }
+
+    // =========================
+    // CANTIDAD DE PÁGINAS
+    // =========================
+
+    const pagesInput = document.getElementById("j-pages");
+
+    if (pagesInput) {
+
+        pagesInput.value = JuguemosState.pages;
+
+        const btnPlus = document.querySelector(".j-pages-plus");
+        const btnMinus = document.querySelector(".j-pages-minus");
+
+        btnPlus.addEventListener("click", () => {
+            pagesInput.stepUp();
+            pagesInput.dispatchEvent(new Event("input"));
+        });
+
+        btnMinus.addEventListener("click", () => {
+            pagesInput.stepDown();
+            pagesInput.dispatchEvent(new Event("input"));
+        });
+
+        pagesInput.addEventListener("input", () => {
+
+            let value = parseInt(pagesInput.value);
+
+            if (isNaN(value) || value < 1) {
+                value = 1;
+            }
+
+            pagesInput.value = value;
+            JuguemosState.pages = value;
+
+        });
+
+    }
+
+    // =========================
+    // MARCAS DE CORTE
+    // =========================
+
+    const cutMarks = document.getElementById("j-cut-marks");
+
+    if (cutMarks) {
+
+        cutMarks.checked = JuguemosState.cutMarks;
+
+        drawCutMarks(); // ← Agregar aquí
+
+        cutMarks.addEventListener("change", () => {
+
+            JuguemosState.cutMarks = cutMarks.checked;
+
+            drawCutMarks();
+
+        });
+
+    }
 
 
         // ========== COLOR DE MARCO ==========
@@ -234,6 +360,110 @@ document.addEventListener("DOMContentLoaded", () => {
     drawGrid();
     drawMarcosPreview();   
 
+    // =========================
+    // SIGUIENTE: VISTA PREVIA
+    // =========================
+
+    const btnGoPreview = document.getElementById("j-go-preview");
+
+    if (btnGoPreview) {
+
+        btnGoPreview.addEventListener("click", () => {
+
+            // Ocultar todos los pasos
+            document.querySelectorAll(".j-step").forEach(step => {
+                step.classList.remove("active");
+            });
+
+            console.log("Cantidad:", JuguemosState.quantity);
+
+            document.getElementById("j-tables-per-page").value =
+                JuguemosState.quantity;
+                
+            // Mostrar el paso 3
+            document
+                .getElementById("juguemos-preview-completo")
+                .classList.add("active");
+            requestAnimationFrame(drawCutMarks);
+
+            // Actualizar el encabezado
+            document.querySelectorAll(".juguemos-step").forEach(step => {
+                step.classList.remove("active");
+            });
+
+            const step3 = document.querySelector(
+                '.juguemos-step[data-step="3"]'
+            );
+
+            if (step3) {
+                step3.classList.add("active");
+            }
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+
+        });
+
+    }
+
+
+    // =========================
+    // EDITAR PEDIDO
+    // =========================
+
+    const btnEditOrder = document.getElementById("j-edit-order");
+
+    if (btnEditOrder) {
+
+        btnEditOrder.addEventListener("click", () => {
+            
+            // Sincronizar los controles del paso 1
+            const tablesNumber = document.getElementById("tables-number");
+            const tablesRange = document.getElementById("tables-range");
+
+            if (tablesNumber) {
+                tablesNumber.value = JuguemosState.quantity;
+            }
+
+            if (tablesRange) {
+                tablesRange.value = JuguemosState.quantity;
+                tablesRange.dispatchEvent(new Event("input"));
+            }
+            
+
+            // Ocultar todos los pasos
+            document.querySelectorAll(".j-step").forEach(step => {
+                step.classList.remove("active");
+            });
+
+            // Mostrar el paso 1
+            document
+                .getElementById("juguemos-design")
+                .classList.add("active");
+
+            // Actualizar el encabezado
+            document.querySelectorAll(".juguemos-step").forEach(step => {
+                step.classList.remove("active");
+            });
+
+            const step1 = document.querySelector(
+                '.juguemos-step[data-step="1"]'
+            );
+
+            if (step1) {
+                step1.classList.add("active");
+            }
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+
+        });
+
+    }
 });
 
 function updatePrice() {
@@ -244,6 +474,38 @@ function updatePrice() {
             JuguemosState.quantity
         );
     }
+}
+function updatePaperOptions() {
+
+    const select = document.getElementById("j-paper-size");
+
+    if (!select) return;
+
+    const currentValue = JuguemosState.paper;
+
+    select.innerHTML = "";
+
+    if (JuguemosState.country === "Mexico") {
+
+        select.innerHTML = `
+            <option value="carta">Carta (21.59 × 27.94 cm)</option>
+            <option value="oficio">Oficio (21.59 × 33.02 cm)</option>
+            <option value="a4">A4 (21 × 29.7 cm)</option>
+        `;
+    
+    } else {
+    
+        select.innerHTML = `
+            <option value="letter">Letter (8.5 × 11 in)</option>
+            <option value="legal">Legal (8.5 × 14 in)</option>
+            <option value="a4">A4 (8.27 × 11.69 in)</option>
+        `;
+    
+    }
+    
+    select.selectedIndex = 0;
+    JuguemosState.paper = select.value;
+
 }
 
 function drawGrid() {
@@ -390,4 +652,11 @@ function drawMarcosPreview() {
     }
 
     container.innerHTML = html;
+}
+
+function drawCutMarks() {
+    const sheet = document.getElementById("j-preview-sheet");
+    if (!sheet) return;
+
+    sheet.classList.toggle("cut-marks-active", JuguemosState.cutMarks);
 }

@@ -244,3 +244,31 @@
 .j-incluir-status.inactive {
     color: #FF9800;
 }
+
+.j-btn-back{
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    height:40px;
+    padding:0 18px;
+
+    border:2px solid #FA299C;
+    border-radius:8px;
+
+    background:#FFFFFF;
+    color:#FA299C;
+
+    font-family:'Cairo',sans-serif;
+    font-size:15px;
+    font-weight:700;
+
+    cursor:pointer;
+    transition:.2s;
+}
+
+.j-btn-back:hover{
+    background:#FA299C;
+    color:#FFFFFF;
+    border-color: #FA299C;
+}

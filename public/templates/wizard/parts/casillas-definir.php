@@ -10,7 +10,7 @@
         <button class="j-casilla-btn" data-mode="aleatoria">
             Selección Aleatoria
         </button>
-        <p class="j-casilla-desc">El sistema elegirá aleatoriamente todas tus casillas de tus tablas.</p>
+        <p class="j-texto-normal">El sistema elegirá aleatoriamente todas tus casillas de tus tablas.</p>
     </div>
 
 </div>
