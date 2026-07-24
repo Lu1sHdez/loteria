@@ -662,7 +662,6 @@ function actualizarPreviewCasillas(casillas) {
         html += `
             <div class="cell" data-index="${index}" title="${casilla.nombre}">
                 <img src="${casilla.imagen}" alt="${casilla.nombre}" loading="lazy">
-                <span class="cell-number">${index + 1}</span>
             </div>
         `;
     });

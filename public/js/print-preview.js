@@ -10,9 +10,9 @@ window.PrintPaper = {
     gridConfig: {
         '4x4': { cols: 4, rows: 4, total: 16 },
         '5x5': { cols: 5, rows: 5, total: 25 },
-        'pocitos4': { cols: 4, rows: 4, total: 16 },
-        'pocitos3': { cols: 3, rows: 3, total: 9 },
-        'cruzadas': { cols: 4, rows: 4, total: 16 }
+        'pocitos4': { cols: 2, rows: 2, total: 4 },
+        'pocitos3': { cols: 3, rows: 3, total: 3 },
+        'cruzadas': { cols: 3, rows: 3, total: 5 }
     },
 
     // Tamaños de papel en mm
@@ -263,20 +263,6 @@ render() {
 
                 cell.appendChild(img);
 
-                const number = document.createElement('span');
-                number.className = 'j-cell-number';
-                number.textContent = i + 1;
-                number.style.position = 'absolute';
-                number.style.top = '2px';
-                number.style.right = '2px';
-                number.style.fontSize = '8px';
-                number.style.color = '#999';
-                number.style.fontWeight = 'bold';
-                number.style.backgroundColor = 'rgba(255,255,255,.7)';
-                number.style.padding = '0 3px';
-                number.style.borderRadius = '2px';
-
-                cell.appendChild(number);
             } else {
                 cell.textContent = i + 1;
                 cell.style.fontSize = '10px';
