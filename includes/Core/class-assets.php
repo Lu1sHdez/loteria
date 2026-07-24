@@ -97,6 +97,16 @@ class Juguemos_Assets
             JUGUEMOS_VERSION,
             true
         );
+
+        wp_enqueue_script(
+            'juguemos-print-preview',
+            JUGUEMOS_URL . 'public/js/print-preview.js',
+            [
+                'juguemos-state'
+            ],
+            JUGUEMOS_VERSION,
+            true
+        );
         
         wp_enqueue_script(
             'juguemos-app',

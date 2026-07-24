@@ -11,7 +11,7 @@
                 type="range"
                 min="1"
                 max="30"
-                value="18">
+                value="1">
         </div>
 
 
@@ -29,7 +29,7 @@
                 type="number"
                 min="1"
                 max="30"
-                value="18">
+                value="1">
 
             <button type="button" class="j-number-btn plus">
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none">

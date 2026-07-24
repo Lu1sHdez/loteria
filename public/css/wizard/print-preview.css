@@ -1,38 +1,119 @@
-.j-print-grid{
+/* ============================================
+   ESTILOS PARA VISTA PREVIA CON BARAJAS
+   ============================================ */
 
-    display:flex;
-    flex-wrap:wrap;
-    gap:12px;
-
-    justify-content:center;
-    align-content:flex-start;
-
+/* Contenedor de barajas */
+.j-print-board {
+    transition: all 0.2s ease;
 }
 
-.j-print-board{
-
-    width:150px;
-
+.j-print-board:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12) !important;
+    transform: scale(1.01);
 }
 
-.j-board-grid{
-
-    display:grid;
-
-    grid-template-columns:repeat(4,1fr);
-
-    gap:3px;
-
+/* Celdas con barajas */
+.j-board-cell {
+    transition: all 0.2s ease;
 }
 
-.j-board-cell{
+.j-board-cell:hover {
+    transform: scale(1.05);
+    z-index: 5;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
 
-    aspect-ratio:1;
+/* Imágenes dentro de celdas */
+.j-board-cell img {
+    transition: all 0.2s ease;
+    backface-visibility: hidden;
+}
 
-    border:1px solid #DDD;
+/* Números de celda */
+.j-cell-number {
+    font-family: 'Arial', sans-serif;
+    user-select: none;
+    pointer-events: none;
+}
 
-    border-radius:4px;
+/* Hoja de papel */
+.j-sheet {
+    transition: all 0.3s ease;
+}
 
-    background:white;
+.j-sheet:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
 
+/* Grid de tablas */
+.j-boards-grid {
+    transition: all 0.3s ease;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    .j-sheet {
+        transform: scale(0.6);
+        transform-origin: top center;
+        margin: 10px auto;
+    }
+    
+    .j-print-preview-wrapper {
+        padding: 10px !important;
+        overflow: auto;
+    }
+
+    .j-board-cell {
+        padding: 1px !important;
+    }
+
+    .j-cell-number {
+        font-size: 6px !important;
+        top: 1px !important;
+        right: 2px !important;
+        line-height: 10px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .j-sheet {
+        transform: scale(0.4);
+        transform-origin: top center;
+    }
+}
+
+/* Animación de carga para imágenes */
+.j-board-cell img {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Scroll suave en el contenedor */
+.j-print-preview-wrapper::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.j-print-preview-wrapper::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 4px;
+}
+
+.j-print-preview-wrapper::-webkit-scrollbar-thumb {
+    background: #24B8C8;
+    border-radius: 4px;
+}
+
+.j-print-preview-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #1d9ba8;
 }

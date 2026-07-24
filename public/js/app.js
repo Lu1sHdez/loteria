@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
             JuguemosState.paper = this.value;
             updateOrderSummary();
 
+            PrintPaper.render();
+
         });
     }
 
@@ -403,6 +405,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (btnGoPreview) {
 
         btnGoPreview.addEventListener("click", () => {
+
+            const btnAleatoria = document.querySelector(".j-casilla-btn.active");
+            if (btnAleatoria && JuguemosState.todasLasTablas.length > 0) {
+                regenerarTodasLasTablas();
+            }
             updateOrderSummary();
 
             // Ocultar todos los pasos
@@ -419,7 +426,7 @@ document.addEventListener("DOMContentLoaded", () => {
             document
                 .getElementById("juguemos-preview-completo")
                 .classList.add("active");
-            requestAnimationFrame(drawCutMarks);
+            //requestAnimationFrame(drawCutMarks);
 
             // Actualizar el encabezado
             document.querySelectorAll(".juguemos-step").forEach(step => {
@@ -438,7 +445,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 top: 0,
                 behavior: "smooth"
             });
-            PrintPreview.refresh();
+            PrintPaper.refresh();
 
         });
 
@@ -541,6 +548,7 @@ function updatePaperOptions() {
     
     select.selectedIndex = 0;
     JuguemosState.paper = select.value;
+    
 
 }
 
@@ -599,31 +607,47 @@ function llenarCasillasAleatorio() {
 
     const grid = JuguemosState.grid || '4x4';
     const totalCasillas = getTotalCasillas(grid);
-    
+    const totalTablas = JuguemosState.quantity || 1;
+    const totalPaginas = JuguemosState.pages || 1;
+
     if (totalCasillas === 0) {
         alert('Configuración de casillas no válida.');
         return;
     }
 
-    const barajasDisponibles = [...JuguemosState.barajas];
-    
-    // Fisher-Yates shuffle
-    for (let i = barajasDisponibles.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [barajasDisponibles[i], barajasDisponibles[j]] = [barajasDisponibles[j], barajasDisponibles[i]];
+    const todasLasTablas = [];
+
+    for (let tabla = 0; tabla < totalTablas; tabla++) {
+        const barajasDisponibles = [...JuguemosState.barajas];
+
+        for (let i = barajasDisponibles.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [barajasDisponibles[i], barajasDisponibles[j]] = [barajasDisponibles[j], barajasDisponibles[i]];
+        }
+
+        let casillasSeleccionadas = barajasDisponibles.slice(0, totalCasillas);
+
+        while (casillasSeleccionadas.length < totalCasillas) {
+            const barajaExtra = barajasDisponibles[Math.floor(Math.random() * barajasDisponibles.length)];
+            casillasSeleccionadas.push(barajaExtra);
+        }
+
+        todasLasTablas.push(casillasSeleccionadas);
     }
 
-    const casillasSeleccionadas = barajasDisponibles.slice(0, totalCasillas);
-    
-    while (casillasSeleccionadas.length < totalCasillas) {
-        const barajaExtra = barajasDisponibles[Math.floor(Math.random() * barajasDisponibles.length)];
-        casillasSeleccionadas.push(barajaExtra);
+    JuguemosState.todasLasTablas = todasLasTablas;
+
+    if (todasLasTablas.length > 0) {
+        JuguemosState.casillasAsignadas = todasLasTablas[0];
+        actualizarPreviewCasillas(todasLasTablas[0]);
     }
 
-    actualizarPreviewCasillas(casillasSeleccionadas);
-    JuguemosState.casillasAsignadas = casillasSeleccionadas;
-    
-    console.log(`Casillas llenadas: ${casillasSeleccionadas.length} barajas asignadas`);
+    console.log(`${totalTablas} tablas generadas con órdenes aleatorios únicos`);
+    console.log('Tabla 1:', todasLasTablas[0]?.map(c => c.nombre).join(', '));
+
+    if (todasLasTablas.length > 1) {
+        console.log('Tabla 2:', todasLasTablas[1]?.map(c => c.nombre).join(', '));
+    }
 }
 
 function actualizarPreviewCasillas(casillas) {
@@ -644,7 +668,10 @@ function actualizarPreviewCasillas(casillas) {
     });
     
     container.innerHTML = html;
-    console.log(`Preview actualizado con ${casillas.length} casillas`);
+    
+    JuguemosState.casillasAsignadas = casillas;
+    
+    console.log(`Preview actualizado con ${casillas.length} casillas (primera tabla)`);
 }
 
 function limpiarCasillas() {
@@ -662,8 +689,11 @@ function limpiarCasillas() {
     }
     
     container.innerHTML = html;
+    
     JuguemosState.casillasAsignadas = [];
-    console.log('Casillas limpiadas');
+    JuguemosState.todasLasTablas = [];
+    
+    console.log('Casillas limpiadas (todas las tablas)');
 }
 
 
@@ -734,3 +764,46 @@ function updateOrderSummary(){
 
 }
 
+/**
+ * Regenerar todas las tablas con nuevos órdenes aleatorios
+ */
+function regenerarTodasLasTablas() {
+    if (!JuguemosState.todasLasTablas || JuguemosState.todasLasTablas.length === 0) {
+        // Si no hay tablas generadas, usar el método existente
+        llenarCasillasAleatorio();
+        return;
+    }
+    
+    const grid = JuguemosState.grid || '4x4';
+    const totalCasillas = getTotalCasillas(grid);
+    const totalTablas = JuguemosState.quantity || 1;
+    
+    const todasLasTablas = [];
+    const barajasDisponibles = [...JuguemosState.barajas];
+    
+    for (let tabla = 0; tabla < totalTablas; tabla++) {
+        // Mezclar para cada tabla
+        const shuffled = [...barajasDisponibles];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        
+        let casillas = shuffled.slice(0, totalCasillas);
+        while (casillas.length < totalCasillas) {
+            const extra = shuffled[Math.floor(Math.random() * shuffled.length)];
+            casillas.push(extra);
+        }
+        todasLasTablas.push(casillas);
+    }
+    
+    JuguemosState.todasLasTablas = todasLasTablas;
+    JuguemosState.casillasAsignadas = todasLasTablas[0] || [];
+    
+    // Actualizar preview
+    if (todasLasTablas.length > 0) {
+        actualizarPreviewCasillas(todasLasTablas[0]);
+    }
+    
+    console.log(`${totalTablas} tablas regeneradas con nuevos órdenes`);
+}

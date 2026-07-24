@@ -11,7 +11,7 @@ const JuguemosState = {
     barajasIncluidas: false,
 
     // Configuración
-    quantity: 18,
+    quantity: 1,
     pages: 10,
     mode: "sencilla",
     grid: "4x4",
