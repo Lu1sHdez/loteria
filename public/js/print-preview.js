@@ -45,53 +45,53 @@ window.PrintPaper = {
     },
 
     /**
- * Renderizar vista previa completa
- */
-render() {
-    const container = document.getElementById('j-print-preview');
-    if (!container) {
-        console.warn('⚠️ PrintPaper: No se encontró #j-print-preview');
-        return;
-    }
+     * Renderizar vista previa completa
+     */
+    render() {
+        const container = document.getElementById('j-print-preview');
+        if (!container) {
+            console.warn('⚠️ PrintPaper: No se encontró #j-print-preview');
+            return;
+        }
 
-    console.log('🔄 PrintPaper: Renderizando...');
-    console.log('📐 Configuración:', JuguemosState);
+        console.log('🔄 PrintPaper: Renderizando...');
+        console.log('📐 Configuración:', JuguemosState);
 
-    container.innerHTML = '';
+        container.innerHTML = '';
 
-    const paper = this.getPaperConfig();
-    const totalPages = Number(JuguemosState.pages) || 1;
+        const paper = this.getPaperConfig();
+        const totalPages = Number(JuguemosState.pages) || 1;
 
-    // NUEVO: Calcular escala para que quepa en pantalla pero sea más grande
-    const maxWidth = Math.min(container.clientWidth - 20, 2000); // Aumentado de 800 a 1200
-    const maxHeight = window.innerHeight - 150;
-    
-    // NUEVO: Escala base sin limitación superior
-    let scaleX = maxWidth / paper.width;
-    let scaleY = maxHeight / paper.height;
-    let scale = Math.min(scaleX, scaleY);
-    
-    // NUEVO: Establecer escala mínima y máxima
-    const minScale = 0.5; // Mínimo 50%
-    const maxScale = 2.5; // Máximo 250%
-    scale = Math.max(minScale, Math.min(scale, maxScale));
-    
-    // NUEVO: Si es vertical, dar prioridad al ancho
-    if (paper.orientation === 'vertical') {
-        // Usar el ancho disponible sin limitar tanto
-        scale = Math.min(scaleX, scale * 1.1);
-    }
+        // NUEVO: Calcular escala para que quepa en pantalla pero sea más grande
+        const maxWidth = Math.min(container.clientWidth - 20, 2000); // Aumentado de 800 a 1200
+        const maxHeight = window.innerHeight - 150;
+        
+        // NUEVO: Escala base sin limitación superior
+        let scaleX = maxWidth / paper.width;
+        let scaleY = maxHeight / paper.height;
+        let scale = Math.min(scaleX, scaleY);
+        
+        // NUEVO: Establecer escala mínima y máxima
+        const minScale = 0.5; // Mínimo 50%
+        const maxScale = 2.5; // Máximo 250%
+        scale = Math.max(minScale, Math.min(scale, maxScale));
+        
+        // NUEVO: Si es vertical, dar prioridad al ancho
+        if (paper.orientation === 'vertical') {
+            // Usar el ancho disponible sin limitar tanto
+            scale = Math.min(scaleX, scale * 1.1);
+        }
 
-    console.log(`📏 Escala calculada: ${scale.toFixed(2)}x (${paper.width}mm x ${paper.height}mm)`);
+        console.log(`📏 Escala calculada: ${scale.toFixed(2)}x (${paper.width}mm x ${paper.height}mm)`);
 
-    // Crear cada página
-    for (let page = 0; page < totalPages; page++) {
-        const sheet = this.createSheet(paper, scale, page);
-        container.appendChild(sheet);
-    }
+        // Crear cada página
+        for (let page = 0; page < totalPages; page++) {
+            const sheet = this.createSheet(paper, scale, page);
+            container.appendChild(sheet);
+        }
 
-    console.log(`PrintPaper: ${totalPages} página(s) renderizada(s)`);
-},
+        console.log(`PrintPaper: ${totalPages} página(s) renderizada(s)`);
+    },
 
     /**
      * Crear una hoja
@@ -521,3 +521,5 @@ PrintPaper.refreshWithAnimation = function() {
         this.refresh();
     }
 };
+
+

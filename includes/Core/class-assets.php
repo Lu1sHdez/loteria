@@ -113,17 +113,9 @@ class Juguemos_Assets
             JUGUEMOS_URL.'public/js/app.js',
             [
                 'juguemos-ajax',
-                'juguemos-state'
+                'juguemos-state',
+                'juguemos-print-preview'
             ],
-            JUGUEMOS_VERSION,
-            true
-        );
-
-        // APP
-        wp_enqueue_script(
-            'juguemos-app',
-            JUGUEMOS_URL . 'public/js/app.js',
-            ['juguemos-ajax'],
             JUGUEMOS_VERSION,
             true
         );
@@ -136,6 +128,40 @@ class Juguemos_Assets
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'nonce'    => wp_create_nonce('juguemos_nonce'),
             ]
+        );
+
+        // =========================================================
+        // GENERADOR DE PDF (paso 4 - Pago y Descarga)
+        // =========================================================
+
+        wp_enqueue_script(
+            'html2canvas',
+            'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
+            [],
+            '1.4.1',
+            true
+        );
+
+        wp_enqueue_script(
+            'jspdf',
+            'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+            [],
+            '2.5.1',
+            true
+        );
+
+        wp_enqueue_script(
+            'juguemos-pdf-generator',
+            JUGUEMOS_URL . 'public/js/pdf-generator.js',
+            [
+                'juguemos-state',
+                'juguemos-print-preview',
+                'juguemos-app',
+                'html2canvas',
+                'jspdf'
+            ],
+            JUGUEMOS_VERSION,
+            true
         );
 
     }
