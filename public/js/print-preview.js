@@ -197,8 +197,14 @@ render() {
         const { cols, rows, total } = config;
 
         grid.style.display = 'grid';
-        grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-        grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+        const gridType = JuguemosState.grid || '4x4';
+        if (gridType === 'pocitos4' || gridType === 'pocitos3' || gridType === 'cruzadas') {
+            grid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+            grid.style.gridTemplateRows = 'repeat(3, 1fr)';
+        } else {
+            grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+            grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+        }
         grid.style.gap = '2px';
         grid.style.width = '100%';
         grid.style.height = '100%';
@@ -211,18 +217,30 @@ render() {
         let casillasParaEstaTabla;
         const indexGlobal = (pageIndex * (JuguemosState.quantity || 1)) + boardIndex;
 
+        // Si existe la tabla en el índice global, usarla
         if (todasLasTablas[indexGlobal]) {
             casillasParaEstaTabla = todasLasTablas[indexGlobal];
-            console.log(`Tabla ${indexGlobal + 1}: usando orden único`);
-        } else if (todasLasTablas.length) {
-            casillasParaEstaTabla = [...(todasLasTablas[0] || casillasAsignadas)];
+            console.log(`Tabla ${indexGlobal + 1}: usando orden único de todasLasTablas`);
+        } 
+        // Si no existe pero hay tablas generadas, usar la primera y mezclarla
+        else if (todasLasTablas.length > 0) {
+            // Usar la primera tabla como base y mezclarla
+            const baseTabla = todasLasTablas[0] || casillasAsignadas;
+            casillasParaEstaTabla = [...baseTabla];
 
+            const mezcla = [...(JuguemosState.barajas || [])];
+            // Mezclar para que sea diferente
             for (let i = casillasParaEstaTabla.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
+                [mezcla[i], mezcla[j]] = [mezcla[j], mezcla[i]];
                 [casillasParaEstaTabla[i], casillasParaEstaTabla[j]] = [casillasParaEstaTabla[j], casillasParaEstaTabla[i]];
             }
-        } else {
+            console.log(`Tabla ${indexGlobal + 1}: usando mezcla de tabla base`);
+        } 
+        // Fallback: usar casillasAsignadas
+        else {
             casillasParaEstaTabla = casillasAsignadas;
+            console.log(`Tabla ${indexGlobal + 1}: usando casillasAsignadas (fallback)`);
         }
 
         const mostrarBarajas = JuguemosState.barajasIncluidas !== false;

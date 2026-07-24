@@ -406,10 +406,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         btnGoPreview.addEventListener("click", () => {
 
-            const btnAleatoria = document.querySelector(".j-casilla-btn.active");
-            if (btnAleatoria && JuguemosState.todasLasTablas.length > 0) {
-                regenerarTodasLasTablas();
-            }
+            regenerarTodasLasTablas();
             updateOrderSummary();
 
             // Ocultar todos los pasos
@@ -507,6 +504,48 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
     }
+
+
+
+    // =========================
+    // CONFIRMAR PEDIDO - PASO 4
+    // =========================
+
+    const btnConfirmOrder = document.getElementById("j-confirm-order");
+
+    if (btnConfirmOrder) {
+
+        btnConfirmOrder.addEventListener("click", () => {
+            
+            // Ocultar todos los pasos
+            document.querySelectorAll(".j-step").forEach(step => {
+                step.classList.remove("active");
+            });
+
+            // Mostrar el paso 4 (Pago y Descarga)
+            document.getElementById("juguemos-payment").classList.add("active");
+
+            // Actualizar el encabezado
+            document.querySelectorAll(".juguemos-step").forEach(step => {
+                step.classList.remove("active");
+            });
+
+            const step4 = document.querySelector(
+                '.juguemos-step[data-step="4"]'
+            );
+
+            if (step4) {
+                step4.classList.add("active");
+            }
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+
+        });
+
+    }
 });
 
 function updatePrice() {
@@ -593,7 +632,6 @@ function getTotalCasillas(grid) {
         default: return 16;
     }
 }
-
 function llenarCasillasAleatorio() {
     if (!JuguemosState.deck) {
         alert('Primero selecciona un diseño.');
@@ -607,8 +645,9 @@ function llenarCasillasAleatorio() {
 
     const grid = JuguemosState.grid || '4x4';
     const totalCasillas = getTotalCasillas(grid);
-    const totalTablas = JuguemosState.quantity || 1;
-    const totalPaginas = JuguemosState.pages || 1;
+    const tablasPorHoja = JuguemosState.quantity || 1;
+    const paginas = JuguemosState.pages || 1;
+    const totalTablas = tablasPorHoja * paginas;
 
     if (totalCasillas === 0) {
         alert('Configuración de casillas no válida.');
@@ -616,20 +655,30 @@ function llenarCasillasAleatorio() {
     }
 
     const todasLasTablas = [];
+    const todasLasBarajas = [...JuguemosState.barajas];
 
     for (let tabla = 0; tabla < totalTablas; tabla++) {
-        const barajasDisponibles = [...JuguemosState.barajas];
-
-        for (let i = barajasDisponibles.length - 1; i > 0; i--) {
+        // Mezclar TODAS las barajas
+        const barajasMezcladas = [...todasLasBarajas];
+        for (let i = barajasMezcladas.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
-            [barajasDisponibles[i], barajasDisponibles[j]] = [barajasDisponibles[j], barajasDisponibles[i]];
+            [barajasMezcladas[i], barajasMezcladas[j]] = [barajasMezcladas[j], barajasMezcladas[i]];
         }
 
-        let casillasSeleccionadas = barajasDisponibles.slice(0, totalCasillas);
-
-        while (casillasSeleccionadas.length < totalCasillas) {
-            const barajaExtra = barajasDisponibles[Math.floor(Math.random() * barajasDisponibles.length)];
-            casillasSeleccionadas.push(barajaExtra);
+        // ✅ Seleccionar ALEATORIAMENTE de TODAS las barajas, SIN repetir en la misma tabla
+        const casillasSeleccionadas = [];
+        const copiaBarajas = [...barajasMezcladas];
+        
+        for (let i = 0; i < totalCasillas; i++) {
+            if (copiaBarajas.length > 0) {
+                const indice = Math.floor(Math.random() * copiaBarajas.length);
+                casillasSeleccionadas.push(copiaBarajas.splice(indice, 1)[0]);
+            } else {
+                // Si ya no hay barajas, reiniciar la copia
+                const reinicio = [...barajasMezcladas];
+                const indice = Math.floor(Math.random() * reinicio.length);
+                casillasSeleccionadas.push(reinicio[indice]);
+            }
         }
 
         todasLasTablas.push(casillasSeleccionadas);
@@ -642,14 +691,12 @@ function llenarCasillasAleatorio() {
         actualizarPreviewCasillas(todasLasTablas[0]);
     }
 
-    console.log(`${totalTablas} tablas generadas con órdenes aleatorios únicos`);
-    console.log('Tabla 1:', todasLasTablas[0]?.map(c => c.nombre).join(', '));
-
-    if (todasLasTablas.length > 1) {
+    console.log(`${totalTablas} tablas generadas usando TODAS las barajas disponibles (${todasLasBarajas.length})`);
+    if (todasLasTablas.length >= 2) {
+        console.log('Tabla 1:', todasLasTablas[0]?.map(c => c.nombre).join(', '));
         console.log('Tabla 2:', todasLasTablas[1]?.map(c => c.nombre).join(', '));
     }
 }
-
 function actualizarPreviewCasillas(casillas) {
     const container = document.getElementById('j-casilla-preview-grid');
     if (!container) return;
@@ -762,47 +809,6 @@ function updateOrderSummary(){
             : "Sin líneas de corte";
 
 }
-
-/**
- * Regenerar todas las tablas con nuevos órdenes aleatorios
- */
 function regenerarTodasLasTablas() {
-    if (!JuguemosState.todasLasTablas || JuguemosState.todasLasTablas.length === 0) {
-        // Si no hay tablas generadas, usar el método existente
-        llenarCasillasAleatorio();
-        return;
-    }
-    
-    const grid = JuguemosState.grid || '4x4';
-    const totalCasillas = getTotalCasillas(grid);
-    const totalTablas = JuguemosState.quantity || 1;
-    
-    const todasLasTablas = [];
-    const barajasDisponibles = [...JuguemosState.barajas];
-    
-    for (let tabla = 0; tabla < totalTablas; tabla++) {
-        // Mezclar para cada tabla
-        const shuffled = [...barajasDisponibles];
-        for (let i = shuffled.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-        }
-        
-        let casillas = shuffled.slice(0, totalCasillas);
-        while (casillas.length < totalCasillas) {
-            const extra = shuffled[Math.floor(Math.random() * shuffled.length)];
-            casillas.push(extra);
-        }
-        todasLasTablas.push(casillas);
-    }
-    
-    JuguemosState.todasLasTablas = todasLasTablas;
-    JuguemosState.casillasAsignadas = todasLasTablas[0] || [];
-    
-    // Actualizar preview
-    if (todasLasTablas.length > 0) {
-        actualizarPreviewCasillas(todasLasTablas[0]);
-    }
-    
-    console.log(`${totalTablas} tablas regeneradas con nuevos órdenes`);
+    llenarCasillasAleatorio();
 }

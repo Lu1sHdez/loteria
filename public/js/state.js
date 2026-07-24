@@ -1,33 +1,33 @@
-const JuguemosState = {
+    const JuguemosState = {
 
-    // País
-    country: "Mexico",
-    currency: "MXN",
+        // País
+        country: "Mexico",
+        currency: "MXN",
 
-    // Diseño
-    deck: null,
-    category: null,
-    barajas: [],
-    barajasIncluidas: false,
+        // Diseño
+        deck: null,
+        category: null,
+        barajas: [],
+        barajasIncluidas: false,
 
-    // Configuración
-    quantity: 1,
-    pages: 10,
-    mode: "sencilla",
-    grid: "4x4",
+        // Configuración
+        quantity: 1,
+        pages: 10,
+        mode: "sencilla",
+        grid: "4x4",
 
-    paper:"carta",
+        paper:"carta",
 
-    // Precio
-    unitPrice: 0,
-    total: 0,
+        // Precio
+        unitPrice: 0,
+        total: 0,
 
-    cutMarks: true,
+        cutMarks: true,
 
 
-    marcoColor: '#FA299C',
-    fondoColor: '#FFFFFF',
+        marcoColor: '#FA299C',
+        fondoColor: '#FFFFFF',
 
-    orientation: "vertical",
+        orientation: "vertical",
 
-};
+    };

@@ -23,22 +23,8 @@ if (!defined('ABSPATH')) {
             </div>
             
             <!-- NUEVO: Botón actualizar -->
-            <button id="j-refresh-preview" class="j-btn-refresh" style="
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                padding: 8px 16px;
-                background: #24B8C8;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                font-size: 14px;
-                font-weight: 500;
-                transition: all 0.3s ease;
-                box-shadow: 0 2px 8px rgba(36, 184, 200, 0.3);
-            ">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.5s ease;">
+            <button id="j-refresh-preview" class="j-baraja-update">
+                <svg class="j-refresh-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="23 4 23 10 17 10"></polyline>
                     <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
                 </svg>
@@ -262,19 +248,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     PrintPaper.refresh();
                     window.updateTimestamp();
                     window.updatePreviewState('ready');
-                    
+
                     // Restaurar botón
                     this.classList.remove('refreshing');
                     this.querySelector('span').textContent = originalText;
-                    
-                    // Feedback visual
-                    this.style.background = '#2ecc71';
-                    setTimeout(() => {
-                        this.style.background = '#24B8C8';
-                    }, 800);
+
                 }, 300);
             } else {
-                console.warn('⚠️ PrintPaper no está disponible');
+                console.warn('PrintPaper no está disponible');
                 this.classList.remove('refreshing');
                 this.querySelector('span').textContent = originalText;
             }

@@ -613,7 +613,7 @@
     grid-row: 2; 
 }
 .j-board-grid[data-grid="pocitos3"] .j-board-cell:nth-child(3) { 
-    grid-column: 2; 
+    grid-column: 1; 
     grid-row: 3; 
 }
 
@@ -664,5 +664,26 @@
 }
 .j-board-grid[data-grid="cruzadas"] .j-board-cell:nth-child(5) { 
     grid-column: 3; 
+    grid-row: 3; 
+}
+/* ==========================================
+   PREVIEWS DEL ASIDE - Pocitos 3
+========================================== */
+
+/* Vista previa de ubicación */
+.j-grid-preview[data-grid="pocitos3"] .cell:nth-child(3) { 
+    grid-column: 1; 
+    grid-row: 3; 
+}
+
+/* Vista previa de casillas */
+.j-casilla-preview-grid[data-grid="pocitos3"] .cell:nth-child(3) { 
+    grid-column: 1; 
+    grid-row: 3; 
+}
+
+/* Vista previa de marcos */
+.j-marcos-preview-grid[data-grid="pocitos3"] .cell:nth-child(3) { 
+    grid-column: 1; 
     grid-row: 3; 
 }
