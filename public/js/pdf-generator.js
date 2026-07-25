@@ -1,22 +1,7 @@
-/**
- * =====================================================
- * JUGUEMOS PDF GENERATOR
- * Captura el preview ya renderizado por PrintPaper
- * (con diseño, colores, marcas de corte, etc. ya
- * aplicados) y lo exporta como PDF respetando el
- * tamaño de papel y orientación configurados.
- * =====================================================
- */
-
 window.JuguemosPDF = {
 
-    // Escala de captura (más alto = mejor calidad, más lento/pesado)
-    captureScale: 2,
+    captureScale: 3,
 
-    /**
-     * Espera a que todas las imágenes dentro de un contenedor
-     * terminen de cargar antes de capturar (evita cartas en blanco)
-     */
     esperarImagenes(container) {
         const imgs = Array.from(container.querySelectorAll('img'));
         const promesas = imgs.map(img => {
@@ -24,16 +9,22 @@ window.JuguemosPDF = {
                 return Promise.resolve();
             }
             return new Promise(resolve => {
-                img.addEventListener('load', resolve, { once: true });
-                img.addEventListener('error', resolve, { once: true });
+                const timeout = setTimeout(() => {
+                    resolve();
+                }, 8000);
+                
+                const onLoad = () => {
+                    clearTimeout(timeout);
+                    resolve();
+                };
+                
+                img.addEventListener('load', onLoad, { once: true });
+                img.addEventListener('error', onLoad, { once: true });
             });
         });
         return Promise.all(promesas);
     },
 
-    /**
-     * Genera y descarga el PDF con el diseño actual
-     */
     async generate() {
         const btn = document.getElementById('j-download-pdf');
         const btnText = document.getElementById('j-pdf-btn-text');
@@ -52,22 +43,12 @@ window.JuguemosPDF = {
 
         const { jsPDF } = window.jspdf;
 
-        // -----------------------------------------------------------
-        // FIX: al llegar al paso 4, el paso 3 (#juguemos-preview-completo)
-        // queda con display:none (perdió la clase .active). html2canvas
-        // no puede capturar contenido de un elemento oculto: el canvas
-        // sale vacío y el PDF descarga en blanco.
-        //
-        // Solución: mostrar temporalmente ese paso, pero posicionado
-        // fuera de la pantalla para que el usuario no vea el flash,
-        // capturar, y luego restaurar el estado original.
-        // -----------------------------------------------------------
         const stepPreview = document.getElementById('juguemos-preview-completo');
         let stepWasHidden = false;
 
         if (stepPreview && !stepPreview.classList.contains('active')) {
             stepWasHidden = true;
-            stepPreview.classList.add('active'); // aplica display:block (CSS .j-step.active)
+            stepPreview.classList.add('active');
             stepPreview.style.position = 'fixed';
             stepPreview.style.top = '0';
             stepPreview.style.left = '-99999px';
@@ -75,13 +56,9 @@ window.JuguemosPDF = {
             stepPreview.style.width = '100%';
         }
 
-        // IMPORTANTE: forzar un render con el estado actual antes de capturar,
-        // para que el PDF refleje exactamente la última configuración
-        // (diseño, colores, cantidad de tablas, grid, marcas de corte, etc.)
         PrintPaper.render();
 
-        // Esperar un tick para que el DOM termine de pintarse
-        await new Promise(resolve => setTimeout(resolve, 150));
+        await new Promise(resolve => setTimeout(resolve, 500));
 
         const container = document.getElementById('j-print-preview');
         const sheets = container ? Array.from(container.querySelectorAll('.j-sheet')) : [];
@@ -92,12 +69,10 @@ window.JuguemosPDF = {
             return;
         }
 
-        // UI de carga
         if (btn) btn.disabled = true;
         if (btnText) btnText.textContent = 'Preparando...';
         if (progress) progress.style.display = 'block';
 
-        // Configuración real de papel (mm), respetando orientación elegida
         const paperConfig = PrintPaper.getPaperConfig();
         const orientation = paperConfig.orientation === 'horizontal' ? 'landscape' : 'portrait';
 
@@ -113,31 +88,46 @@ window.JuguemosPDF = {
                     progressCount.textContent = `${i + 1}/${sheets.length}`;
                 }
                 if (btnText) {
-                    btnText.textContent = `Generando ${i + 1}/${sheets.length}...`;
+                    btnText.textContent = `Capturando hoja ${i + 1}/${sheets.length}...`;
                 }
 
                 const sheet = sheets[i];
 
-                // Esperar a que las imágenes de barajas de ESTA hoja carguen
+                sheets.forEach((s, index) => {
+                    if (index !== i) {
+                        s.style.display = 'none';
+                    } else {
+                        s.style.display = 'block';
+                        s.style.visibility = 'visible';
+                        s.style.opacity = '1';
+                    }
+                });
+
+                sheet.offsetHeight;
+
                 await this.esperarImagenes(sheet);
 
-                // Capturar la hoja tal cual se ve: diseño, colores de marco,
-                // fondo de tabla, marcas de corte (ya son elementos del DOM)
+                await new Promise(resolve => setTimeout(resolve, 400));
+
                 const canvas = await html2canvas(sheet, {
                     scale: this.captureScale,
                     useCORS: true,
                     allowTaint: false,
                     backgroundColor: '#FFFFFF',
-                    logging: false
+                    logging: false,
+                    onclone: (clonedDoc, element) => {
+                        return new Promise((resolve) => {
+                            setTimeout(resolve, 300);
+                        });
+                    }
                 });
 
-                const imgData = canvas.toDataURL('image/jpeg', 0.95);
+                const imgData = canvas.toDataURL('image/jpeg', 1.0);
 
                 if (i > 0) {
                     pdf.addPage([paperConfig.width, paperConfig.height], orientation);
                 }
 
-                // La imagen capturada ocupa toda la hoja del PDF (0,0 -> ancho/alto en mm)
                 pdf.addImage(
                     imgData,
                     'JPEG',
@@ -146,6 +136,16 @@ window.JuguemosPDF = {
                     paperConfig.width,
                     paperConfig.height
                 );
+
+                sheets.forEach((s) => {
+                    s.style.display = '';
+                });
+
+                await new Promise(resolve => setTimeout(resolve, 200));
+
+                if (progressCount) {
+                    progressCount.textContent = `${i + 1}/${sheets.length} ✅`;
+                }
             }
 
             const nombreArchivo = `loteria-la-dama-${Date.now()}.pdf`;
@@ -159,12 +159,17 @@ window.JuguemosPDF = {
             if (btnText) btnText.textContent = 'Descargar PDF';
             if (progress) progress.style.display = 'none';
             this.restoreStep(stepPreview, stepWasHidden);
+            
+            if (container) {
+                container.querySelectorAll('.j-sheet').forEach(s => {
+                    s.style.display = '';
+                    s.style.visibility = '';
+                    s.style.opacity = '';
+                });
+            }
         }
     },
 
-    /**
-     * Revierte el paso 3 a su estado oculto original después de capturarlo
-     */
     restoreStep(stepPreview, stepWasHidden) {
         if (!stepPreview || !stepWasHidden) return;
         stepPreview.classList.remove('active');
