@@ -3,6 +3,7 @@
     
     class JuguemosPayment {
         constructor() {
+            this.isDownloading = false; 
             this.init();
         }
         
@@ -164,7 +165,9 @@
             
             if (paymentVerified && paymentToken) {
                 console.log('Pago confirmado!');
-                this.paymentSuccess();
+                setTimeout(() => {
+                    this.paymentSuccess();
+                }, 100);
                 return;
             }
             
@@ -199,7 +202,9 @@
             
             if (paymentVerified && paymentToken) {
                 console.log('Pago ya verificado en sessionStorage');
-                this.paymentSuccess();
+                setTimeout(() => {
+                    this.paymentSuccess();
+                }, 100);
                 return true;
             }
             
@@ -255,34 +260,42 @@
         }
         
         paymentSuccess() {
+            // ✅ EVITAR DESCARGA DUPLICADA
+            if (this.isDownloading) {
+                console.log('Descarga ya en proceso, ignorando...');
+                return;
+            }
+            this.isDownloading = true;
+            
             $('.j-payment-methods').hide();
             $('#j-process-payment').hide();
             $('#j-payment-loading').hide();
             $('#j-waiting-message').remove();
             
+            // ✅ Mostrar sección de descarga
             $('#j-download-section').show();
             
             const btnDownload = document.getElementById('j-download-pdf');
+            const btnText = document.getElementById('j-download-text');
+
             if (btnDownload) {
-                btnDownload.textContent = 'Descargar PDF';
-                btnDownload.style.background = '#24B8C8';
                 btnDownload.style.display = 'inline-block';
+            }
+
+            if (btnText) {
+                btnText.textContent = 'Descargar PDF';
             }
             
             $('#j-download-section h3').text('Pago confirmado');
             
             sessionStorage.setItem('juguemos_payment_verified', 'true');
             
+            console.log('Pago confirmado. Esperando que el usuario haga clic en "Descargar PDF"');
+            
+            // Resetear bandera después de 3 segundos
             setTimeout(() => {
-                if (typeof PrintPaper !== 'undefined' && document.getElementById('j-print-preview')?.children.length > 0) {
-                    if (typeof JuguemosPDF !== 'undefined') {
-                        JuguemosPDF.generate();
-                    }
-                } else {
-                    console.log('Vista previa no lista, esperando usuario...');
-                    $('#j-download-section p').text('La vista previa se está cargando. Haz clic en "Descargar PDF" cuando esté lista.');
-                }
-            }, 1500);
+                this.isDownloading = false;
+            }, 3000);
         }
     }
     

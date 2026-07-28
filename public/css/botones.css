@@ -340,3 +340,35 @@
     color:#FA299C;
     border-color: #FA299C;
 }
+
+/* =====================================================
+   BOTÓN DESCARGAR PDF (diseño propio - rosa)
+===================================================== */
+
+.j-btn-download {
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    height:40px;
+    padding:0 18px;
+
+    border:2px solid #FA299C;
+    border-radius:8px;
+
+    background:#FA299C;
+    color:#FFFFFF;
+
+    font-family:'Cairo',sans-serif;
+    font-size:15px;
+    font-weight:700;
+
+    cursor:pointer;
+    transition:.2s;
+}
+
+.j-btn-download:hover {
+    background:#FFFFFF;
+    color:#FA299C;
+    border-color: #FA299C;
+}

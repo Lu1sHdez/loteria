@@ -23,6 +23,9 @@ if (!defined('ABSPATH')) {
                 alt="">
         </div>
     </div>
+    
+
+    
 
     <div class="j-step-body">
 

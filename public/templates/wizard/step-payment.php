@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
             ========================================== -->
             <div class="j-section">
                 <div class="j-panel-item">
-                    <div class="subtitulo-aqua">Resumen de tu pedido</div>
+                    <div class="subtitulo-aqua">1. Resumen de tu pedido</div>
                 </div>
 
                 <div class="j-order-summary">
@@ -47,7 +47,7 @@ if (!defined('ABSPATH')) {
             ========================================== -->
             <div class="j-section">
                 <div class="j-panel-item">
-                    <div class="subtitulo-aqua">Selecciona tu método de pago</div>
+                    <div class="subtitulo-aqua">2. Selecciona tu método de pago</div>
                 </div>
 
                 <div class="j-payment-methods">
@@ -81,11 +81,12 @@ if (!defined('ABSPATH')) {
             <!-- ==========================================
             SECCIÓN DE DESCARGA (se muestra después de pagar)
             ========================================== -->
-            <div id="j-download-section" style="display:none;text-align:center;padding:30px;background:#f0f9fa;border-radius:12px;margin-top:20px;">
-                <h3>¡Pago confirmado!</h3>
+            <div id="j-download-section" style="display:none; text-align:center; padding:30px; background:#f0f9fa; border-radius:12px; margin-top:20px;">
+                <p class="text-aqua-normal">¡Pago confirmado!</p>
                 <p class="j-texto-normal">Tu pago ha sido procesado exitosamente. Ahora puedes descargar tu PDF.</p>
-                <button id="j-download-pdf" class="j-btn-next" style="background:#24B8C8;">
-                    Descargar PDF
+                <button id="j-download-pdf" class="j-btn-download">
+                    <span id="j-download-text">Descargar PDF</span>
+                    <span id="j-download-spinner" style="display:none; width:18px; height:18px; border:2px solid #fff; border-top-color: transparent; border-radius:50%; animation: spin 0.8s linear infinite;"></span>
                 </button>
             </div>
 
