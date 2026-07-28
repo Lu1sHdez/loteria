@@ -8,9 +8,12 @@ class Juguemos_PayPal_Handler {
     private $mode;
     
     public function __construct() {
-        $this->client_id = get_option('juguemos_paypal_client_id', '');
-        $this->secret = get_option('juguemos_paypal_secret', '');
-        $this->mode = get_option('juguemos_paypal_mode', 'sandbox');
+        // ✅ USAR LA CLASE PARA OBTENER LAS CREDENCIALES
+        $creds = Juguemos_Payment_Settings::get_paypal_credentials();
+        
+        $this->client_id = $creds['client_id'];
+        $this->secret = $creds['secret'];
+        $this->mode = $creds['mode'];
     }
     
     private function get_access_token() {
@@ -93,6 +96,7 @@ class Juguemos_PayPal_Handler {
             }
         }
 
+        error_log('PayPal Create Order Error: ' . print_r($data, true));
         return false;
     }
 
@@ -123,6 +127,7 @@ class Juguemos_PayPal_Handler {
             return $data;
         }
 
+        error_log('PayPal Capture Response: ' . print_r($data, true));
         return false;
     }
 
