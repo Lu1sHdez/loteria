@@ -4,15 +4,18 @@
 // ============================================
 // CARGAR WORDPRESS
 // ============================================
-$wp_load = dirname(dirname(dirname(dirname(__FILE__)))) . '/wp-load.php';
+$wp_load = dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/wp-load.php';
+
 if (!file_exists($wp_load)) {
     $wp_load = $_SERVER['DOCUMENT_ROOT'] . '/wp-load.php';
 }
+
 if (!file_exists($wp_load)) {
     header('Content-Type: application/json');
-    echo json_encode(['error' => 'No se encontró wp-load.php']);
+    echo json_encode(['error' => 'No se encontró wp-load.php en: ' . $wp_load]);
     exit;
 }
+
 require_once($wp_load);
 
 // ============================================

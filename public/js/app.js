@@ -399,7 +399,6 @@ document.addEventListener("DOMContentLoaded", () => {
             // ✅ ACTUALIZAR RESUMEN CUANDO SE ENTRA AL PASO 4
             if (typeof JuguemosPaymentInstance !== 'undefined') {
                 JuguemosPaymentInstance.updatePaymentSummary();
-                JuguemosPaymentInstance.checkPaymentStatus();
             }
         });
     }
@@ -422,7 +421,6 @@ document.addEventListener("DOMContentLoaded", () => {
             updateTotalInStep4();
             if (typeof JuguemosPaymentInstance !== 'undefined') {
                 JuguemosPaymentInstance.updatePaymentSummary();
-                JuguemosPaymentInstance.checkPaymentStatus();
             }
         }
     });
@@ -694,6 +692,24 @@ function drawMarcosPreview() {
 }
 
 function updateOrderSummary() {
+    // ✅ Para el paso 4 (pago)
+    const countryEl = document.getElementById('payment-summary-country');
+    if (countryEl) countryEl.textContent = JuguemosState.country || 'Mexico';
+    
+    const modeEl = document.getElementById('payment-summary-mode');
+    if (modeEl) modeEl.textContent = JuguemosState.mode === 'favoritas' ? '7 Favoritas' : JuguemosState.mode;
+    
+    const quantityEl = document.getElementById('payment-summary-quantity');
+    if (quantityEl) quantityEl.textContent = JuguemosState.quantity || 0;
+    
+    const priceEl = document.getElementById('payment-summary-price');
+    if (priceEl) {
+        const total = JuguemosState.total || 0;
+        const currency = JuguemosState.currency || 'USD';
+        priceEl.textContent = `$${Number(total).toFixed(2)} ${currency}`;
+    }
+    
+    // ✅ Para el resto de la página (pasos 1-3)
     document.getElementById("j-summary-tables").textContent = `${JuguemosState.quantity} tablas por hoja`;
     document.getElementById("j-summary-cards").textContent = `${JuguemosState.barajas.length} barajas`;
     document.getElementById("j-summary-paper").textContent = JuguemosState.paper;

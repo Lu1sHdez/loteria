@@ -81,20 +81,26 @@
                     description: 'Lotería La Dama - Pedido'
                 })
             })
-            .then(response => response.json())
+            .then(async response => {
+                // ✅ Leer como texto primero para depurar
+                const text = await response.text();
+                console.log('📦 Respuesta cruda:', text);
+                
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    console.error('❌ Error al parsear JSON:', e);
+                    console.error('📄 Texto recibido:', text);
+                    throw new Error('El servidor no devolvió JSON válido');
+                }
+            })
             .then(data => {
                 console.log('✅ Respuesta PayPal:', data);
                 
                 if (data.approve_url) {
-                    // ✅ ABRIR PAYPAL EN NUEVA VENTANA
                     window.open(data.approve_url, '_blank', 'width=800,height=600');
-                    
-                    // ✅ MOSTRAR MENSAJE DE ESPERA
                     this.showWaitingMessage();
-                    
-                    // ✅ INICIAR VERIFICACIÓN DE PAGO
                     this.startPaymentVerification();
-                    
                 } else {
                     alert('❌ Error: ' + (data.error || 'No se pudo crear la orden'));
                     btn.prop('disabled', false);
@@ -110,7 +116,7 @@
                 $('#j-payment-loading').hide();
             });
         }
-        
+                
         showWaitingMessage() {
             // Ocultar botón de pago
             $('#j-process-payment').hide();
@@ -177,6 +183,41 @@
                     alert('❌ Error al verificar el pago. Intenta nuevamente.');
                 }
             });
+        }
+        checkPaymentStatus() {
+            console.log('🔍 Verificando estado de pago...');
+            
+            const paymentVerified = sessionStorage.getItem('juguemos_payment_verified') === 'true';
+            const paymentToken = sessionStorage.getItem('juguemos_payment_token');
+            
+            if (paymentVerified && paymentToken) {
+                console.log('✅ Pago ya verificado en sessionStorage');
+                this.paymentSuccess();
+                return true;
+            }
+            
+            // Verificar con el servidor
+            $.ajax({
+                url: Juguemos.ajax_url,
+                method: 'POST',
+                data: {
+                    action: 'juguemos_verify_payment',
+                    nonce: Juguemos.nonce,
+                    token: sessionStorage.getItem('juguemos_payment_token') || ''
+                },
+                success: (response) => {
+                    console.log('✅ Respuesta verificación:', response);
+                    if (response.success && response.data && response.data.paid) {
+                        sessionStorage.setItem('juguemos_payment_verified', 'true');
+                        this.paymentSuccess();
+                    }
+                },
+                error: (xhr) => {
+                    console.log('⚠️ Error al verificar:', xhr.responseText);
+                }
+            });
+            
+            return false;
         }
         
         startPaymentVerification() {
