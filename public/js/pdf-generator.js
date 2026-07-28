@@ -151,6 +151,11 @@ window.JuguemosPDF = {
             const nombreArchivo = `loteria-la-dama-${Date.now()}.pdf`;
             pdf.save(nombreArchivo);
 
+            sessionStorage.removeItem('juguemos_payment_verified');
+            sessionStorage.removeItem('juguemos_payment_token');
+            sessionStorage.removeItem('juguemos_page_loaded');
+            sessionStorage.removeItem('juguemos_order_id');
+
         } catch (error) {
             console.error('Error generando PDF:', error);
             alert('Ocurrió un error al generar el PDF. Revisa la consola para más detalles.');

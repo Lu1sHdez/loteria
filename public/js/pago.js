@@ -15,13 +15,11 @@
         }
         
         bindEvents() {
-            // Seleccionar método de pago
             $(document).on('click', '.j-payment-method', (e) => {
                 const method = $(e.currentTarget).data('method');
                 this.selectMethod(method);
             });
             
-            // Procesar pago
             $(document).on('click', '#j-process-payment', () => {
                 this.processPayment();
             });
@@ -44,18 +42,17 @@
             if (quantityEl) quantityEl.textContent = quantity;
         
             const priceEl = document.getElementById('payment-summary-price');
-            if (priceEl) priceEl.textContent = `$${Number(total).toFixed(2)} ${currency}`;
+            if (priceEl) priceEl.textContent = '$' + Number(total).toFixed(2) + ' ' + currency;
         }
         
         selectMethod(method) {
             $('.j-payment-method').removeClass('active');
-            $(`.j-payment-method[data-method="${method}"]`).addClass('active');
+            $('.j-payment-method[data-method="' + method + '"]').addClass('active');
             
             if (method === 'paypal') {
-                $('#j-process-payment').html(`
-                    <img src="/wp-content/uploads/2026/07/paypal.png" alt="PayPal" style="height:24px;vertical-align:middle;margin-right:10px;">
-                    Pagar con PayPal
-                `);
+                $('#j-process-payment').html(
+                    '<img src="/wp-content/uploads/2026/07/paypal.png" alt="PayPal" style="height:20px;vertical-align:middle;margin-right:8px;"> Pagar con PayPal'
+                );
             }
         }
         
@@ -68,7 +65,7 @@
             const amount = JuguemosState.total || 1.00;
             const currency = JuguemosState.currency || 'USD';
             
-            console.log('💰 Pagando:', amount, currency);
+            console.log('Pagando:', amount, currency);
             
             fetch('/wp-content/plugins/juguemos/public/templates/payment/paypal-simple.php', {
                 method: 'POST',
@@ -82,34 +79,44 @@
                 })
             })
             .then(async response => {
-                // ✅ Leer como texto primero para depurar
                 const text = await response.text();
-                console.log('📦 Respuesta cruda:', text);
+                console.log('Respuesta cruda:', text);
                 
                 try {
                     return JSON.parse(text);
                 } catch (e) {
-                    console.error('❌ Error al parsear JSON:', e);
-                    console.error('📄 Texto recibido:', text);
+                    console.error('Error al parsear JSON:', e);
+                    console.error('Texto recibido:', text);
                     throw new Error('El servidor no devolvió JSON válido');
                 }
             })
             .then(data => {
-                console.log('✅ Respuesta PayPal:', data);
+                console.log('Respuesta PayPal:', data);
                 
                 if (data.approve_url) {
                     window.open(data.approve_url, '_blank', 'width=800,height=600');
                     this.showWaitingMessage();
                     this.startPaymentVerification();
                 } else {
-                    alert('❌ Error: ' + (data.error || 'No se pudo crear la orden'));
+                    alert('Error: ' + (data.error || 'No se pudo crear la orden'));
                     btn.prop('disabled', false);
                     btn.show();
                     $('#j-payment-loading').hide();
                 }
             })
             .catch(error => {
-                console.error('❌ Error:', error);
+                console.error('Error:', error);
+                
+                // ✅ VERIFICAR SI EL PAGO YA ESTÁ VERIFICADO
+                const paymentVerified = sessionStorage.getItem('juguemos_payment_verified') === 'true';
+                const paymentToken = sessionStorage.getItem('juguemos_payment_token');
+                
+                if (paymentVerified && paymentToken) {
+                    console.log('Pago ya verificado, mostrando descarga...');
+                    this.paymentSuccess();
+                    return;
+                }
+                
                 alert('Error de conexión. Intenta nuevamente.');
                 btn.prop('disabled', false);
                 btn.show();
@@ -118,50 +125,49 @@
         }
                 
         showWaitingMessage() {
-            // Ocultar botón de pago
+            // ✅ VERIFICAR ANTES DE MOSTRAR ESPERA
+            const paymentVerified = sessionStorage.getItem('juguemos_payment_verified') === 'true';
+            const paymentToken = sessionStorage.getItem('juguemos_payment_token');
+            
+            if (paymentVerified && paymentToken) {
+                this.paymentSuccess();
+                return;
+            }
+            
             $('#j-process-payment').hide();
             $('#j-payment-loading').hide();
             $('.j-payment-methods').hide();
             
-            // Mostrar mensaje de espera
             if (!$('#j-waiting-message').length) {
                 $('#juguemos-payment .j-section:last').before(`
                     <div id="j-waiting-message" class="j-section" style="text-align:center;padding:30px;">
                         <div class="j-spinner"></div>
-                        <h3 style="color:#1E2249;">⏳ Esperando confirmación de pago...</h3>
-                        <p style="color:#666;">Has sido redirigido a PayPal para completar el pago.</p>
+                        <h3 style="color:#1E2249;">Esperando confirmación de pago</h3>
+                        <p class="j-texto-normal">Has sido redirigido a PayPal para completar el pago.</p>
                         <p style="font-size:14px;color:#999;">La página se actualizará automáticamente cuando el pago sea confirmado.</p>
-                        <button id="j-check-payment-status" class="j-btn-back" style="margin-top:15px;">
-                            🔄 Verificar estado ahora
-                        </button>
-                        <p style="font-size:12px;color:#999;margin-top:10px;">
-                            Si ya pagaste, haz clic en "Verificar estado ahora"
-                        </p>
+                        <button id="j-check-payment-status" class="j-btn-back" style="margin-top:15px;">Verificar estado ahora</button>
+                        <p style="font-size:12px;color:#999;margin-top:10px;">Si ya pagaste, haz clic en "Verificar estado ahora"</p>
                     </div>
                 `);
                 
-                // Evento para verificar manualmente
                 $(document).on('click', '#j-check-payment-status', () => {
                     this.checkPaymentManually();
                 });
             }
         }
         
-        // ✅ NUEVO: Verificar pago manualmente SIN RECARGAR
         checkPaymentManually() {
-            console.log('🔍 Verificando pago manualmente...');
+            console.log('Verificando pago manualmente...');
             
-            // Verificar en sessionStorage
             const paymentVerified = sessionStorage.getItem('juguemos_payment_verified') === 'true';
             const paymentToken = sessionStorage.getItem('juguemos_payment_token');
             
             if (paymentVerified && paymentToken) {
-                console.log('✅ Pago confirmado!');
+                console.log('Pago confirmado!');
                 this.paymentSuccess();
                 return;
             }
             
-            // Si no está en sessionStorage, verificar con el servidor
             $.ajax({
                 url: Juguemos.ajax_url,
                 method: 'POST',
@@ -171,32 +177,32 @@
                     token: sessionStorage.getItem('juguemos_payment_token') || ''
                 },
                 success: (response) => {
-                    console.log('✅ Respuesta del servidor:', response);
+                    console.log('Respuesta del servidor:', response);
                     if (response.success && response.data && response.data.paid) {
                         sessionStorage.setItem('juguemos_payment_verified', 'true');
                         this.paymentSuccess();
                     } else {
-                        alert('⏳ Aún no se ha confirmado tu pago. Por favor espera unos segundos.');
+                        alert('Aún no se ha confirmado tu pago. Por favor espera unos segundos.');
                     }
                 },
                 error: () => {
-                    alert('❌ Error al verificar el pago. Intenta nuevamente.');
+                    alert('Error al verificar el pago. Intenta nuevamente.');
                 }
             });
         }
+        
         checkPaymentStatus() {
-            console.log('🔍 Verificando estado de pago...');
+            console.log('Verificando estado de pago...');
             
             const paymentVerified = sessionStorage.getItem('juguemos_payment_verified') === 'true';
             const paymentToken = sessionStorage.getItem('juguemos_payment_token');
             
             if (paymentVerified && paymentToken) {
-                console.log('✅ Pago ya verificado en sessionStorage');
+                console.log('Pago ya verificado en sessionStorage');
                 this.paymentSuccess();
                 return true;
             }
             
-            // Verificar con el servidor
             $.ajax({
                 url: Juguemos.ajax_url,
                 method: 'POST',
@@ -206,14 +212,14 @@
                     token: sessionStorage.getItem('juguemos_payment_token') || ''
                 },
                 success: (response) => {
-                    console.log('✅ Respuesta verificación:', response);
+                    console.log('Respuesta verificación:', response);
                     if (response.success && response.data && response.data.paid) {
                         sessionStorage.setItem('juguemos_payment_verified', 'true');
                         this.paymentSuccess();
                     }
                 },
                 error: (xhr) => {
-                    console.log('⚠️ Error al verificar:', xhr.responseText);
+                    console.log('Error al verificar:', xhr.responseText);
                 }
             });
             
@@ -222,67 +228,61 @@
         
         startPaymentVerification() {
             let attempts = 0;
-            const maxAttempts = 30; // 30 intentos (2.5 minutos)
+            const maxAttempts = 30;
             
             const checkPayment = setInterval(() => {
                 attempts++;
-                console.log('🔍 Verificando pago... Intento ' + attempts);
+                console.log('Verificando pago... Intento ' + attempts);
                 
                 const paymentVerified = sessionStorage.getItem('juguemos_payment_verified') === 'true';
                 const paymentToken = sessionStorage.getItem('juguemos_payment_token');
                 
                 if (paymentVerified && paymentToken) {
                     clearInterval(checkPayment);
-                    console.log('✅ Pago confirmado!');
+                    console.log('Pago confirmado!');
                     this.paymentSuccess();
                 }
                 
                 if (attempts >= maxAttempts) {
                     clearInterval(checkPayment);
-                    console.log('⏰ Tiempo de espera agotado.');
-                    // Mostrar mensaje de tiempo agotado
+                    console.log('Tiempo de espera agotado.');
                     $('#j-waiting-message p:last').before(`
-                        <p style="color:#e74c3c;font-weight:bold;">
-                            ⏰ El tiempo de espera ha terminado.
-                        </p>
-                        <p style="font-size:12px;color:#999;">
-                            Si ya realizaste el pago, haz clic en "Verificar estado ahora".
-                        </p>
+                        <p style="color:#e74c3c;font-weight:bold;">El tiempo de espera ha terminado.</p>
+                        <p style="font-size:12px;color:#999;">Si ya realizaste el pago, haz clic en "Verificar estado ahora".</p>
                     `);
                 }
-            }, 5000); // Cada 5 segundos
+            }, 5000);
         }
         
         paymentSuccess() {
-            // Ocultar todo
             $('.j-payment-methods').hide();
             $('#j-process-payment').hide();
             $('#j-payment-loading').hide();
             $('#j-waiting-message').remove();
             
-            // ✅ Mostrar sección de descarga
             $('#j-download-section').show();
             
-            // ✅ Actualizar el botón de descarga
             const btnDownload = document.getElementById('j-download-pdf');
             if (btnDownload) {
-                btnDownload.textContent = '📄 Descargar PDF';
+                btnDownload.textContent = 'Descargar PDF';
                 btnDownload.style.background = '#24B8C8';
                 btnDownload.style.display = 'inline-block';
             }
             
-            // ✅ Mostrar mensaje de éxito
-            $('#j-download-section h3').text('🎉 ¡Pago confirmado!');
+            $('#j-download-section h3').text('Pago confirmado');
             
-            // ✅ Guardar en sessionStorage para futuras visitas
             sessionStorage.setItem('juguemos_payment_verified', 'true');
             
-            // ✅ Generar PDF automáticamente después de 2 segundos (opcional)
             setTimeout(() => {
-                if (typeof JuguemosPDF !== 'undefined') {
-                    JuguemosPDF.generate();
+                if (typeof PrintPaper !== 'undefined' && document.getElementById('j-print-preview')?.children.length > 0) {
+                    if (typeof JuguemosPDF !== 'undefined') {
+                        JuguemosPDF.generate();
+                    }
+                } else {
+                    console.log('Vista previa no lista, esperando usuario...');
+                    $('#j-download-section p').text('La vista previa se está cargando. Haz clic en "Descargar PDF" cuando esté lista.');
                 }
-            }, 2000);
+            }, 1500);
         }
     }
     

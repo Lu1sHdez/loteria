@@ -1,5 +1,16 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+    const pageLoaded = sessionStorage.getItem('juguemos_page_loaded');
+    
+    if (pageLoaded) {
+        sessionStorage.removeItem('juguemos_payment_verified');
+        sessionStorage.removeItem('juguemos_payment_token');
+        sessionStorage.removeItem('juguemos_page_loaded');
+    } else {
+        // Marcar que la página se está cargando
+        sessionStorage.setItem('juguemos_page_loaded', 'true');
+    }
+
     const paperSelect = document.getElementById("j-paper-size");
     if (paperSelect) {
         paperSelect.addEventListener("change", function () {
@@ -353,6 +364,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnEditOrder = document.getElementById("j-edit-order");
     if (btnEditOrder) {
         btnEditOrder.addEventListener("click", () => {
+
+            sessionStorage.removeItem('juguemos_payment_verified');
+            sessionStorage.removeItem('juguemos_payment_token');
+            sessionStorage.removeItem('juguemos_page_loaded');
+            sessionStorage.removeItem('juguemos_order_id');
+
+            sessionStorage.removeItem('juguemos_payment_verified');
+            sessionStorage.removeItem('juguemos_payment_token');
+
             const tablesNumber = document.getElementById("tables-number");
             const tablesRange = document.getElementById("tables-range");
             if (tablesNumber) {
@@ -432,6 +452,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnBackToPreview = document.getElementById("j-back-to-preview");
     if (btnBackToPreview) {
         btnBackToPreview.addEventListener("click", () => {
+            sessionStorage.removeItem('juguemos_payment_verified');
+            sessionStorage.removeItem('juguemos_payment_token');
+
             document.querySelectorAll(".j-step").forEach(step => {
                 step.classList.remove("active");
             });
