@@ -89,7 +89,7 @@ class Juguemos_Pricing
     {
         $prices = [
             'mexico' => [
-                'sencilla'   => 1.25,  // $1.25 pesos por tabla
+                'sencilla'   => 1.25,  
                 'dobles'     => 1.25,  // $1.25 pesos por tabla
                 'favoritas'  => 2.00,  // $2.00 pesos por tabla
                 'libre'      => 2.50,  // $2.50 pesos por tabla (personalizadas)

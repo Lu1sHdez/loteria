@@ -97,6 +97,13 @@ class Juguemos_Assets
             JUGUEMOS_VERSION,
             true
         );
+        wp_enqueue_script(
+            'juguemos-pago',
+            JUGUEMOS_URL . 'public/js/pago.js',
+            ['jquery'],
+            JUGUEMOS_VERSION,
+            true
+        );
 
         wp_enqueue_script(
             'juguemos-print-preview',

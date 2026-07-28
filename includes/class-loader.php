@@ -27,18 +27,14 @@ class Juguemos_Loader
         require_once JUGUEMOS_PATH . 'includes/Repositories/class-deck-repository.php';
         require_once JUGUEMOS_PATH . 'includes/Repositories/class-price-repository.php';
         require_once JUGUEMOS_PATH . 'includes/Pricing/class-pricing.php';
-        require_once JUGUEMOS_PATH . 'includes/Auth/class-auth.php';
         require_once JUGUEMOS_PATH . 'includes/Auth/class-login.php';
-        require_once JUGUEMOS_PATH . 'includes/Auth/class-register.php';    
-        require_once JUGUEMOS_PATH . 'includes/Auth/class-account.php';
-        require_once JUGUEMOS_PATH . 'includes/Auth/class-auth-shortcodes.php';
         require_once JUGUEMOS_PATH . 'admin/class-admin-categorias.php';
         require_once JUGUEMOS_PATH . 'admin/class-admin-dashboard.php';
         require_once JUGUEMOS_PATH . 'admin/class-admin-designs.php';
         require_once JUGUEMOS_PATH . 'includes/Ajax/class-admin-ajax.php';
         require_once JUGUEMOS_PATH . 'admin/class-admin-barajas.php';
         require_once JUGUEMOS_PATH . 'includes/Files/class-files.php';
-
+        require_once JUGUEMOS_PATH . 'includes/Payment/class-paypal-handler.php';
     }
 
 

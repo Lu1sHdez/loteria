@@ -1,0 +1,239 @@
+/* ==========================================
+   MODAL DE PAGO - ESTILOS
+   ========================================== */
+
+/* Overlay - fondo oscuro */
+.j-payment-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 99999;
+    justify-content: center;
+    align-items: center;
+}
+
+.j-payment-overlay.active {
+    display: flex;
+}
+
+/* Modal - ventana blanca */
+.j-payment-modal {
+    display: none;
+    background: white;
+    border-radius: 16px;
+    max-width: 420px;
+    width: 90%;
+    padding: 30px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    position: relative;
+    animation: modalFadeIn 0.3s ease;
+}
+
+.j-payment-modal.active {
+    display: block;
+}
+
+/* Animación de entrada */
+@keyframes modalFadeIn {
+    from { 
+        opacity: 0; 
+        transform: scale(0.9) translateY(20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: scale(1) translateY(0); 
+    }
+}
+
+/* Botón cerrar */
+.j-payment-modal-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+    background: none;
+    border: none;
+    transition: color 0.2s ease;
+}
+
+.j-payment-modal-close:hover {
+    color: #333;
+}
+
+/* Header */
+.j-payment-header {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.j-payment-header h3 {
+    margin: 0 0 5px 0;
+    color: #1E2249;
+    font-size: 18px;
+}
+
+.j-payment-header p {
+    color: #666;
+    font-size: 14px;
+    margin: 0;
+}
+
+.j-payment-header strong {
+    color: #FA299C;
+    font-size: 20px;
+}
+
+/* Métodos de pago */
+.j-payment-methods {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.j-payment-method {
+    padding: 12px 15px;
+    border: 2px solid #e8e8e8;
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    min-width: 80px;
+}
+
+.j-payment-method .j-payment-icon {
+    height: 30px;
+    width: auto;
+    object-fit: contain;
+}
+
+.j-payment-method:hover:not(:disabled) {
+    border-color: #24B8C8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.j-payment-method.active {
+    border-color: #24B8C8;
+    background: #f0f9fa;
+    box-shadow: 0 4px 12px rgba(36, 184, 200, 0.15);
+}
+
+.j-payment-method span {
+    font-size: 12px;
+    color: #333;
+}
+
+.j-payment-method:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Detalles del pago */
+.j-payment-details {
+    margin-top: 15px;
+    padding: 20px;
+    background: #f8f8f8;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.j-payment-info p {
+    color: #555;
+    font-size: 14px;
+    margin: 0 0 5px 0;
+}
+
+.j-payment-info .j-payment-sub {
+    color: #999;
+    font-size: 12px;
+    margin-bottom: 15px;
+}
+
+.j-payment-details .j-btn-next {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Spinner de carga */
+.j-spinner {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border: 4px solid #e0e0e0;
+    border-top: 4px solid #FA299C;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#j-process-payment:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Redes sociales */
+.j-payment-social {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.j-social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+
+@media (max-width: 480px) {
+    .j-payment-modal {
+        padding: 20px;
+    }
+    
+    .j-payment-methods {
+        flex-wrap: wrap;
+    }
+    
+    .j-payment-method {
+        flex: 1 1 calc(33% - 10px);
+        min-width: 70px;
+        padding: 10px;
+    }
+    
+    .j-payment-method .j-payment-icon {
+        height: 24px;
+    }
+}
+
+@media (max-width: 380px) {
+    .j-payment-method {
+        flex: 1 1 calc(50% - 10px);
+    }
+}

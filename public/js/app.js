@@ -546,6 +546,137 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
     }
+    // =========================
+    // REGRESAR A VISTA PREVIA (DESDE PAGO)
+    // =========================
+
+    const btnBackToPreview = document.getElementById("j-back-to-preview");
+
+    if (btnBackToPreview) {
+
+        btnBackToPreview.addEventListener("click", () => {
+
+            // Ocultar todos los pasos
+            document.querySelectorAll(".j-step").forEach(step => {
+                step.classList.remove("active");
+            });
+
+            // Mostrar el paso 3 (Vista Previa)
+            document
+                .getElementById("juguemos-preview-completo")
+                .classList.add("active");
+
+            // Actualizar el encabezado del wizard
+            document.querySelectorAll(".juguemos-step").forEach(step => {
+                step.classList.remove("active");
+            });
+
+            const step3 = document.querySelector(
+                '.juguemos-step[data-step="3"]'
+            );
+
+            if (step3) {
+                step3.classList.add("active");
+            }
+
+            // Scroll al inicio
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+
+            // Refrescar vista previa
+            if (typeof PrintPaper !== 'undefined') {
+                setTimeout(() => {
+                    PrintPaper.refresh();
+                }, 300);
+            }
+
+        });
+
+        // =========================
+        // DETECTAR DESCARGA DESPUÉS DE PAGO EXITOSO
+        // =========================
+
+        // Verificar si venimos de un pago exitoso con parámetro download
+        const urlParams = new URLSearchParams(window.location.search);
+        const downloadParam = urlParams.get('download');
+
+        if (downloadParam === 'pdf') {
+            // ✅ Verificar que el pago fue confirmado
+            const paymentVerified = sessionStorage.getItem('juguemos_payment_verified') === 'true';
+            const paymentToken = sessionStorage.getItem('juguemos_payment_token');
+            
+            if (paymentVerified && paymentToken) {
+                // 🔥 Generar PDF automáticamente después de un pequeño delay
+                if (typeof JuguemosPDF !== 'undefined') {
+                    setTimeout(() => {
+                        JuguemosPDF.generate();
+                        // Limpiar el parámetro de la URL para evitar regeneración
+                        if (window.history && window.history.replaceState) {
+                            window.history.replaceState({}, document.title, window.location.pathname);
+                        }
+                    }, 800);
+                }
+            } else {
+                console.warn('⚠️ No se encontró verificación de pago');
+                // Redirigir a la lotería si no hay verificación
+                setTimeout(() => {
+                    window.location.href = '/juguemos';
+                }, 2000);
+            }
+        }
+
+        // =========================
+        // VERIFICAR ESTADO DE PAGO AL CARGAR LA PÁGINA
+        // =========================
+
+        // Si el usuario ya pagó en una sesión anterior, mantener el estado
+        const verified = sessionStorage.getItem('juguemos_payment_verified') === 'true';
+        const token = sessionStorage.getItem('juguemos_payment_token');
+
+        if (verified && token) {
+            console.log('✅ Pago verificado previamente. El usuario puede descargar el PDF.');
+            
+            // Opcional: Mostrar un mensaje o indicador visual
+            const btnDownload = document.getElementById('j-download-pdf');
+            if (btnDownload) {
+                btnDownload.textContent = '📄 Descargar PDF (Pago confirmado)';
+                btnDownload.style.background = '#24B8C8';
+            }
+        }
+
+    }
+
+    // =========================
+    // ESCUCHAR MENSAJE DE PAYPAL (VENTANA POPUP)
+    // =========================
+
+    window.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'paypal_payment_completed') {
+            console.log('✅ PayPal: Pago completado en ventana popup');
+            
+            // Guardar en sessionStorage
+            sessionStorage.setItem('juguemos_payment_verified', 'true');
+            sessionStorage.setItem('juguemos_payment_token', event.data.token || 'verified');
+            
+            // Ocultar mensaje de espera si existe
+            const overlay = document.getElementById('j-waiting-overlay');
+            if (overlay) {
+                overlay.remove();
+            }
+            
+            // Generar PDF automáticamente
+            if (typeof JuguemosPDF !== 'undefined') {
+                setTimeout(() => {
+                    JuguemosPDF.generate();
+                }, 500);
+            }
+        }
+    });
+
+
+
 });
 
 function updatePrice() {
@@ -589,6 +720,37 @@ function updatePaperOptions() {
     JuguemosState.paper = select.value;
     
 
+}
+
+// =========================
+// MANEJO DEL BOTÓN "Descargar PDF" - FLUJO COMPLETO
+// =========================
+
+const btnDownload = document.getElementById('j-download-pdf');
+
+if (btnDownload) {
+    btnDownload.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // 🔥 PASO 1: Verificar si ya pagó
+        const paymentVerified = sessionStorage.getItem('juguemos_payment_verified') === 'true';
+        const paymentToken = sessionStorage.getItem('juguemos_payment_token');
+        
+        if (paymentVerified && paymentToken) {
+            // ✅ Ya pagó → Generar PDF directamente
+            if (typeof JuguemosPDF !== 'undefined') {
+                JuguemosPDF.generate();
+            }
+            return;
+        }
+        
+        // ❌ No ha pagado → Mostrar modal de pago
+        if (typeof JuguemosPaymentInstance !== 'undefined') {
+            JuguemosPaymentInstance.showPaymentModal();
+        } else {
+            alert('Error: No se pudo cargar el sistema de pago.');
+        }
+    });
 }
 
 function drawGrid() {

@@ -266,7 +266,7 @@
     cursor:pointer;
     transition:.2s;
 }
-
+.j-btn-back:focus,
 .j-btn-back:hover{
     background:#FA299C;
     color:#FFFFFF;

@@ -180,12 +180,3 @@ window.JuguemosPDF = {
         stepPreview.style.width = '';
     }
 };
-
-document.addEventListener('DOMContentLoaded', () => {
-    const btnDownload = document.getElementById('j-download-pdf');
-    if (btnDownload) {
-        btnDownload.addEventListener('click', () => {
-            JuguemosPDF.generate();
-        });
-    }
-});
