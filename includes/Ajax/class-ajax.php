@@ -61,6 +61,8 @@ class Juguemos_Ajax
             'wp_ajax_nopriv_juguemos_get_design',
             [$this, 'get_design']
         );
+        add_action('wp_ajax_juguemos_verify_payment', [$this, 'verify_payment']);
+        add_action('wp_ajax_nopriv_juguemos_verify_payment', [$this, 'verify_payment']);
 
     }
 
@@ -210,6 +212,41 @@ class Juguemos_Ajax
             'nombre'   => $design->nombre,
             'portada'  => Juguemos_Admin_Designs::get_portada($design)
         ]);
+    }
+
+
+
+
+    public function verify_payment()
+    {
+        check_ajax_referer('juguemos_nonce', 'nonce');
+
+        $token = sanitize_text_field($_POST['token'] ?? '');
+
+        if (!$token) {
+            wp_send_json_success(['paid' => false]);
+            return;
+        }
+
+        // Revisa si ya quedó marcado como pagado por el return-handler
+        $paid = get_transient('juguemos_paid_' . $token);
+
+        if ($paid) {
+            wp_send_json_success(['paid' => true]);
+            return;
+        }
+
+        // Si no está marcado, intenta capturarlo directamente (por si el popup nunca volvió)
+        $handler = new Juguemos_PayPal_Handler();
+        $result = $handler->capture_order($token);
+
+        if ($result) {
+            set_transient('juguemos_paid_' . $token, true, HOUR_IN_SECONDS);
+            wp_send_json_success(['paid' => true]);
+            return;
+        }
+
+        wp_send_json_success(['paid' => false]);
     }
 
 }
