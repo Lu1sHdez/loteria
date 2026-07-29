@@ -189,84 +189,64 @@ $barajas = Juguemos_Admin_Barajas::get_by_design(
 
 <div class="j-admin-design-cards">
 
-    <?php foreach($barajas as $baraja): ?>
+<?php foreach($barajas as $baraja): ?>
 
-        <div
-            class="j-baraja-card"
+<div class="j-baraja-card" data-id="<?php echo $baraja->id; ?>">
+
+    <!-- 🔥 CONTENEDOR DE LA IMAGEN -->
+    <div class="j-baraja-preview j-baraja-upload">
+
+        <input
+            type="file"
+            class="j-baraja-file"
+            accept=".webp,image/webp"
+            hidden
             data-id="<?php echo $baraja->id; ?>">
 
-            <div class="j-baraja-preview j-baraja-upload">
-                <input
-                    type="file"
-                    class="j-baraja-file"
-                    accept=".webp,image/webp"
-                    hidden>
+        <?php if (!empty($baraja->imagen)): ?>
+            <img
+                id="preview-img-<?php echo $baraja->id; ?>"
+                class="j-baraja-preview-image"
+                src="<?php echo esc_url(
+                    Juguemos_Files::preview_url($design->id) . $baraja->imagen
+                ); ?>"
+                alt="<?php echo esc_attr($baraja->nombre); ?>">
+                
+            <div class="j-baraja-placeholder" style="display:none;">+ Imagen</div>
+        <?php else: ?>
+            <img
+                id="preview-img-<?php echo $baraja->id; ?>"
+                class="j-baraja-preview-image"
+                style="display:none;"
+                alt="">
+            <div class="j-baraja-placeholder">+ Imagen</div>
+        <?php endif; ?>
 
-                <?php if (!empty($baraja->imagen)): ?>
+        <!-- 🔥 BOTÓN DENTRO DEL CONTENEDOR DE LA IMAGEN -->
+        <button
+            type="button"
+            class="j-baraja-edit-image-btn"
+            data-id="<?php echo $baraja->id; ?>">
+            Editar
+        </button>
 
-                    <img
-                        class="j-baraja-preview-image"
-                        src="<?php echo esc_url(
-                            Juguemos_Files::preview_url($design->id) . $baraja->imagen
-                        ); ?>"
-                        alt="<?php echo esc_attr($baraja->nombre); ?>">
-
-                    <div
-                        class="j-baraja-placeholder"
-                        style="display:none;">
-
-                        + Imagen
-
-                    </div>
-
-                <?php else: ?>
-
-                    <img
-                        class="j-baraja-preview-image"
-                        style="display:none;"
-                        alt="">
-
-                    <div class="j-baraja-placeholder">
-
-                        + Imagen
-
-                    </div>
-
-                <?php endif; ?>
-
-            </div>
-
-            <div class="j-baraja-numero">
-
-                Baraja #<?php echo $baraja->numero; ?>
-
-            </div>
-
-            <input
-                type="text"
-                class="j-baraja-nombre"
-                value="<?php echo esc_attr($baraja->nombre); ?>">
-
-            <button
-                class="j-baraja-update"
-                data-id="<?php echo $baraja->id; ?>">
-
-                Actualizar
-
-            </button>
-            <button
-                type="button"
-                class="j-baraja-delete"
-                data-id="<?php echo $baraja->id; ?>"
-                data-nonce="<?php echo wp_create_nonce('juguemos_admin_baraja'); ?>">
-
-                Eliminar
-
-            </button>
-
+        <!-- 🔥 PROGRESO DENTRO DEL CONTENEDOR DE LA IMAGEN -->
+        <div class="j-baraja-upload-progress" id="progress-<?php echo $baraja->id; ?>" style="display:none;">
+            <div class="j-baraja-progress-bar"></div>
+            <span class="j-baraja-progress-text">Subiendo...</span>
         </div>
 
-    <?php endforeach; ?>
+    </div>
+
+    <!-- RESTO DEL CONTENIDO -->
+    <div class="j-baraja-numero">Baraja #<?php echo $baraja->numero; ?></div>
+    <input type="text" class="j-baraja-nombre" value="<?php echo esc_attr($baraja->nombre); ?>">
+    <button class="j-baraja-update" data-id="<?php echo $baraja->id; ?>">Actualizar</button>
+    <button type="button" class="j-baraja-delete" data-id="<?php echo $baraja->id; ?>" data-nonce="<?php echo wp_create_nonce('juguemos_admin_baraja'); ?>">Eliminar</button>
+
+</div>
+
+<?php endforeach; ?>
 
 
     <?php
@@ -464,6 +444,173 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     });
+
+    // ==========================================
+// ✅ NUEVO: EDITAR IMAGEN - Click en botón
+// ==========================================
+document.querySelectorAll('.j-baraja-edit-image-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const id = this.dataset.id;
+        const card = this.closest('.j-baraja-card');
+        const fileInput = card.querySelector('.j-baraja-file');
+        
+        if (fileInput) {
+            fileInput.click();
+        }
+    });
+});
+
+// ==========================================
+// ✅ NUEVO: SUBIR IMAGEN
+// ==========================================
+// ==========================================
+// ✅ NUEVO: SUBIR IMAGEN (SOLO BARAJAS EXISTENTES)
+// ==========================================
+document.querySelectorAll('.j-baraja-card:not(.j-baraja-new) .j-baraja-file').forEach(function(input) {
+    input.addEventListener('change', function() {
+        const card = this.closest('.j-baraja-card');
+        const id = card.dataset.id;
+        
+        // 🔥 Verificar que el ID exista
+        if (!id) {
+            console.warn('⚠️ ID de baraja no encontrado');
+            this.value = '';
+            return;
+        }
+        
+        const file = this.files[0];
+        if (!file) return;
+        
+        // Validar formato WebP
+        if (!file.type.includes('webp')) {
+            alert('Solo se permiten imágenes en formato WebP.');
+            this.value = '';
+            return;
+        }
+        
+        // Validar tamaño (max 2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            alert('La imagen no debe superar los 2MB.');
+            this.value = '';
+            return;
+        }
+        
+        // Mostrar progreso
+        const progress = document.getElementById('progress-' + id);
+        if (progress) {
+            progress.style.display = 'block';
+            progress.querySelector('.j-baraja-progress-bar').style.width = '0%';
+            progress.querySelector('.j-baraja-progress-text').textContent = 'Subiendo... 0%';
+        }
+        
+        // Deshabilitar botón
+        const btn = card.querySelector('.j-baraja-edit-image-btn');
+        if (btn) {
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+        }
+        
+        // Crear FormData
+        const formData = new FormData();
+        formData.append('action', 'juguemos_update_baraja_imagen');
+        formData.append('id', id);
+        formData.append('imagen', file);
+        formData.append('nonce', '<?php echo wp_create_nonce("juguemos_nonce"); ?>');
+        
+        // Subir archivo con progreso
+        const xhr = new XMLHttpRequest();
+        
+        xhr.upload.addEventListener('progress', function(e) {
+            if (e.lengthComputable) {
+                const percent = Math.round((e.loaded / e.total) * 100);
+                const progress = document.getElementById('progress-' + id);
+                if (progress) {
+                    progress.querySelector('.j-baraja-progress-bar').style.width = percent + '%';
+                    progress.querySelector('.j-baraja-progress-text').textContent = 'Subiendo... ' + percent + '%';
+                }
+            }
+        });
+        
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        const img = document.getElementById('preview-img-' + id);
+                        if (img) {
+                            img.src = response.data.image_url + '?t=' + Date.now();
+                            img.style.display = 'block';
+                        }
+                        
+                        const placeholder = card.querySelector('.j-baraja-placeholder');
+                        if (placeholder) {
+                            placeholder.style.display = 'none';
+                        }
+                        
+                        const progress = document.getElementById('progress-' + id);
+                        if (progress) {
+                            progress.querySelector('.j-baraja-progress-bar').style.width = '100%';
+                            progress.querySelector('.j-baraja-progress-text').textContent = '✅ Imagen actualizada';
+                        }
+                        
+                        setTimeout(() => {
+                            const progress = document.getElementById('progress-' + id);
+                            if (progress) {
+                                progress.style.display = 'none';
+                            }
+                        }, 2000);
+                        
+                    } else {
+                        alert('Error: ' + (response.data || 'No se pudo actualizar la imagen'));
+                        const progress = document.getElementById('progress-' + id);
+                        if (progress) {
+                            progress.style.display = 'none';
+                        }
+                    }
+                } catch (e) {
+                    alert('Error al procesar la respuesta: ' + e.message);
+                    const progress = document.getElementById('progress-' + id);
+                    if (progress) {
+                        progress.style.display = 'none';
+                    }
+                }
+            } else {
+                alert('Error de conexión (Código: ' + xhr.status + ')');
+                const progress = document.getElementById('progress-' + id);
+                if (progress) {
+                    progress.style.display = 'none';
+                }
+            }
+            
+            const btn = card.querySelector('.j-baraja-edit-image-btn');
+            if (btn) {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            }
+            
+            this.value = '';
+        };
+        
+        xhr.onerror = function() {
+            alert('Error de conexión. Verifica tu internet.');
+            const progress = document.getElementById('progress-' + id);
+            if (progress) {
+                progress.style.display = 'none';
+            }
+            const btn = card.querySelector('.j-baraja-edit-image-btn');
+            if (btn) {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            }
+        };
+        
+        xhr.open('POST', '<?php echo admin_url("admin-ajax.php"); ?>');
+        xhr.send(formData);
+    });
+});
 
 });
 </script>

@@ -41,6 +41,10 @@ class Juguemos_Admin_Ajax
             'wp_ajax_juguemos_delete_baraja',
             [$this,'delete_baraja']
         );
+        add_action(
+            'wp_ajax_juguemos_update_baraja_imagen',
+            [$this, 'update_baraja_imagen']
+        );
 
     }
 
@@ -160,106 +164,60 @@ class Juguemos_Admin_Ajax
 
     }
     public function create_baraja()
-    {
-
-        error_log('Nonce recibido: ' . ($_POST['nonce'] ?? 'no enviado'));
-    
-        check_ajax_referer('juguemos_nonce', 'nonce');
-    
-        check_ajax_referer(
-            'juguemos_nonce',
-            'nonce'
-        );
-    
-        $design_id = intval($_POST['design_id'] ?? 0);
-        $numero    = intval($_POST['numero'] ?? 0);
-        $nombre    = sanitize_text_field($_POST['nombre'] ?? '');
-    
-        if (
-            !$design_id ||
-            !$numero ||
-            empty($nombre)
-        ) {
-    
-            wp_send_json_error(
-                'Datos incompletos.'
-            );
-    
-            return;
-    
-        }
-    
-        if (
-            empty($_FILES['imagen']) ||
-            $_FILES['imagen']['error'] !== UPLOAD_ERR_OK
-        ) {
-    
-            wp_send_json_error(
-                'No se recibió la imagen.'
-            );
-    
-            return;
-    
-        }
-    
-        $archivo = sprintf(
-            '%02d.webp',
-            $numero
-        );
-    
-        $resultado = Juguemos_Files::upload_preview(
-    
-            $design_id,
-    
-            $_FILES['imagen'],
-    
-            $archivo
-    
-        );
-    
-        if (is_wp_error($resultado)) {
-    
-            wp_send_json_error(
-                $resultado->get_error_message()
-            );
-    
-            return;
-    
-        }
-    
-        $id = Juguemos_Admin_Barajas::create([
-    
-            'design_id' => $design_id,
-    
-            'numero'    => $numero,
-    
-            'nombre'    => $nombre,
-    
-            'imagen'    => $archivo
-    
-        ]);
-    
-        if (!$id) {
-    
-            global $wpdb;
-    
-            wp_send_json_error(
-                'No se pudo guardar en la base de datos: ' . $wpdb->last_error
-            );
-    
-            return;
-    
-        }
-    
-        wp_send_json_success([
-    
-            'id'      => $id,
-    
-            'imagen'  => $archivo
-    
-        ]);
-    
+{
+    if (!check_ajax_referer('juguemos_nonce', 'nonce', false)) {
+        wp_send_json_error('Nonce inválido. Recarga la página e intenta nuevamente.');
+        return;
     }
+
+    $design_id = intval($_POST['design_id'] ?? 0);
+    $numero    = intval($_POST['numero'] ?? 0);
+    $nombre    = sanitize_text_field($_POST['nombre'] ?? '');
+
+    if (!$design_id || !$numero || empty($nombre)) {
+        wp_send_json_error('Datos incompletos. Design ID: ' . $design_id . ', Número: ' . $numero);
+        return;
+    }
+
+    if (empty($_FILES['imagen']) || $_FILES['imagen']['error'] !== UPLOAD_ERR_OK) {
+        wp_send_json_error('No se recibió la imagen correctamente.');
+        return;
+    }
+
+    $archivo = sprintf('%02d.webp', $numero);
+
+    $resultado = Juguemos_Files::upload_preview(
+        $design_id,
+        $_FILES['imagen'],
+        $archivo
+    );
+
+    if (is_wp_error($resultado)) {
+        wp_send_json_error($resultado->get_error_message());
+        return;
+    }
+
+    $id = Juguemos_Admin_Barajas::create([
+        'design_id' => $design_id,
+        'numero'    => $numero,
+        'nombre'    => $nombre,
+        'imagen'    => $archivo
+    ]);
+
+    if (!$id) {
+        global $wpdb;
+        wp_send_json_error('No se pudo guardar en la base de datos: ' . $wpdb->last_error);
+        return;
+    }
+
+    // ✅ Respuesta exitosa con todos los datos
+    wp_send_json_success([
+        'id'      => $id,
+        'imagen'  => $archivo,
+        'numero'  => $numero,
+        'nombre'  => $nombre
+    ]);
+}
     public function update_baraja()
     {
 
@@ -382,6 +340,76 @@ class Juguemos_Admin_Ajax
         wp_send_json_success();
 
     }
+
+    public function update_baraja_imagen()
+{
+    check_ajax_referer('juguemos_nonce', 'nonce');
+    
+    $id = intval($_POST['id'] ?? 0);
+    
+    if (!$id) {
+        wp_send_json_error('ID de baraja inválido');
+        return;
+    }
+    
+    $baraja = Juguemos_Admin_Barajas::get($id);
+    
+    if (!$baraja) {
+        wp_send_json_error('Baraja no encontrada');
+        return;
+    }
+    
+    if (empty($_FILES['imagen']) || $_FILES['imagen']['error'] !== UPLOAD_ERR_OK) {
+        wp_send_json_error('No se recibió la imagen correctamente');
+        return;
+    }
+    
+    // Validar formato WebP
+    $extension = strtolower(pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION));
+    if ($extension !== 'webp') {
+        wp_send_json_error('Solo se permiten imágenes en formato WebP');
+        return;
+    }
+    
+    // Validar tamaño (max 2MB)
+    if ($_FILES['imagen']['size'] > 2 * 1024 * 1024) {
+        wp_send_json_error('La imagen no debe superar los 2MB');
+        return;
+    }
+    
+    // Mantener el nombre del archivo (ej. 25.webp)
+    $nombre_archivo = $baraja->imagen;
+    
+    // Subir nueva imagen (sobrescribir la existente)
+    $resultado = Juguemos_Files::upload_preview(
+        $baraja->design_id,
+        $_FILES['imagen'],
+        $nombre_archivo
+    );
+    
+    if (is_wp_error($resultado)) {
+        wp_send_json_error($resultado->get_error_message());
+        return;
+    }
+    
+    // Actualizar el updated_at en la base de datos
+    global $wpdb;
+    $wpdb->update(
+        $wpdb->prefix . 'juguemos_barajas',
+        ['updated_at' => current_time('mysql')],
+        ['id' => $id]
+    );
+    
+    // Forzar recarga con timestamp
+    $image_url = Juguemos_Files::preview_url($baraja->design_id) . $nombre_archivo;
+    $image_url_with_timestamp = $image_url . '?v=' . time();
+    
+    wp_send_json_success([
+        'filename' => $nombre_archivo,
+        'image_url' => $image_url_with_timestamp
+    ]);
+}
+
 
     public static function create($data)
 {
