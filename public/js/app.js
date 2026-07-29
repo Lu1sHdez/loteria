@@ -30,19 +30,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    // ========== PAÍS ==========
-    document.querySelectorAll(".country").forEach(button => {
-        button.addEventListener("click", () => {
-            document.querySelectorAll(".country").forEach(b => b.classList.remove("active"));
-            button.classList.add("active");
-            JuguemosState.country = button.dataset.country;
-            JuguemosState.currency = button.dataset.currency;
-            updatePaperOptions();
-            updatePrice();
-            updateOrderSummary();
-        });
-    });
-
     // ========== RANGE Y INPUT DE TABLAS ==========
     const range = document.getElementById("tables-range");
     const input = document.getElementById("tables-number");
@@ -476,7 +463,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // =========================
-    // ✅ VERIFICACIÓN DE PAGO (FUERA DE LOS EVENTOS)
+    // VERIFICACIÓN DE PAGO (FUERA DE LOS EVENTOS)
     // =========================
 
     // 1. Detectar descarga después de pago exitoso
@@ -497,7 +484,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }, 800);
             }
         } else {
-            console.warn('⚠️ No se encontró verificación de pago');
+            console.warn('No se encontró verificación de pago');
             setTimeout(() => {
                 window.location.href = '/juguemos';
             }, 2000);
@@ -732,7 +719,7 @@ function updateOrderSummary() {
         priceEl.textContent = `$${Number(total).toFixed(2)} ${currency}`;
     }
     
-    // ✅ Para el resto de la página (pasos 1-3)
+    // Para el resto de la página (pasos 1-3)
     document.getElementById("j-summary-tables").textContent = `${JuguemosState.quantity} tablas por hoja`;
     document.getElementById("j-summary-cards").textContent = `${JuguemosState.barajas.length} barajas`;
     document.getElementById("j-summary-paper").textContent = JuguemosState.paper;
@@ -752,3 +739,209 @@ function updateOrderSummary() {
 function regenerarTodasLasTablas() {
     llenarCasillasAleatorio();
 }
+
+
+// ========== PAÍS ==========
+document.querySelectorAll(".country").forEach(button => {
+    button.addEventListener("click", function() {
+        document.querySelectorAll(".country").forEach(b => b.classList.remove("active"));
+        this.classList.add("active");
+        
+        const country = this.dataset.country;
+        const currency = this.dataset.currency;
+        
+        JuguemosState.country = country;
+        JuguemosState.currency = currency;
+        
+        const lang = country === 'USA' ? 'en' : 'es';
+        cambiarIdiomaGTtranslate(lang);
+    });
+});
+
+
+// =============================================
+// 1. TUS BOTONES PERSONALIZADOS (Cambian TODO)
+// =============================================
+document.querySelectorAll(".country").forEach(button => {
+    button.addEventListener("click", function() {
+        document.querySelectorAll(".country").forEach(b => b.classList.remove("active"));
+        this.classList.add("active");
+        
+        const country = this.dataset.country;
+        const currency = this.dataset.currency;
+        
+        JuguemosState.country = country;
+        JuguemosState.currency = currency;
+        
+        const lang = country === 'USA' ? 'en' : 'es';
+        cambiarIdiomaGTtranslate(lang);
+    });
+});
+
+function cambiarIdiomaGTtranslate(lang) {
+    const country = lang === 'en' ? 'USA' : 'Mexico';
+    
+    document.cookie = `juguemos_country=${country}; path=/; max-age=31536000`;
+    
+    const url = new URL(window.location.href);
+    url.searchParams.set('lang', lang);
+    window.location.href = url.toString();
+}
+
+// =============================================
+// 2. DETECTAR CAMBIO EN SELECTOR DE GTranslate
+// =============================================
+function detectarCambioGTranslate() {
+    const selector = document.querySelector('.goog-te-combo');
+    
+    if (selector) {
+        selector.addEventListener('change', function() {
+            const lang = this.value;
+            const country = lang === 'en' ? 'USA' : 'Mexico';
+            const currency = lang === 'en' ? 'USD' : 'MXN';
+            
+            // Actualizar estado
+            JuguemosState.country = country;
+            JuguemosState.currency = currency;
+            
+            // Guardar cookie
+            document.cookie = `juguemos_country=${country}; path=/; max-age=31536000`;
+            
+            // Marcar botón activo
+            document.querySelectorAll(".country").forEach(btn => {
+                if (btn.dataset.country === country) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Actualizar interfaz
+            updatePaperOptions();
+            updatePrice();
+            updateOrderSummary();
+        });
+    }
+}
+// =============================================
+// 1. SINCRONIZAR PAÍS AL CARGAR
+// =============================================
+function sincronizarPais() {
+    const urlParams = new URLSearchParams(window.location.search);
+    let lang = urlParams.get('lang');
+    
+    let country;
+    if (lang === 'en') {
+        country = 'USA';
+    } else if (lang === 'es') {
+        country = 'Mexico';
+    } else {
+        country = getCookie('juguemos_country') || 'Mexico';
+    }
+    
+    const currency = country === 'USA' ? 'USD' : 'MXN';
+    
+    document.querySelectorAll(".country").forEach(btn => {
+        if (btn.dataset.country === country) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+    
+    JuguemosState.country = country;
+    JuguemosState.currency = currency;
+    updatePaperOptions();
+    updatePrice();
+    updateOrderSummary();
+}
+
+// =============================================
+// 2. DETECTAR GTranslate (CON ESPERA ACTIVA)
+// =============================================
+function detectarGTranslateActivo() {
+    // Intentar cada 500ms hasta encontrar el selector
+    const interval = setInterval(function() {
+        const selector = document.querySelector('.goog-te-combo');
+        if (selector) {
+            clearInterval(interval);
+            console.log('✅ GTranslate encontrado');
+            
+            // Quitar listener duplicado
+            if (!selector._listenerAdded) {
+                selector._listenerAdded = true;
+                selector.addEventListener('change', function() {
+                    const lang = this.value;
+                    const country = lang === 'en' ? 'USA' : 'Mexico';
+                    const currency = lang === 'en' ? 'USD' : 'MXN';
+                    
+                    JuguemosState.country = country;
+                    JuguemosState.currency = currency;
+                    document.cookie = `juguemos_country=${country}; path=/; max-age=31536000`;
+                    
+                    document.querySelectorAll(".country").forEach(btn => {
+                        if (btn.dataset.country === country) {
+                            btn.classList.add('active');
+                        } else {
+                            btn.classList.remove('active');
+                        }
+                    });
+                    
+                    updatePaperOptions();
+                    updatePrice();
+                    updateOrderSummary();
+                });
+            }
+        }
+    }, 500);
+    
+    // Detener después de 10 segundos (tiempo máximo de espera)
+    setTimeout(() => {
+        clearInterval(interval);
+    }, 10000);
+}
+
+// =============================================
+// 3. TUS BOTONES PERSONALIZADOS
+// =============================================
+document.querySelectorAll(".country").forEach(button => {
+    button.addEventListener("click", function() {
+        document.querySelectorAll(".country").forEach(b => b.classList.remove("active"));
+        this.classList.add("active");
+        
+        const country = this.dataset.country;
+        const currency = this.dataset.currency;
+        
+        JuguemosState.country = country;
+        JuguemosState.currency = currency;
+        
+        const lang = country === 'USA' ? 'en' : 'es';
+        cambiarIdiomaGTtranslate(lang);
+    });
+});
+
+function cambiarIdiomaGTtranslate(lang) {
+    const country = lang === 'en' ? 'USA' : 'Mexico';
+    document.cookie = `juguemos_country=${country}; path=/; max-age=31536000`;
+    const url = new URL(window.location.href);
+    url.searchParams.set('lang', lang);
+    window.location.href = url.toString();
+}
+
+// =============================================
+// 4. FUNCIÓN PARA LEER COOKIES
+// =============================================
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+}
+
+// =============================================
+// 5. EJECUTAR AL CARGAR
+// =============================================
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(sincronizarPais, 100);
+    setTimeout(detectarGTranslateActivo, 500);
+});
