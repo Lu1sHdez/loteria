@@ -11,7 +11,17 @@
 if (!defined('ABSPATH')) {
     exit;
 }
+// FORZAR UTF-8
+add_action('init', function() {
+    if (!headers_sent()) {
+        header('Content-Type: text/html; charset=utf-8');
+    }
+});
 
+add_filter('wp_headers', function($headers) {
+    $headers['Content-Type'] = 'text/html; charset=utf-8';
+    return $headers;
+});
 
 /**
  * Constantes principales
