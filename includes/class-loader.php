@@ -42,6 +42,16 @@ class Juguemos_Loader
 
     private function init_plugin()
     {
+        add_action('template_redirect', function() {
+            // Verificar si estamos en una página que usa el shortcode [juguemos_admin]
+            global $post;
+            if (is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'juguemos_admin')) {
+                if (!is_user_logged_in() || !current_user_can('manage_options')) {
+                    wp_redirect(home_url('/juguemos'));
+                    exit;
+                }
+            }
+        });
 
         new Juguemos_Core();
         new Juguemos_Shortcodes();

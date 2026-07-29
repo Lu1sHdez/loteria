@@ -30,6 +30,7 @@ class Juguemos_Shortcodes
         );
 
     }
+    
     public function login()
     {
 
@@ -61,6 +62,7 @@ class Juguemos_Shortcodes
     }
     public function admin()
     {
+        
         ob_start();
 
         include JUGUEMOS_PATH . 'admin/views/dashboard.php';
