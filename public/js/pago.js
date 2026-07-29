@@ -27,23 +27,9 @@
         }
         
         updatePaymentSummary() {
-            const total = JuguemosState.total || 0;
-            const currency = JuguemosState.currency || 'USD';
-            const country = JuguemosState.country || 'Mexico';
-            const mode = JuguemosState.mode || 'sencilla';
-            const quantity = JuguemosState.quantity || 1;
-        
-            const countryEl = document.getElementById('payment-summary-country');
-            if (countryEl) countryEl.textContent = country;
-        
-            const modeEl = document.getElementById('payment-summary-mode');
-            if (modeEl) modeEl.textContent = mode === 'favoritas' ? '7 Favoritas' : mode;
-        
-            const quantityEl = document.getElementById('payment-summary-quantity');
-            if (quantityEl) quantityEl.textContent = quantity;
-        
-            const priceEl = document.getElementById('payment-summary-price');
-            if (priceEl) priceEl.textContent = '$' + Number(total).toFixed(2) + ' ' + currency;
+            if (typeof updateOrderSummary === 'function') {
+                updateOrderSummary();
+            }
         }
         
         selectMethod(method) {
@@ -260,39 +246,24 @@
         }
         
         paymentSuccess() {
-            // ✅ EVITAR DESCARGA DUPLICADA
             if (this.isDownloading) {
                 console.log('Descarga ya en proceso, ignorando...');
                 return;
             }
             this.isDownloading = true;
             
-            $('.j-payment-methods').hide();
-            $('#j-process-payment').hide();
-            $('#j-payment-loading').hide();
+            $('.j-payment-methods, #j-process-payment, #j-payment-loading').hide();
             $('#j-waiting-message').remove();
-            
-            // ✅ Mostrar sección de descarga
             $('#j-download-section').show();
             
             const btnDownload = document.getElementById('j-download-pdf');
             const btnText = document.getElementById('j-download-text');
-
-            if (btnDownload) {
-                btnDownload.style.display = 'inline-block';
-            }
-
-            if (btnText) {
-                btnText.textContent = 'Descargar PDF';
-            }
             
-            $('#j-download-section h3').text('Pago confirmado');
+            if (btnDownload) btnDownload.style.display = 'inline-block';
+            if (btnText) btnText.textContent = 'Descargar PDF';
             
             sessionStorage.setItem('juguemos_payment_verified', 'true');
             
-            console.log('Pago confirmado. Esperando que el usuario haga clic en "Descargar PDF"');
-            
-            // Resetear bandera después de 3 segundos
             setTimeout(() => {
                 this.isDownloading = false;
             }, 3000);

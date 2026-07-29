@@ -5,9 +5,22 @@ if (!defined('ABSPATH')) {
 ?>
 
 <section id="juguemos-payment" class="j-step">
+    <div class="j-step-header">
+        <div class="titulo-seccion-contenedor">
+            <img
+                class="destello"
+                src="/wp-content/uploads/2026/07/Destello1.png"
+                alt="">
 
-    <div class="titulo-seccion-contenedor">
-        <h2 class="titulo-seccion">PAGO Y DESCARGA</h2>
+            <h2 class="titulo-seccion">
+                PAGO Y DESCARGA
+            </h2>
+
+            <img
+                class="destello"
+                src="/wp-content/uploads/2026/07/Destello2.png"
+                alt="">
+        </div>
     </div>
 
     <div class="j-step-body">

@@ -102,7 +102,13 @@ const JuguemosAjax = {
         JuguemosState.barajas = [];
     
         JuguemosAjax.loadDesignPreview(designId);
-        JuguemosAjax.loadBarajas(designId); 
+        JuguemosAjax.loadBarajas(designId).then(() => {
+            if (typeof llenarCasillasAutomatico === 'function') {
+                setTimeout(() => {
+                    llenarCasillasAutomatico();
+                }, 200);
+            }
+        });
     
         const btnAleatoria = document.querySelector(".j-casilla-btn");
         if (btnAleatoria) {
@@ -187,24 +193,18 @@ const JuguemosAjax = {
             JuguemosState.total = response.data.total;
             JuguemosState.currency = response.data.moneda;
             
-            // Actualizar el resumen
-            const summaryCountry = document.getElementById("summary-country");
-            const summaryMode = document.getElementById("summary-mode");
-            const summaryQuantity = document.getElementById("summary-quantity");
-            const summaryPrice = document.getElementById("summary-price");
+            if (typeof updateOrderSummary === 'function') {
+                updateOrderSummary();
+            }
             
-            if (summaryCountry) summaryCountry.textContent = response.data.pais;
-            if (summaryMode) summaryMode.textContent = response.data.modo;
-            if (summaryQuantity) summaryQuantity.textContent = response.data.cantidad;
-            if (summaryPrice) {
-                summaryPrice.textContent = "$" + Number(response.data.total).toFixed(2) + " " + response.data.moneda;
+            if (typeof JuguemosPaymentInstance !== 'undefined') {
+                JuguemosPaymentInstance.updatePaymentSummary();
             }
         })
         .catch(error => {
             console.error('Error loading price:', error);
         });
     },
-
     loadPreview() {
         console.log("Vista previa");
     }
