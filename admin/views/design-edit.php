@@ -208,7 +208,7 @@ $barajas = Juguemos_Admin_Barajas::get_by_design(
                 id="preview-img-<?php echo $baraja->id; ?>"
                 class="j-baraja-preview-image"
                 src="<?php echo esc_url(
-                    Juguemos_Files::preview_url($design->id) . $baraja->imagen
+                    Juguemos_Files::preview_url($design->id) . $baraja->imagen . '?v=' . time()
                 ); ?>"
                 alt="<?php echo esc_attr($baraja->nombre); ?>">
                 
