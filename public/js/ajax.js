@@ -39,7 +39,7 @@ const JuguemosAjax = {
 
     loadDecks(categoriaId) {
         const container = document.getElementById("juguemos-decks");
-        container.innerHTML = "Cargando...";
+        container.innerHTML = "Cargando diseños...";
     
         fetch(
             Juguemos.ajax_url +

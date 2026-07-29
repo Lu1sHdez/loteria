@@ -553,7 +553,7 @@ document.querySelectorAll('.j-baraja-card:not(.j-baraja-new) .j-baraja-file').fo
                         const progress = document.getElementById('progress-' + id);
                         if (progress) {
                             progress.querySelector('.j-baraja-progress-bar').style.width = '100%';
-                            progress.querySelector('.j-baraja-progress-text').textContent = '✅ Imagen actualizada';
+                            progress.querySelector('.j-baraja-progress-text').textContent = 'Imagen actualizada';
                         }
                         
                         setTimeout(() => {

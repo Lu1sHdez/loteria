@@ -823,8 +823,9 @@ function detectarCambioGTranslate() {
         });
     }
 }
+
 // =============================================
-// 1. SINCRONIZAR PAÍS AL CARGAR
+// 3. SINCRONIZAR AL CARGAR LA PÁGINA
 // =============================================
 function sincronizarPais() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -856,81 +857,6 @@ function sincronizarPais() {
     updateOrderSummary();
 }
 
-// =============================================
-// 2. DETECTAR GTranslate (CON ESPERA ACTIVA)
-// =============================================
-function detectarGTranslateActivo() {
-    // Intentar cada 500ms hasta encontrar el selector
-    const interval = setInterval(function() {
-        const selector = document.querySelector('.goog-te-combo');
-        if (selector) {
-            clearInterval(interval);
-            console.log('✅ GTranslate encontrado');
-            
-            // Quitar listener duplicado
-            if (!selector._listenerAdded) {
-                selector._listenerAdded = true;
-                selector.addEventListener('change', function() {
-                    const lang = this.value;
-                    const country = lang === 'en' ? 'USA' : 'Mexico';
-                    const currency = lang === 'en' ? 'USD' : 'MXN';
-                    
-                    JuguemosState.country = country;
-                    JuguemosState.currency = currency;
-                    document.cookie = `juguemos_country=${country}; path=/; max-age=31536000`;
-                    
-                    document.querySelectorAll(".country").forEach(btn => {
-                        if (btn.dataset.country === country) {
-                            btn.classList.add('active');
-                        } else {
-                            btn.classList.remove('active');
-                        }
-                    });
-                    
-                    updatePaperOptions();
-                    updatePrice();
-                    updateOrderSummary();
-                });
-            }
-        }
-    }, 500);
-    
-    // Detener después de 10 segundos (tiempo máximo de espera)
-    setTimeout(() => {
-        clearInterval(interval);
-    }, 10000);
-}
-
-// =============================================
-// 3. TUS BOTONES PERSONALIZADOS
-// =============================================
-document.querySelectorAll(".country").forEach(button => {
-    button.addEventListener("click", function() {
-        document.querySelectorAll(".country").forEach(b => b.classList.remove("active"));
-        this.classList.add("active");
-        
-        const country = this.dataset.country;
-        const currency = this.dataset.currency;
-        
-        JuguemosState.country = country;
-        JuguemosState.currency = currency;
-        
-        const lang = country === 'USA' ? 'en' : 'es';
-        cambiarIdiomaGTtranslate(lang);
-    });
-});
-
-function cambiarIdiomaGTtranslate(lang) {
-    const country = lang === 'en' ? 'USA' : 'Mexico';
-    document.cookie = `juguemos_country=${country}; path=/; max-age=31536000`;
-    const url = new URL(window.location.href);
-    url.searchParams.set('lang', lang);
-    window.location.href = url.toString();
-}
-
-// =============================================
-// 4. FUNCIÓN PARA LEER COOKIES
-// =============================================
 function getCookie(name) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
@@ -939,9 +865,41 @@ function getCookie(name) {
 }
 
 // =============================================
-// 5. EJECUTAR AL CARGAR
+// 4. OBSERVAR CAMBIOS EN DOM (para GTranslate)
 // =============================================
+function observarGTranslate() {
+    const observer = new MutationObserver(function() {
+        const selector = document.querySelector('.goog-te-combo');
+        if (selector && !selector._listenerAdded) {
+            selector._listenerAdded = true;
+            selector.addEventListener('change', function() {
+                const lang = this.value;
+                const country = lang === 'en' ? 'USA' : 'Mexico';
+                const currency = lang === 'en' ? 'USD' : 'MXN';
+                
+                JuguemosState.country = country;
+                JuguemosState.currency = currency;
+                document.cookie = `juguemos_country=${country}; path=/; max-age=31536000`;
+                
+                document.querySelectorAll(".country").forEach(btn => {
+                    if (btn.dataset.country === country) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+                
+                updatePaperOptions();
+                updatePrice();
+                updateOrderSummary();
+            });
+        }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(sincronizarPais, 100);
-    setTimeout(detectarGTranslateActivo, 500);
+    setTimeout(detectarCambioGTranslate, 300);
+    setTimeout(observarGTranslate, 500);
 });

@@ -130,7 +130,4 @@ function paypal_create_order($amount, $currency, $description) {
     echo json_encode(['error' => $error_msg]);
 }
 
-// ============================================
-// EJECUTAR
-// ============================================
 paypal_create_order($amount, $currency, $description);

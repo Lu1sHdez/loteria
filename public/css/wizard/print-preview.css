@@ -186,3 +186,26 @@
     margin-top: 20px;
     flex-wrap: wrap;
 }
+
+.j-board-grid {
+    position: relative;
+}
+
+.j-board-grid:not(.pdf-export)::before {    
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none;
+
+    background-image: url('/wp-content/uploads/2026/07/logo_marca_agua.png');
+    background-repeat: repeat;
+    background-position: center;
+    background-size: 60px 60px;
+    opacity: .50;
+}
+
+.j-board-grid > * {
+    position: relative;
+    z-index: 6;
+}
