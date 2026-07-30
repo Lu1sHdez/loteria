@@ -15,57 +15,66 @@
     color: #1E2249;
     margin-bottom: 12px;
 }
+/* =====================================================
+   BOTÓN SELECCIÓN ALEATORIA
+===================================================== */
 
-/* 🔥 Botón Selección Aleatoria */
-.j-casilla-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 44px;
-    padding: 0 20px;
-    border: 2px solid #FA299C;
-    border-radius: 8px;
-    background: #FA299C;
-    color: #FFFFFF;
-    font-family: 'Cairo', sans-serif;
-    font-weight: 700;
-    font-size: 15px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    gap: 8px;
+.j-casilla-btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+
+    width:100%;
+    height:44px;
+    padding:0 20px;
+
+    border:2px solid #FA299C;
+    border-radius:8px;
+
+    background:#FA299C;
+    color:#FFF;
+
+    font:700 15px 'Cairo',sans-serif;
+
+    cursor:pointer;
+    transition:all .25s ease;
+
+    outline:none;
 }
 
-.j-casilla-btn:hover {
-    background: #FA299C;
-    border-color: #FA299C;
-    color: #FA299C;
+/* Hover y Focus */
+
+.j-casilla-btn:hover,
+.j-casilla-btn:focus,
+.j-casilla-btn:focus-visible{
+    background:#FFF;
+    border-color:#FA299C;
+    color:#FA299C;
+
+    outline:none;
+    box-shadow:none;
 }
 
-.j-casilla-btn.active {
-    background: #FA299C;
-    border-color: #FA299C;
-    color: #FFFFFF;
+/* Al presionar */
+
+.j-casilla-btn:active{
+    transform:scale(.98);
 }
 
-.j-casilla-btn.active:hover {
-    background: #E91E8C;
-    border-color: #E91E8C;
-    color: #FFFFFF;
+/* Inactivo */
+
+.j-casilla-btn.inactive{
+    background:#FFF;
+    border-color:#D9D9D9;
+    color:#999;
 }
 
-.j-casilla-btn.inactive {
-    background: #E91E8C;
-    border-color: #E91E8C;
-    color: #FFFFFF;
+.j-casilla-btn.inactive:hover{
+    background:#F5F5F5;
+    border-color:#D9D9D9;
+    color:#666;
 }
-
-.j-casilla-btn.inactive:hover {
-    background: #F5F5F5;
-    border-color: #D9D9D9;
-    color: #666666;
-}
-
 /* =====================================================
    VISTA PREVIA DE UBICACIÓN
 ===================================================== */

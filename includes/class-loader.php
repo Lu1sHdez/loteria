@@ -23,7 +23,7 @@ class Juguemos_Loader
         require_once JUGUEMOS_PATH . 'includes/Core/class-assets.php';
         require_once JUGUEMOS_PATH . 'includes/Core/class-shortcodes.php';
         require_once JUGUEMOS_PATH . 'includes/Ajax/class-ajax.php';
-        require_once JUGUEMOS_PATH . 'includes/Repositories/class-category-repository.php';
+        require_once JUGUEMOS_PATH . 'includes/Repositories/class-categoria-repository.php';
         require_once JUGUEMOS_PATH . 'includes/Repositories/class-deck-repository.php';
         require_once JUGUEMOS_PATH . 'includes/Repositories/class-price-repository.php';
         require_once JUGUEMOS_PATH . 'includes/Pricing/class-pricing.php';

@@ -41,17 +41,25 @@ if (!defined('ABSPATH')) {
 
                 <div class="j-panel-item">
                     <div class="subtitulo-aqua">
-                        1. Estilo de barajas
+                        1. Estilo de loteria
                     </div>
                 </div>
 
                 <?php include __DIR__ . '/parts/design-categories.php'; ?>
 
-                <button
-                    type="button"
-                    id="j-incluir-barajas"
-                    class="j-btn-incluir-barajas active">
-                    Incluir barajas
+                <button type="button" id="j-incluir-barajas" class="j-toggle-barajas active">
+
+                    <span class="j-toggle-circle">
+                        <img
+                            id="j-toggle-icon"
+                            src="/wp-content/uploads/2026/07/incluir_on.png"
+                            alt="Incluir barajas">
+                    </span>
+
+                    <span class="j-toggle-text">
+                        Incluir barajas
+                    </span>
+
                 </button>
 
                 <div id="j-incluir-status" class="j-incluir-status active">

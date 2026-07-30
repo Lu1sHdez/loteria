@@ -13,11 +13,13 @@ class Juguemos_Admin_Designs
         return $wpdb->get_results(
             $wpdb->prepare(
                 "
-                SELECT *
-                FROM {$wpdb->prefix}juguemos_designs
-                WHERE categoria_id = %d
-                AND activo = 1
-                ORDER BY nombre ASC
+                SELECT d.*, COUNT(b.id) as total_barajas
+                FROM wp_juguemos_designs d
+                LEFT JOIN wp_juguemos_barajas b ON d.id = b.design_id AND b.activo = 1
+                WHERE d.categoria_id = %d AND d.activo = 1
+                GROUP BY d.id
+                HAVING COUNT(b.id) >= 3 
+                ORDER BY d.nombre ASC
                 ",
                 $categoria_id
             )

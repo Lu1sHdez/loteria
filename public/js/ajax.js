@@ -49,7 +49,7 @@ const JuguemosAjax = {
         .then(r => r.json())
         .then(response => {
             if (!response.success || !response.data.length) {
-                container.innerHTML = "<p>No se encontraron diseños.</p>";
+                container.innerHTML = "<p>Actualmente no tenemos diseños en esta categoría. ¡Esperalos próximamente!</p>";
                 return;
             }
     

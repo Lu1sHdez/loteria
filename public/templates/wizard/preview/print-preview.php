@@ -101,15 +101,7 @@ if (!defined('ABSPATH')) {
     border-radius: 2px;
 }
 
-.j-sheet-content {
-    width: 100%;
-    height: 100%;
-    padding: 15px;
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+
 
 .j-print-board {
     transition: all 0.2s ease;

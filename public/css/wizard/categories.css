@@ -107,3 +107,113 @@
     width:140px;
     margin:12px auto;
 }
+
+
+/* =====================================================
+   BOTÓN INCLUIR BARAJAS
+===================================================== */
+
+.j-toggle-barajas{
+    display:flex;
+    align-items:center;
+    gap:18px;
+
+    display:inline-flex;
+    width:auto;
+    height:60px;
+    margin-top:20px;
+    border:3px solid #FA299C;
+    border-radius:999px;
+
+    background:#FA299C;
+    cursor:pointer;
+
+    transition:all .25s ease;
+
+    outline:none;
+}
+
+/* Círculo */
+
+.j-toggle-circle{
+    width:54px;
+    height:54px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    flex-shrink:0;
+
+    border-radius:50%;
+    background:#FFF;
+
+    transition:background .25s ease;
+}
+
+.j-toggle-circle img{
+    width:55px;
+    height:55px;
+    display:block;
+}
+
+/* Texto */
+
+.j-toggle-text{
+    font:700 26px 'Cairo',sans-serif;
+    color:#FFF;
+    transition:color .25s ease;
+}
+
+/* =====================================================
+   HOVER / FOCUS
+===================================================== */
+
+.j-toggle-barajas:hover,
+.j-toggle-barajas:focus,
+.j-toggle-barajas:focus-visible{
+    background:#FFF;
+    border-color:#FA299C;
+    outline:none;
+    box-shadow:none;
+}
+
+.j-toggle-barajas:hover .j-toggle-text,
+.j-toggle-barajas:focus .j-toggle-text,
+.j-toggle-barajas:focus-visible .j-toggle-text{
+    color:#FA299C;
+}
+
+.j-toggle-barajas:hover .j-toggle-circle,
+.j-toggle-barajas:focus .j-toggle-circle,
+.j-toggle-barajas:focus-visible .j-toggle-circle{
+    background:#FFF5FB;
+}
+
+/* =====================================================
+   ACTIVE
+===================================================== */
+
+.j-toggle-barajas:active{
+    transform:scale(.98);
+}
+
+/* =====================================================
+   INACTIVO
+===================================================== */
+
+.j-toggle-barajas.inactive{
+    background:#FFF;
+}
+
+.j-toggle-barajas.inactive .j-toggle-text{
+    color:#FA299C;
+}
+
+.j-toggle-barajas.inactive:hover{
+    background:#FA299C;
+}
+
+.j-toggle-barajas.inactive:hover .j-toggle-text{
+    color:#FFF;
+}

@@ -20,40 +20,6 @@
     text-align:center;
 }
 
-#j-incluir-barajas{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    width:100%;
-    height:46px;
-    margin-top:20px;
-    border:2px solid #FA299C;
-    border-radius:10px;
-    background:#FA299C;
-    color:#FFFFFF;
-    font-family:'Cairo',sans-serif;
-    font-weight:700;
-    font-size:15px;
-    cursor:pointer;
-    transition:.25s;
-}
-
-#j-incluir-barajas:hover{
-    background:#FFFFFF;
-    color:#FA299C;
-}
-
-#j-incluir-barajas.j-incluidas{
-    background:#24B8C8;
-    border-color:#24B8C8;
-    cursor:default;
-}
-
-#j-incluir-barajas.j-incluidas:hover{
-    background:#24B8C8;
-    color:#FFFFFF;
-}
-
 .j-strip-confirmed{
     outline:2px solid #24B8C8;
     outline-offset:6px;
@@ -146,7 +112,6 @@
         border-top: 2px solid #f0f0f0;
     }
 
-
 /* ===== 1. MARCA DE AGUA EN "Vista previa diseño" ===== */
 
 .j-preview-cover {
@@ -161,15 +126,13 @@
     bottom: 0;
     left: 60px;
     right: 60px;
-
     z-index: 5;
     pointer-events: none;
-
-    background-image: url('/wp-content/uploads/2026/07/logo_marca_agua.png');
-    background-size: 70px 70px;
-    background-repeat: repeat;
+    background-image: url('/wp-content/uploads/2026/07/marca_agua.png');
+    background-size: cover;
+    background-repeat: no-repeat;
     background-position: center;
-    opacity: .80;
+    opacity: 5;
 }
 
 .j-preview-cover img {
@@ -192,11 +155,11 @@
     height: 100%;
     z-index: 5;
     pointer-events: none;
-    background-image: url('/wp-content/uploads/2026/07/logo_marca_agua.png');
-    background-size: 70px 70px;
-    background-repeat: repeat;
+    background-image: url('/wp-content/uploads/2026/07/marca_agua.png');
+    background-size: cover;
+    background-repeat: no-repeat;
     background-position: center;
-    opacity: 0.80;
+    opacity: 8;
 }
 
 #j-casilla-preview-grid .cell {

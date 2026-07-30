@@ -193,32 +193,23 @@ document.addEventListener("DOMContentLoaded", () => {
     aplicarColores();
     updateOrderSummary();
 
-    // ========== INCLUIR BARAJAS ==========
+    // ========== TOGGLE INCLUIR BARAJAS ==========
     const btnIncluir = document.getElementById("j-incluir-barajas");
-    const statusMsg = document.getElementById("j-incluir-status");
+    const toggleIcon = document.getElementById("j-toggle-icon");
     if (btnIncluir) {
-        btnIncluir.classList.add('active');
-        JuguemosState.barajasIncluidas = true;
-        if (statusMsg) statusMsg.style.display = 'none';
-
-        btnIncluir.addEventListener("click", function() {
-            const isActive = this.classList.toggle('active');
-            JuguemosState.barajasIncluidas = isActive;
-            if (isActive) {
-                this.classList.remove('inactive');
-                this.innerHTML = 'Incluir barajas';
-                if (statusMsg) statusMsg.style.display = 'none';
-            } else {
-                this.classList.add('inactive');
-                this.innerHTML = 'No incluir barajas';
-                if (statusMsg) {
-                    statusMsg.textContent = 'Barajas no incluidas';
-                    statusMsg.style.display = 'block';
-                    statusMsg.className = 'j-incluir-status inactive';
-                    statusMsg.style.color = '#898989';
-                }
-            }
+        const setActive = (active) => {
+            JuguemosState.barajasIncluidas = active;
+            btnIncluir.classList.toggle("active", active);
+            toggleIcon.src =
+                `/wp-content/uploads/2026/07/incluir_${active ? "on" : "off"}.png`;
             updateOrderSummary();
+            if (typeof PrintPaper !== "undefined") {
+                setTimeout(() => PrintPaper.refresh(), 150);
+            }
+        };
+        setActive(true);
+        btnIncluir.addEventListener("click", () => {
+            setActive(!JuguemosState.barajasIncluidas);
         });
     }
 
@@ -609,8 +600,8 @@ function ejecutarLlenadoAleatorio() {
 // =========================================================
 // PROTECCIÓN
 // =========================================================
-document.addEventListener('dragstart', e => e.preventDefault());
-document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('dragstart', e => e.preventDefault());
+    document.addEventListener('contextmenu', e => e.preventDefault());
 
 // =========================================================
 // INICIALIZACIÓN FINAL
