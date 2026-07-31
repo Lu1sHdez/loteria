@@ -11,8 +11,8 @@ window.PrintPaper = {
         '4x4': { cols: 4, rows: 4, total: 16 },
         '5x5': { cols: 5, rows: 5, total: 25 },
         'pocitos4': { cols: 2, rows: 2, total: 4 },
-        'pocitos3': { cols: 3, rows: 3, total: 3 },
-        'cruzadas': { cols: 3, rows: 3, total: 5 }
+        'pocitos3': { cols: 2, rows: 2, total: 3 },
+        'cruzadas': { cols: 4, rows: 4, total: 8 }
     },
 
     // Tamaños de papel en mm
@@ -214,6 +214,180 @@ window.PrintPaper = {
         board.dataset.board = boardIndex + 1;
         board.dataset.page = pageIndex + 1;
     
+        const gridType = JuguemosState.grid || '4x4';
+        const isPocitos3 = gridType === 'pocitos3';
+        const isPocitos4 = gridType === 'pocitos4';
+    
+        // 🔥 Si es Pocitos 3, usar lógica especial con conexión de mitades
+        if (isPocitos3) {
+            Object.assign(board.style, {
+                border: `2px solid ${JuguemosState.marcoColor || '#FA299C'}`,
+                borderRadius: '4px',
+                overflow: 'hidden',
+                backgroundColor: JuguemosState.fondoColor || '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '4px',
+                boxSizing: 'border-box',
+                aspectRatio: '1 / 1'
+            });
+    
+            const grid = document.createElement('div');
+            grid.className = 'j-board-grid';
+            grid.dataset.grid = 'pocitos3';
+    
+            // 🔥 GRID: 2 columnas (1fr 0.5fr)
+            Object.assign(grid.style, {
+                display: 'grid',
+                gridTemplateColumns: '1fr 0.5fr',
+                gridTemplateRows: '1fr 1fr',
+                gap: '1px',
+                width: '100%',
+                height: '100%',
+                padding: '1px',
+                boxSizing: 'border-box'
+            });
+    
+            const todasLasTablas = JuguemosState.todasLasTablas || [];
+            const casillasAsignadas = JuguemosState.casillasAsignadas || [];
+    
+            let casillasParaEstaTabla;
+            const indexGlobal = (pageIndex * (JuguemosState.quantity || 1)) + boardIndex;
+    
+            if (todasLasTablas[indexGlobal]) {
+                casillasParaEstaTabla = todasLasTablas[indexGlobal];
+            } else if (todasLasTablas.length > 0) {
+                const baseTabla = todasLasTablas[0] || casillasAsignadas;
+                casillasParaEstaTabla = [...baseTabla];
+                for (let i = casillasParaEstaTabla.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [casillasParaEstaTabla[i], casillasParaEstaTabla[j]] = [casillasParaEstaTabla[j], casillasParaEstaTabla[i]];
+                }
+            } else {
+                casillasParaEstaTabla = casillasAsignadas;
+            }
+    
+            // 🔥 CONEXIÓN: Casilla 3 se conecta con casilla 2 de la siguiente tabla
+            const totalTablas = todasLasTablas.length;
+            let casilla1, casilla2, casilla3;
+    
+            casilla1 = casillasParaEstaTabla[0] || null;
+    
+            if (boardIndex > 0 && totalTablas > 1) {
+                const tablaAnterior = todasLasTablas[indexGlobal - 1];
+                if (tablaAnterior && tablaAnterior[2]) {
+                    casilla2 = tablaAnterior[2];
+                } else {
+                    casilla2 = casillasParaEstaTabla[1] || null;
+                }
+            } else {
+                casilla2 = casillasParaEstaTabla[1] || null;
+            }
+    
+            if (boardIndex < totalTablas - 1 && totalTablas > 1) {
+                const tablaSiguiente = todasLasTablas[indexGlobal + 1];
+                if (tablaSiguiente && tablaSiguiente[1]) {
+                    casilla3 = tablaSiguiente[1];
+                } else {
+                    casilla3 = casillasParaEstaTabla[2] || null;
+                }
+            } else {
+                casilla3 = casillasParaEstaTabla[2] || null;
+            }
+    
+            const casillas = [casilla1, casilla2, casilla3];
+            const mostrarBarajas = JuguemosState.barajasIncluidas !== false;
+    
+            for (let i = 0; i < 3; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'j-board-cell';
+                cell.dataset.index = i;
+    
+                // 🔥 POSICIONAMIENTO
+                if (i === 0) {
+                    // Casilla 1: ocupa toda la izquierda
+                    cell.style.gridRow = '1 / 3';
+                    cell.style.gridColumn = '1';
+                    cell.style.aspectRatio = 'auto';
+                } else {
+                    // Casilla 2 y 3: cuadradas
+                    cell.style.aspectRatio = '1 / 1';
+                    if (i === 1) {
+                        cell.style.gridRow = '1';
+                        cell.style.gridColumn = '2';
+                    } else if (i === 2) {
+                        cell.style.gridRow = '2';
+                        cell.style.gridColumn = '2';
+                    }
+                }
+    
+                // 🔥 BORDES
+                const borderColor = JuguemosState.marcoColor || '#FA299C';
+                if (i === 0) {
+                    cell.style.borderRight = `2px solid ${borderColor}`;
+                    cell.style.borderTop = 'none';
+                    cell.style.borderBottom = 'none';
+                    cell.style.borderLeft = 'none';
+                } else if (i === 1) {
+                    cell.style.borderBottom = `2px solid ${borderColor}`;
+                    cell.style.borderTop = 'none';
+                    cell.style.borderLeft = 'none';
+                    cell.style.borderRight = 'none';
+                } else {
+                    cell.style.border = 'none';
+                }
+    
+                Object.assign(cell.style, {
+                    borderRadius: '2px',
+                    backgroundColor: JuguemosState.fondoColor || '#FFFFFF',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    overflow: 'hidden',
+                    position: 'relative'
+                });
+    
+                const casilla = casillas[i];
+    
+                if (casilla && mostrarBarajas) {
+                    const img = document.createElement('img');
+                    img.src = casilla.imagen;
+                    img.alt = casilla.nombre || 'Baraja';
+                    Object.assign(img.style, {
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain',
+                        padding: '2px',
+                        boxSizing: 'border-box'
+                    });
+    
+                    img.onerror = function() {
+                        this.style.display = 'none';
+                        cell.textContent = casilla.nombre || '❌';
+                        cell.style.fontSize = '8px';
+                        cell.style.textAlign = 'center';
+                        cell.style.color = '#333';
+                    };
+    
+                    cell.appendChild(img);
+                } else {
+                    cell.textContent = i + 1;
+                    Object.assign(cell.style, {
+                        fontSize: '10px',
+                        color: '#ccc',
+                        fontWeight: 'bold'
+                    });
+                }
+    
+                grid.appendChild(cell);
+            }
+    
+            board.appendChild(grid);
+            return board;
+        }
+    
+        // 🔥 Para los demás grids (4x4, 5x5, pocitos4, cruzadas)
         Object.assign(board.style, {
             border: `2px solid ${JuguemosState.marcoColor || '#FA299C'}`,
             borderRadius: '4px',
@@ -232,30 +406,29 @@ window.PrintPaper = {
         grid.dataset.grid = JuguemosState.grid || '4x4';
     
         const { cols, rows, total } = config;
-
-        const gridType = JuguemosState.grid || '4x4';
-        const isSpecial = ['pocitos3', 'cruzadas'].includes(gridType); // 🔥 QUITAR pocitos4 de isSpecial
-        const isPocitos4 = gridType === 'pocitos4';
-
-        // 🔥 AJUSTE: Gap según el tipo
+    
+        const isSpecial = [].includes(gridType);
+    
         let gapValue = '2px';
         if (isPocitos4) {
-            gapValue = '0px'; 
+            gapValue = '0px';
         }
-
+    
         let gridCols = cols;
         let gridRows = rows;
-
-        // 🔥 Si es Pocitos 4, usar 2x2
+    
         if (isPocitos4) {
             gridCols = 2;
             gridRows = 2;
         }
-
+    
+        let gridTemplateCols = isSpecial ? 'repeat(3, 1fr)' : `repeat(${gridCols}, 1fr)`;
+        let gridTemplateRows = isSpecial ? 'repeat(3, 1fr)' : `repeat(${gridRows}, 1fr)`;
+    
         Object.assign(grid.style, {
             display: 'grid',
-            gridTemplateColumns: isSpecial ? 'repeat(3, 1fr)' : `repeat(${gridCols}, 1fr)`,
-            gridTemplateRows: isSpecial ? 'repeat(3, 1fr)' : `repeat(${gridRows}, 1fr)`,
+            gridTemplateColumns: gridTemplateCols,
+            gridTemplateRows: gridTemplateRows,
             gap: gapValue,
             width: '100%',
             height: '100%',
@@ -288,7 +461,21 @@ window.PrintPaper = {
             const cell = document.createElement('div');
             cell.className = 'j-board-cell';
             cell.dataset.index = i;
-    
+        
+            // 🔥 POSICIONAMIENTO ESPECIAL PARA CRUZADAS (4x4)
+            if (gridType === 'cruzadas') {
+                // Diagonal principal (arriba-izquierda a abajo-derecha)
+                if (i === 0) { cell.style.gridRow = '1'; cell.style.gridColumn = '1'; }
+                if (i === 1) { cell.style.gridRow = '2'; cell.style.gridColumn = '2'; }
+                if (i === 2) { cell.style.gridRow = '3'; cell.style.gridColumn = '3'; }
+                if (i === 3) { cell.style.gridRow = '4'; cell.style.gridColumn = '4'; }
+                // Diagonal secundaria (arriba-derecha a abajo-izquierda)
+                if (i === 4) { cell.style.gridRow = '1'; cell.style.gridColumn = '4'; }
+                if (i === 5) { cell.style.gridRow = '2'; cell.style.gridColumn = '3'; }
+                if (i === 6) { cell.style.gridRow = '3'; cell.style.gridColumn = '2'; }
+                if (i === 7) { cell.style.gridRow = '4'; cell.style.gridColumn = '1'; }
+            }
+        
             Object.assign(cell.style, {
                 border: `1px solid ${JuguemosState.marcoColor || '#FA299C'}`,
                 borderRadius: '2px',
@@ -315,7 +502,7 @@ window.PrintPaper = {
                     boxSizing: 'border-box'
                 });
     
-                img.onerror = function () {
+                img.onerror = function() {
                     this.style.display = 'none';
                     cell.textContent = casilla.nombre || '❌';
                     cell.style.fontSize = '8px';
@@ -325,7 +512,6 @@ window.PrintPaper = {
     
                 cell.appendChild(img);
             } else {
-                // 🔥 Para Pocitos 4: casillas vacías y sin borde visible
                 if (gridType === 'pocitos4') {
                     cell.textContent = '';
                     Object.assign(cell.style, {
@@ -349,6 +535,7 @@ window.PrintPaper = {
         board.appendChild(grid);
         return board;
     },
+
 
     addCutMarks(sheet, paper, scale, layout) {
         layout = layout || this.getBoardLayout(paper, scale);

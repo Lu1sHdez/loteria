@@ -136,8 +136,18 @@ class Juguemos_Assets
                 'nonce'    => wp_create_nonce('juguemos_nonce'),
             ]
         );
-
         // =========================================================
+        // POCITOS 3 - CONECTOR DE MITADES
+        // =========================================================
+
+        wp_enqueue_style(
+            'juguemos-pocitos3-preview',
+            JUGUEMOS_URL . 'public/css/pocitos3-preview.css',
+            [],
+            JUGUEMOS_VERSION
+        );
+
+        // =========================================================    
         // GENERADOR DE PDF (paso 4 - Pago y Descarga)
         // =========================================================
 

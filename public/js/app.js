@@ -404,7 +404,7 @@ function drawGrid() {
         container.style.gridTemplateColumns = 'repeat(2, 1fr)';
         container.style.gridTemplateRows = 'repeat(2, 1fr)';
     } else {
-        cells = { '4x4': 16, '5x5': 25, 'pocitos4': 4, 'pocitos3': 3, 'cruzadas': 5 }[grid] || 16;
+        cells = { '4x4': 16, '5x5': 25, 'pocitos4': 4, 'pocitos3': 3, 'cruzadas': 8 }[grid] || 16;
         container.style.gridTemplateColumns = '';
         container.style.gridTemplateRows = '';
     }
@@ -413,7 +413,7 @@ function drawGrid() {
 }
 
 function getTotalCasillas(grid) {
-    return { '4x4': 16, '5x5': 25, 'pocitos4': 4, 'pocitos3': 3, 'cruzadas': 5 }[grid] || 16;
+    return { '4x4': 16, '5x5': 25, 'pocitos4': 4, 'pocitos3': 3, 'cruzadas': 8 }[grid] || 16;
 }
 
 function llenarCasillasAleatorio() {
@@ -516,8 +516,7 @@ function updateOrderSummary() {
         'j-summary-paper': JuguemosState.paper,
         'j-summary-orientation': JuguemosState.orientation === "vertical" ? "Vertical" : "Horizontal",
         'j-summary-pages': `${JuguemosState.pages} páginas`,
-        'j-summary-grid': { "4x4": "4x4 · 16 casillas", "5x5": "5x5 · 25 casillas", "pocitos4": "Pocitos 4", "pocitos3": "Pocitos 3", "cruzadas": "Cruzadas" }[JuguemosState.grid] || "4x4 · 16 casillas",
-        'j-summary-mode': modeLabel,
+        'j-summary-grid': { "4x4": "4x4 · 16 casillas", "5x5": "5x5 · 25 casillas", "pocitos4": "Pocitos 4", "pocitos3": "Pocitos 3", "cruzadas": "Cruzadas · 8 casillas" }[JuguemosState.grid] || "4x4 · 16 casillas",        'j-summary-mode': modeLabel,
         'j-summary-cutmarks': JuguemosState.cutMarks ? "Líneas de corte" : "Sin líneas de corte"
     };
 
@@ -645,8 +644,8 @@ function ejecutarLlenadoAleatorio() {
 // =========================================================
 // PROTECCIÓN
 // =========================================================
-    document.addEventListener('dragstart', e => e.preventDefault());
-    document.addEventListener('contextmenu', e => e.preventDefault());
+/*     document.addEventListener('dragstart', e => e.preventDefault());
+    document.addEventListener('contextmenu', e => e.preventDefault()); */
 
 // =========================================================
 // INICIALIZACIÓN FINAL
