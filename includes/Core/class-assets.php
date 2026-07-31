@@ -146,6 +146,20 @@ class Juguemos_Assets
             [],
             JUGUEMOS_VERSION
         );
+        wp_enqueue_script(
+            'juguemos-libre-upload',
+            JUGUEMOS_URL . 'public/js/libre-upload.js',
+            ['juguemos-state'],
+            JUGUEMOS_VERSION,
+            true
+        );
+        wp_enqueue_script(
+            'juguemos-favoritas',
+            JUGUEMOS_URL . 'public/js/favoritas.js',
+            ['juguemos-state', 'juguemos-ajax'],
+            JUGUEMOS_VERSION,
+            true
+        );
 
         // =========================================================    
         // GENERADOR DE PDF (paso 4 - Pago y Descarga)

@@ -1,0 +1,238 @@
+/* =====================================================
+   LIBRE - UPLOAD DE IMÁGENES (SIN BORDES)
+===================================================== */
+
+.j-libre-upload {
+    background: #FFFFFF;
+    border-radius: 12px;
+    margin-top: 15px;
+}
+
+.j-libre-header {
+    margin-bottom: 15px;
+}
+
+.j-libre-nav {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.j-libre-nav-btn {
+    padding: 8px 18px;
+    border: 2px solid #DDD;
+    border-radius: 8px;
+    background: #FFF;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    color: #5D5D5D;
+    transition: 0.2s;
+}
+
+.j-libre-nav-btn:hover {
+    border-color: #FA299C;
+    color: #ffffff;
+    background: #FA299C;
+}
+
+.j-libre-nav-btn.active {
+    background: #FA299C;
+    border-color: #FA299C;
+    color: #FFF;
+}
+
+.j-libre-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+.j-delete {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    border: 1px solid #D9D9D9;
+    border-radius: 6px;
+    color: #E53935;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .2s;
+    padding: 8px 18px;
+}
+
+.j-delete:hover {
+    background: #E53935;
+    border-color: #E53935;
+    color: #FFFFFF;
+}
+
+.j-libre-counter {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1E2249;
+    margin-left: 5px;
+}
+
+.j-libre-counter.complete {
+    color: #27ae60;
+}
+
+.j-libre-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 10px;
+    background: #f8f8f8;
+    border-radius: 8px;
+    min-height: 100px;
+    /* border eliminado */
+    transition: background-color 0.3s;
+}
+
+.j-libre-grid.dragover {
+    background: #f0f9fa;
+}
+
+.j-libre-item {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    border-radius: 6px;
+    overflow: hidden;
+    /* border eliminado */
+    background: #FFFFFF;
+    transition: transform 0.2s;
+}
+
+.j-libre-item:hover {
+    transform: scale(1.02);
+    z-index: 2;
+}
+
+.j-libre-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+.j-libre-item .j-libre-number {
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    font-size: 9px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(0, 0, 0, 0.6);
+    padding: 0 4px;
+    border-radius: 3px;
+    font-family: 'Cairo', sans-serif;
+}
+
+/* ========== BOTÓN "X" BLANCO, GRANDE Y GRUESO ========== */
+.j-libre-item .j-libre-remove {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    border: none;
+    background: transparent;
+    color: #ffffff;
+    font-size: 28px;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(0,0,0,0.9);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    line-height: 1;
+    padding: 0 6px;
+    width: auto;
+    height: auto;
+}
+
+.j-libre-item:hover .j-libre-remove {
+    opacity: 1;
+}
+
+.j-libre-item-placeholder {
+    aspect-ratio: 2 / 3;
+    border-radius: 6px;
+    /* border eliminado */
+    background: #F5F5F5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #CCC;
+    font-weight: 700;
+}
+
+.j-libre-status {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 6px;
+    text-align: center;
+    font-weight: 600;
+    display: none;
+}
+
+.j-libre-status.success {
+    display: block;
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.j-libre-status.error {
+    display: block;
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.j-libre-status.info {
+    display: block;
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+/* Scroll personalizado */
+.j-libre-grid::-webkit-scrollbar {
+    width: 6px;
+}
+
+.j-libre-grid::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 3px;
+}
+
+.j-libre-grid::-webkit-scrollbar-thumb {
+    background: #FA299C;
+    border-radius: 3px;
+}
+
+.j-libre-grid::-webkit-scrollbar-thumb:hover {
+    background: #d91a7a;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .j-libre-grid {
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+        max-height: 300px;
+    }
+    
+    .j-libre-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

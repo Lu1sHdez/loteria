@@ -1,16 +1,12 @@
-<!-- =====================================================
-   CASILLAS POR DEFINIR
-===================================================== -->
+<?php
+if (!defined('ABSPATH')) {
+    exit;
+}
+?>
 
 <div class="j-casillas-definir">
-
-    <!-- Selección Aleatoria -->
-    <div class="j-casilla-option">
-        <p class="text-p-negrita">Selección Aleatoria</p>
-        <button class="j-casilla-btn" data-mode="aleatoria">
-            Selección Aleatoria
-        </button>
-        <p class="j-texto-normal">El sistema elegirá aleatoriamente todas tus casillas de tus tablas.</p>
-    </div>
-
+    <?php include __DIR__ . '/modos/sencilla.php'; ?>
+    <?php include __DIR__ . '/modos/dobles.php'; ?>
+    <?php include __DIR__ . '/modos/favoritas.php'; ?>
+    <?php include __DIR__ . '/modos/libre-upload.php'; ?>
 </div>

@@ -30,4 +30,7 @@
 
         orientation: "vertical",
 
+        favoritas: [],
+        favoritasUbicacion: 'aleatoria',
+
     };

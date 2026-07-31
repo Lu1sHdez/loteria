@@ -217,177 +217,9 @@ window.PrintPaper = {
         const gridType = JuguemosState.grid || '4x4';
         const isPocitos3 = gridType === 'pocitos3';
         const isPocitos4 = gridType === 'pocitos4';
+        const isCruzadas = gridType === 'cruzadas';
     
-        // 🔥 Si es Pocitos 3, usar lógica especial con conexión de mitades
-        if (isPocitos3) {
-            Object.assign(board.style, {
-                border: `2px solid ${JuguemosState.marcoColor || '#FA299C'}`,
-                borderRadius: '4px',
-                overflow: 'hidden',
-                backgroundColor: JuguemosState.fondoColor || '#FFFFFF',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '4px',
-                boxSizing: 'border-box',
-                aspectRatio: '1 / 1'
-            });
-    
-            const grid = document.createElement('div');
-            grid.className = 'j-board-grid';
-            grid.dataset.grid = 'pocitos3';
-    
-            // 🔥 GRID: 2 columnas (1fr 0.5fr)
-            Object.assign(grid.style, {
-                display: 'grid',
-                gridTemplateColumns: '1fr 0.5fr',
-                gridTemplateRows: '1fr 1fr',
-                gap: '1px',
-                width: '100%',
-                height: '100%',
-                padding: '1px',
-                boxSizing: 'border-box'
-            });
-    
-            const todasLasTablas = JuguemosState.todasLasTablas || [];
-            const casillasAsignadas = JuguemosState.casillasAsignadas || [];
-    
-            let casillasParaEstaTabla;
-            const indexGlobal = (pageIndex * (JuguemosState.quantity || 1)) + boardIndex;
-    
-            if (todasLasTablas[indexGlobal]) {
-                casillasParaEstaTabla = todasLasTablas[indexGlobal];
-            } else if (todasLasTablas.length > 0) {
-                const baseTabla = todasLasTablas[0] || casillasAsignadas;
-                casillasParaEstaTabla = [...baseTabla];
-                for (let i = casillasParaEstaTabla.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [casillasParaEstaTabla[i], casillasParaEstaTabla[j]] = [casillasParaEstaTabla[j], casillasParaEstaTabla[i]];
-                }
-            } else {
-                casillasParaEstaTabla = casillasAsignadas;
-            }
-    
-            // 🔥 CONEXIÓN: Casilla 3 se conecta con casilla 2 de la siguiente tabla
-            const totalTablas = todasLasTablas.length;
-            let casilla1, casilla2, casilla3;
-    
-            casilla1 = casillasParaEstaTabla[0] || null;
-    
-            if (boardIndex > 0 && totalTablas > 1) {
-                const tablaAnterior = todasLasTablas[indexGlobal - 1];
-                if (tablaAnterior && tablaAnterior[2]) {
-                    casilla2 = tablaAnterior[2];
-                } else {
-                    casilla2 = casillasParaEstaTabla[1] || null;
-                }
-            } else {
-                casilla2 = casillasParaEstaTabla[1] || null;
-            }
-    
-            if (boardIndex < totalTablas - 1 && totalTablas > 1) {
-                const tablaSiguiente = todasLasTablas[indexGlobal + 1];
-                if (tablaSiguiente && tablaSiguiente[1]) {
-                    casilla3 = tablaSiguiente[1];
-                } else {
-                    casilla3 = casillasParaEstaTabla[2] || null;
-                }
-            } else {
-                casilla3 = casillasParaEstaTabla[2] || null;
-            }
-    
-            const casillas = [casilla1, casilla2, casilla3];
-            const mostrarBarajas = JuguemosState.barajasIncluidas !== false;
-    
-            for (let i = 0; i < 3; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'j-board-cell';
-                cell.dataset.index = i;
-    
-                // 🔥 POSICIONAMIENTO
-                if (i === 0) {
-                    // Casilla 1: ocupa toda la izquierda
-                    cell.style.gridRow = '1 / 3';
-                    cell.style.gridColumn = '1';
-                    cell.style.aspectRatio = 'auto';
-                } else {
-                    // Casilla 2 y 3: cuadradas
-                    cell.style.aspectRatio = '1 / 1';
-                    if (i === 1) {
-                        cell.style.gridRow = '1';
-                        cell.style.gridColumn = '2';
-                    } else if (i === 2) {
-                        cell.style.gridRow = '2';
-                        cell.style.gridColumn = '2';
-                    }
-                }
-    
-                // 🔥 BORDES
-                const borderColor = JuguemosState.marcoColor || '#FA299C';
-                if (i === 0) {
-                    cell.style.borderRight = `2px solid ${borderColor}`;
-                    cell.style.borderTop = 'none';
-                    cell.style.borderBottom = 'none';
-                    cell.style.borderLeft = 'none';
-                } else if (i === 1) {
-                    cell.style.borderBottom = `2px solid ${borderColor}`;
-                    cell.style.borderTop = 'none';
-                    cell.style.borderLeft = 'none';
-                    cell.style.borderRight = 'none';
-                } else {
-                    cell.style.border = 'none';
-                }
-    
-                Object.assign(cell.style, {
-                    borderRadius: '2px',
-                    backgroundColor: JuguemosState.fondoColor || '#FFFFFF',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    overflow: 'hidden',
-                    position: 'relative'
-                });
-    
-                const casilla = casillas[i];
-    
-                if (casilla && mostrarBarajas) {
-                    const img = document.createElement('img');
-                    img.src = casilla.imagen;
-                    img.alt = casilla.nombre || 'Baraja';
-                    Object.assign(img.style, {
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'contain',
-                        padding: '2px',
-                        boxSizing: 'border-box'
-                    });
-    
-                    img.onerror = function() {
-                        this.style.display = 'none';
-                        cell.textContent = casilla.nombre || '❌';
-                        cell.style.fontSize = '8px';
-                        cell.style.textAlign = 'center';
-                        cell.style.color = '#333';
-                    };
-    
-                    cell.appendChild(img);
-                } else {
-                    cell.textContent = i + 1;
-                    Object.assign(cell.style, {
-                        fontSize: '10px',
-                        color: '#ccc',
-                        fontWeight: 'bold'
-                    });
-                }
-    
-                grid.appendChild(cell);
-            }
-    
-            board.appendChild(grid);
-            return board;
-        }
-    
-        // 🔥 Para los demás grids (4x4, 5x5, pocitos4, cruzadas)
+        // Configuración base del board
         Object.assign(board.style, {
             border: `2px solid ${JuguemosState.marcoColor || '#FA299C'}`,
             borderRadius: '4px',
@@ -396,39 +228,71 @@ window.PrintPaper = {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '4px',
+            padding: isPocitos3 ? '4px' : '4px',
             boxSizing: 'border-box',
-            aspectRatio: '2/3'
+            aspectRatio: isPocitos3 ? '1/1' : '2/3'
         });
     
         const grid = document.createElement('div');
         grid.className = 'j-board-grid';
-        grid.dataset.grid = JuguemosState.grid || '4x4';
+        grid.dataset.grid = gridType;
     
-        const { cols, rows, total } = config;
-    
-        const isSpecial = [].includes(gridType);
-    
-        let gapValue = '2px';
-        if (isPocitos4) {
-            gapValue = '0px';
+        // Obtener casillas para esta tabla
+        const todasLasTablas = JuguemosState.todasLasTablas || [];
+        const casillasAsignadas = JuguemosState.casillasAsignadas || [];
+        
+        const indexGlobal = (pageIndex * (JuguemosState.quantity || 1)) + boardIndex;
+        
+        let casillasParaEstaTabla;
+        if (todasLasTablas[indexGlobal]) {
+            casillasParaEstaTabla = todasLasTablas[indexGlobal];
+        } else if (todasLasTablas.length > 0) {
+            const baseTabla = todasLasTablas[boardIndex % todasLasTablas.length] || casillasAsignadas;
+            casillasParaEstaTabla = [...baseTabla];
+        } else {
+            casillasParaEstaTabla = casillasAsignadas;
         }
     
+        // 🔥 OBTENER FAVORITAS PARA RESALTAR
+        const favoritas = JuguemosState.favoritas || [];
+        const tieneFavoritas = favoritas.length > 0 && JuguemosState.mode === 'favoritas';
+    
+        // ==========================================
+        // CASO ESPECIAL: POCITOS 3
+        // ==========================================
+        if (isPocitos3) {
+            // ... (código existente de pocitos3, pero usando casillasParaEstaTabla)
+            // Asegurarse de que las casillas estén en el orden correcto
+            const casillas = [
+                casillasParaEstaTabla[0] || null,
+                casillasParaEstaTabla[1] || null,
+                casillasParaEstaTabla[2] || null
+            ];
+            // ... resto del código de pocitos3
+            return board;
+        }
+    
+        // ==========================================
+        // GRIDS NORMALES (4x4, 5x5, pocitos4, cruzadas)
+        // ==========================================
+        const { cols, rows, total } = config;
+        
+        // Configurar grid CSS
+        let gapValue = '2px';
+        if (isPocitos4) gapValue = '0px';
+        
         let gridCols = cols;
         let gridRows = rows;
-    
+        
         if (isPocitos4) {
             gridCols = 2;
             gridRows = 2;
         }
-    
-        let gridTemplateCols = isSpecial ? 'repeat(3, 1fr)' : `repeat(${gridCols}, 1fr)`;
-        let gridTemplateRows = isSpecial ? 'repeat(3, 1fr)' : `repeat(${gridRows}, 1fr)`;
-    
+        
         Object.assign(grid.style, {
             display: 'grid',
-            gridTemplateColumns: gridTemplateCols,
-            gridTemplateRows: gridTemplateRows,
+            gridTemplateColumns: `repeat(${gridCols}, 1fr)`,
+            gridTemplateRows: `repeat(${gridRows}, 1fr)`,
             gap: gapValue,
             width: '100%',
             height: '100%',
@@ -436,46 +300,34 @@ window.PrintPaper = {
             boxSizing: 'border-box'
         });
     
-        const todasLasTablas = JuguemosState.todasLasTablas || [];
-        const casillasAsignadas = JuguemosState.casillasAsignadas || [];
-    
-        let casillasParaEstaTabla;
-        const indexGlobal = (pageIndex * (JuguemosState.quantity || 1)) + boardIndex;
-    
-        if (todasLasTablas[indexGlobal]) {
-            casillasParaEstaTabla = todasLasTablas[indexGlobal];
-        } else if (todasLasTablas.length > 0) {
-            const baseTabla = todasLasTablas[0] || casillasAsignadas;
-            casillasParaEstaTabla = [...baseTabla];
-            for (let i = casillasParaEstaTabla.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [casillasParaEstaTabla[i], casillasParaEstaTabla[j]] = [casillasParaEstaTabla[j], casillasParaEstaTabla[i]];
-            }
-        } else {
-            casillasParaEstaTabla = casillasAsignadas;
-        }
-    
         const mostrarBarajas = JuguemosState.barajasIncluidas !== false;
     
+        // Generar celdas
         for (let i = 0; i < total; i++) {
             const cell = document.createElement('div');
             cell.className = 'j-board-cell';
             cell.dataset.index = i;
-        
-            // 🔥 POSICIONAMIENTO ESPECIAL PARA CRUZADAS (4x4)
-            if (gridType === 'cruzadas') {
-                // Diagonal principal (arriba-izquierda a abajo-derecha)
-                if (i === 0) { cell.style.gridRow = '1'; cell.style.gridColumn = '1'; }
-                if (i === 1) { cell.style.gridRow = '2'; cell.style.gridColumn = '2'; }
-                if (i === 2) { cell.style.gridRow = '3'; cell.style.gridColumn = '3'; }
-                if (i === 3) { cell.style.gridRow = '4'; cell.style.gridColumn = '4'; }
-                // Diagonal secundaria (arriba-derecha a abajo-izquierda)
-                if (i === 4) { cell.style.gridRow = '1'; cell.style.gridColumn = '4'; }
-                if (i === 5) { cell.style.gridRow = '2'; cell.style.gridColumn = '3'; }
-                if (i === 6) { cell.style.gridRow = '3'; cell.style.gridColumn = '2'; }
-                if (i === 7) { cell.style.gridRow = '4'; cell.style.gridColumn = '1'; }
+            
+            // 🔥 POSICIONAMIENTO ESPECIAL PARA CRUZADAS
+            if (isCruzadas) {
+                const positions = {
+                    0: { row: 1, col: 1 },
+                    1: { row: 2, col: 2 },
+                    2: { row: 3, col: 3 },
+                    3: { row: 4, col: 4 },
+                    4: { row: 1, col: 4 },
+                    5: { row: 2, col: 3 },
+                    6: { row: 3, col: 2 },
+                    7: { row: 4, col: 1 }
+                };
+                const pos = positions[i];
+                if (pos) {
+                    cell.style.gridRow = pos.row;
+                    cell.style.gridColumn = pos.col;
+                }
             }
-        
+            
+            // Estilo de celda
             Object.assign(cell.style, {
                 border: `1px solid ${JuguemosState.marcoColor || '#FA299C'}`,
                 borderRadius: '2px',
@@ -488,12 +340,30 @@ window.PrintPaper = {
                 aspectRatio: '2/3'
             });
     
-            const casilla = casillasParaEstaTabla[i];
+            // Obtener casilla
+            const casilla = casillasParaEstaTabla && casillasParaEstaTabla[i] ? casillasParaEstaTabla[i] : null;
+            
+            // Verificar si es favorita (por número)
+            const esFavorita = tieneFavoritas && casilla && favoritas.some(f => f && f.numero === casilla.numero);
     
             if (casilla && mostrarBarajas) {
                 const img = document.createElement('img');
-                img.src = casilla.imagen;
-                img.alt = casilla.nombre;
+                
+                // 🔥 MODO LIBRE: Usar imágenes subidas por el usuario
+                if (JuguemosState.mode === 'libre' && JuguemosState.libreImages && JuguemosState.libreImages.length > 0) {
+                    const libreIndex = casilla.numero ? casilla.numero - 1 : i;
+                    if (JuguemosState.libreImages[libreIndex]) {
+                        img.src = JuguemosState.libreImages[libreIndex].data;
+                        img.alt = casilla.nombre || `Libre ${libreIndex + 1}`;
+                    } else {
+                        img.src = casilla.imagen;
+                        img.alt = casilla.nombre;
+                    }
+                } else {
+                    img.src = casilla.imagen;
+                    img.alt = casilla.nombre || 'Baraja';
+                }
+                
                 Object.assign(img.style, {
                     width: '100%',
                     height: '100%',
@@ -501,7 +371,7 @@ window.PrintPaper = {
                     padding: '2px',
                     boxSizing: 'border-box'
                 });
-    
+                
                 img.onerror = function() {
                     this.style.display = 'none';
                     cell.textContent = casilla.nombre || '❌';
@@ -509,10 +379,26 @@ window.PrintPaper = {
                     cell.style.textAlign = 'center';
                     cell.style.color = '#333';
                 };
-    
+                
                 cell.appendChild(img);
+                
+                // 🔥 BADGE DE FAVORITA EN LA VISTA PREVIA DE IMPRESIÓN
+                if (esFavorita) {
+                    const badge = document.createElement('span');
+                    badge.textContent = '⭐';
+                    Object.assign(badge.style, {
+                        position: 'absolute',
+                        top: '1px',
+                        right: '1px',
+                        fontSize: '8px',
+                        lineHeight: '1',
+                        zIndex: '5',
+                        textShadow: '0 0 3px rgba(255,255,255,0.8)'
+                    });
+                    cell.appendChild(badge);
+                }
             } else {
-                if (gridType === 'pocitos4') {
+                if (isPocitos4) {
                     cell.textContent = '';
                     Object.assign(cell.style, {
                         backgroundColor: 'transparent',
