@@ -123,61 +123,6 @@
    PREVIEWS DEL ASIDE - Pocitos 4
 ========================================== */
 
-/* Vista previa de ubicación - Pocitos 4 */
-.j-grid-preview[data-grid="pocitos4"] .cell:nth-child(1) { 
-    grid-column: 1; 
-    grid-row: 1; 
-}
-.j-grid-preview[data-grid="pocitos4"] .cell:nth-child(2) { 
-    grid-column: 3; 
-    grid-row: 1; 
-}
-.j-grid-preview[data-grid="pocitos4"] .cell:nth-child(3) { 
-    grid-column: 1; 
-    grid-row: 3; 
-}
-.j-grid-preview[data-grid="pocitos4"] .cell:nth-child(4) { 
-    grid-column: 3; 
-    grid-row: 3; 
-}
-
-/* Vista previa de casillas - Pocitos 4 */
-.j-casilla-preview-grid[data-grid="pocitos4"] .cell:nth-child(1) { 
-    grid-column: 1; 
-    grid-row: 1; 
-}
-.j-casilla-preview-grid[data-grid="pocitos4"] .cell:nth-child(2) { 
-    grid-column: 3; 
-    grid-row: 1; 
-}
-.j-casilla-preview-grid[data-grid="pocitos4"] .cell:nth-child(3) { 
-    grid-column: 1; 
-    grid-row: 3; 
-}
-.j-casilla-preview-grid[data-grid="pocitos4"] .cell:nth-child(4) { 
-    grid-column: 3; 
-    grid-row: 3; 
-}
-
-/* Vista previa de marcos - Pocitos 4 */
-.j-marcos-preview-grid[data-grid="pocitos4"] .cell:nth-child(1) { 
-    grid-column: 1; 
-    grid-row: 1; 
-}
-.j-marcos-preview-grid[data-grid="pocitos4"] .cell:nth-child(2) { 
-    grid-column: 3; 
-    grid-row: 1; 
-}
-.j-marcos-preview-grid[data-grid="pocitos4"] .cell:nth-child(3) { 
-    grid-column: 1; 
-    grid-row: 3; 
-}
-.j-marcos-preview-grid[data-grid="pocitos4"] .cell:nth-child(4) { 
-    grid-column: 3; 
-    grid-row: 3; 
-}
-
-
 .j-preview-header {
     display: flex;
     align-items: center;

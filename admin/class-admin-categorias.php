@@ -14,7 +14,7 @@ class Juguemos_Admin_Categorias
             "SELECT *
             FROM {$wpdb->prefix}juguemos_categorias
             WHERE activo = 1
-            ORDER BY orden ASC"
+            ORDER BY nombre ASC"
         );
     }
     public static function create($nombre)

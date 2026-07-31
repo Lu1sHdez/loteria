@@ -85,17 +85,12 @@ window.PrintPaper = {
             }
         }
 
-        // 🔥 Redondear TODO a enteros — sin esto, cada columna
-        // arrastra una fracción de px distinta entre JS y el navegador
         boardWidth = Math.round(boardWidth);
         boardHeight = Math.round(boardHeight);
 
         const gridWidth = cols * boardWidth + (cols - 1) * gap;
         const gridHeight = rows * boardHeight + (rows - 1) * gap;
 
-        // 🔥 Redondear el offset también — este es el punto crítico:
-        // antes se dejaba en float y el centrado real vía CSS
-        // (justify-content:center) redondeaba distinto que este número.
         const offsetX = Math.round(margin + (availableWidth - gridWidth) / 2);
         const offsetY = Math.round(margin + (availableHeight - gridHeight) / 2);
 
@@ -159,7 +154,7 @@ window.PrintPaper = {
         const sheet = document.createElement('div');
         sheet.className = 'j-sheet';
         sheet.dataset.page = pageIndex + 1;
-        sheet.style.position = 'relative'; // 🔥 siempre, no solo si hay cutMarks
+        sheet.style.position = 'relative';
 
         const layout = this.getBoardLayout(paper, scale);
 
@@ -167,15 +162,14 @@ window.PrintPaper = {
         sheet.style.height = layout.sheetHeight + 'px';
         sheet.dataset.orientation = paper.orientation;
 
-        // content ya NO centra nada — solo es contenedor neutro
         const content = document.createElement('div');
         content.className = 'j-sheet-content';
         Object.assign(content.style, {
             position: 'relative',
             width: '100%',
             height: '100%',
-            padding: '0',        // 🔥 anula el padding:15px del CSS externo
-            display: 'block',    // 🔥 anula el display:flex/justify-content del CSS externo
+            padding: '0',
+            display: 'block',
             boxSizing: 'border-box'
         });
 
@@ -186,7 +180,6 @@ window.PrintPaper = {
             gridTemplateColumns: `repeat(${layout.cols}, ${layout.boardWidth}px)`,
             gridTemplateRows: `repeat(${layout.rows}, ${layout.boardHeight}px)`,
             gap: layout.gap + 'px',
-            // 🔥 posición absoluta con los MISMOS números que usan las cut marks
             position: 'absolute',
             left: layout.offsetX + 'px',
             top: layout.offsetY + 'px',
@@ -239,18 +232,34 @@ window.PrintPaper = {
         grid.dataset.grid = JuguemosState.grid || '4x4';
     
         const { cols, rows, total } = config;
-    
+
         const gridType = JuguemosState.grid || '4x4';
-        const isSpecial = ['pocitos4', 'pocitos3', 'cruzadas'].includes(gridType);
-        
+        const isSpecial = ['pocitos3', 'cruzadas'].includes(gridType); // 🔥 QUITAR pocitos4 de isSpecial
+        const isPocitos4 = gridType === 'pocitos4';
+
+        // 🔥 AJUSTE: Gap según el tipo
+        let gapValue = '2px';
+        if (isPocitos4) {
+            gapValue = '0px'; 
+        }
+
+        let gridCols = cols;
+        let gridRows = rows;
+
+        // 🔥 Si es Pocitos 4, usar 2x2
+        if (isPocitos4) {
+            gridCols = 2;
+            gridRows = 2;
+        }
+
         Object.assign(grid.style, {
             display: 'grid',
-            gridTemplateColumns: isSpecial ? 'repeat(3, 1fr)' : `repeat(${cols}, 1fr)`,
-            gridTemplateRows: isSpecial ? 'repeat(3, 1fr)' : `repeat(${rows}, 1fr)`,
-            gap: '2px',
+            gridTemplateColumns: isSpecial ? 'repeat(3, 1fr)' : `repeat(${gridCols}, 1fr)`,
+            gridTemplateRows: isSpecial ? 'repeat(3, 1fr)' : `repeat(${gridRows}, 1fr)`,
+            gap: gapValue,
             width: '100%',
             height: '100%',
-            padding: '2px',
+            padding: isPocitos4 ? '0px' : '2px',
             boxSizing: 'border-box'
         });
     
@@ -316,12 +325,22 @@ window.PrintPaper = {
     
                 cell.appendChild(img);
             } else {
-                cell.textContent = i + 1;
-                Object.assign(cell.style, {
-                    fontSize: '10px',
-                    color: '#ccc',
-                    fontWeight: 'bold'
-                });
+                // 🔥 Para Pocitos 4: casillas vacías y sin borde visible
+                if (gridType === 'pocitos4') {
+                    cell.textContent = '';
+                    Object.assign(cell.style, {
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        boxShadow: 'none'
+                    });
+                } else {
+                    cell.textContent = i + 1;
+                    Object.assign(cell.style, {
+                        fontSize: '10px',
+                        color: '#ccc',
+                        fontWeight: 'bold'
+                    });
+                }
             }
     
             grid.appendChild(cell);
@@ -332,7 +351,6 @@ window.PrintPaper = {
     },
 
     addCutMarks(sheet, paper, scale, layout) {
-        // Si no nos pasan el layout (por compatibilidad), lo calculamos
         layout = layout || this.getBoardLayout(paper, scale);
 
         const marks = document.createElement('div');
@@ -350,7 +368,6 @@ window.PrintPaper = {
 
         const { cols, rows, boardWidth, boardHeight, gap, offsetX, offsetY, gridWidth, gridHeight, totalBoards } = layout;
 
-        // Contorno alrededor del bloque real de tablas (no de toda la hoja)
         const contorno = document.createElement('div');
         Object.assign(contorno.style, {
             position: 'absolute',
@@ -366,8 +383,6 @@ window.PrintPaper = {
         });
         marks.appendChild(contorno);
 
-
-        //Linea vertical
         const cutLineOffsetX = -1; 
         const cutLineOffsetY = 0;  
         if (totalBoards > 1) {
@@ -387,7 +402,7 @@ window.PrintPaper = {
     },
 
     /**
-     * Crear una línea discontinua individual (SOLO UNA VEZ)
+     * Crear una línea discontinua individual
      */
     createCutLine(container, direction, position, start, length) {
         position = Math.round(position);
@@ -395,9 +410,9 @@ window.PrintPaper = {
         length = Math.round(length);
     
         const isVertical = direction === 'vertical';
-        const thickness = 2;      // grosor de la línea
-        const dashLength = 6;     // largo de cada guión
-        const gapLength = 8;      // espacio entre guiones
+        const thickness = 2;
+        const dashLength = 6;
+        const gapLength = 8;
         const step = dashLength + gapLength;
     
         const totalDashes = Math.ceil(length / step);

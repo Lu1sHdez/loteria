@@ -396,8 +396,19 @@ function drawGrid() {
     const grid = JuguemosState.grid || '4x4';
     const container = document.getElementById('j-grid-preview');
     if (!container) return;
+    
     container.dataset.grid = grid;
-    const cells = { '4x4': 16, '5x5': 25, 'pocitos4': 4, 'pocitos3': 3, 'cruzadas': 5 }[grid] || 16;
+    let cells;
+    if (grid === 'pocitos4') {
+        cells = 4;
+        container.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        container.style.gridTemplateRows = 'repeat(2, 1fr)';
+    } else {
+        cells = { '4x4': 16, '5x5': 25, 'pocitos4': 4, 'pocitos3': 3, 'cruzadas': 5 }[grid] || 16;
+        container.style.gridTemplateColumns = '';
+        container.style.gridTemplateRows = '';
+    }
+    
     container.innerHTML = Array(cells).fill('<div class="cell"></div>').join('');
 }
 
@@ -414,7 +425,19 @@ function llenarCasillasAleatorio() {
 function actualizarPreviewCasillas(casillas) {
     const container = document.getElementById('j-casilla-preview-grid');
     if (!container) return;
-    container.dataset.grid = JuguemosState.grid || '4x4';
+    
+    const grid = JuguemosState.grid || '4x4';
+    container.dataset.grid = grid;
+    
+    // 🔥 Si es Pocitos 4, usar 2x2
+    if (grid === 'pocitos4') {
+        container.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        container.style.gridTemplateRows = 'repeat(2, 1fr)';
+    } else {
+        container.style.gridTemplateColumns = '';
+        container.style.gridTemplateRows = '';
+    }
+    
     container.innerHTML = casillas.map((casilla, index) => `
         <div class="cell" data-index="${index}" title="${casilla.nombre}">
             <img src="${casilla.imagen}" alt="${casilla.nombre}" loading="lazy">
@@ -426,8 +449,19 @@ function actualizarPreviewCasillas(casillas) {
 function limpiarCasillas() {
     const container = document.getElementById('j-casilla-preview-grid');
     if (!container) return;
+    
     const grid = JuguemosState.grid || '4x4';
     container.dataset.grid = grid;
+    
+    // 🔥 Si es Pocitos 4, usar 2x2
+    if (grid === 'pocitos4') {
+        container.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        container.style.gridTemplateRows = 'repeat(2, 1fr)';
+    } else {
+        container.style.gridTemplateColumns = '';
+        container.style.gridTemplateRows = '';
+    }
+    
     const total = getTotalCasillas(grid);
     container.innerHTML = Array(total).fill('<div class="cell empty"></div>').join('');
     JuguemosState.casillasAsignadas = [];
@@ -442,8 +476,19 @@ function aplicarColores() {
 function drawMarcosPreview() {
     const container = document.getElementById('j-marcos-preview-grid');
     if (!container) return;
+    
     const grid = JuguemosState.grid || '4x4';
     container.dataset.grid = grid;
+    
+    // 🔥 Si es Pocitos 4, usar 2x2
+    if (grid === 'pocitos4') {
+        container.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        container.style.gridTemplateRows = 'repeat(2, 1fr)';
+    } else {
+        container.style.gridTemplateColumns = '';
+        container.style.gridTemplateRows = '';
+    }
+    
     const total = getTotalCasillas(grid);
     container.innerHTML = Array(total).fill('<div class="cell"></div>').join('');
 }

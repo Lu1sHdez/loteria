@@ -21,13 +21,9 @@
     margin-bottom: 12px;
 }
 
-
-
-
 /* =====================================================
    VISTA PREVIA DE CASILLAS (en el aside)
 ===================================================== */
-
 
 .j-casilla-preview-grid {
     display: grid;
@@ -36,7 +32,10 @@
     padding: 8px;
     background: #f8f8f8;
     border-radius: 8px;
-    max-width: 100%;
+    max-width: 250px !important;
+    width: 250px !important;
+    min-height: 120px !important;
+    flex-shrink: 0;
 }
 
 .j-casilla-preview-grid .cell {
@@ -52,27 +51,25 @@
 /* Grid 4x4 (por defecto) */
 .j-casilla-preview-grid[data-grid="4x4"] {
     grid-template-columns: repeat(4, 1fr);
-    max-width: 240px;
 }
 
 .j-casilla-preview-grid[data-grid="5x5"] {
     grid-template-columns: repeat(5, 1fr);
-    max-width: 300px;
+    min-height: 140px !important;
 }
 
+/* 🔥 Pocitos 4 - 2x2 */
 .j-casilla-preview-grid[data-grid="pocitos4"] {
-    grid-template-columns: repeat(3, 1fr);
-    max-width: 180px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
 }
 
-.j-casilla-preview-grid[data-grid="pocitos4"] .cell:nth-child(1) { grid-column: 1; }
-.j-casilla-preview-grid[data-grid="pocitos4"] .cell:nth-child(2) { grid-column: 3; }
-.j-casilla-preview-grid[data-grid="pocitos4"] .cell:nth-child(3) { grid-column: 1; }
-.j-casilla-preview-grid[data-grid="pocitos4"] .cell:nth-child(4) { grid-column: 3; }
+.j-casilla-preview-grid[data-grid="pocitos4"] .cell {
+    min-height: 50px;
+}
 
 .j-casilla-preview-grid[data-grid="pocitos3"] {
     grid-template-columns: repeat(3, 1fr);
-    max-width: 160px;
 }
 
 .j-casilla-preview-grid[data-grid="pocitos3"] .cell:nth-child(1) { grid-column: 1; }
@@ -81,7 +78,6 @@
 
 .j-casilla-preview-grid[data-grid="cruzadas"] {
     grid-template-columns: repeat(3, 1fr);
-    max-width: 160px;
 }
 
 .j-casilla-preview-grid[data-grid="cruzadas"] .cell:nth-child(1) { grid-column: 1; grid-row: 1; }
