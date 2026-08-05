@@ -236,3 +236,72 @@
         align-items: stretch;
     }
 }
+
+
+
+
+
+/* =====================================================
+   VISTA PREVIA DE CASILLAS - MODO LIBRE
+===================================================== */
+
+.j-casilla-preview-grid .cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+.j-casilla-preview-grid .cell .cell-number {
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    font-size: 9px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.85);
+    background: rgba(0, 0, 0, 0.5);
+    padding: 0 4px;
+    border-radius: 3px;
+    font-family: 'Cairo', sans-serif;
+    line-height: 1.4;
+}
+
+.j-casilla-preview-grid .cell.empty {
+    background: #DDDDDD;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+    color: #aaa;
+    font-family: 'Cairo', sans-serif;
+}
+
+
+/* En wizard/libre-upload.css */
+.j-libre-item-placeholder {
+    cursor: pointer;
+    aspect-ratio: 2/3;
+    border-radius: 6px;
+    background: #F5F5F5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: 700;
+    color: #CCC;
+    transition: all 0.3s ease;
+    border: 2px dashed #DDD;
+}
+
+.j-libre-item-placeholder:hover {
+    background: #E8E8E8;
+    transform: scale(1.02);
+    border-color: #FA299C;
+    color: #FA299C;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.j-libre-item-placeholder:active {
+    transform: scale(0.95);
+}

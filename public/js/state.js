@@ -33,4 +33,9 @@
         favoritas: [],
         favoritasUbicacion: 'aleatoria',
 
+        posicionesDobles: [],
+        cartasDobles: [],
+        asignacionDobles: {},
+        ubicacionDoble: 'aleatoria',
+
     };

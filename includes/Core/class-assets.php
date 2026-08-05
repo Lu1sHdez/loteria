@@ -161,6 +161,23 @@ class Juguemos_Assets
             true
         );
 
+        // En la función frontend_assets(), después de cargar favoritas.js
+        wp_enqueue_script(
+            'juguemos-dobles',
+            JUGUEMOS_URL . 'public/js/dobles.js',
+            ['juguemos-state', 'juguemos-ajax'],
+            JUGUEMOS_VERSION,
+            true
+        );
+        // En public/js/class-assets.php
+        wp_enqueue_script(
+            'juguemos-libre-preview',
+            JUGUEMOS_URL . 'public/js/libre-preview.js',
+            ['juguemos-state'],
+            JUGUEMOS_VERSION,
+            true
+        );
+
         // =========================================================    
         // GENERADOR DE PDF (paso 4 - Pago y Descarga)
         // =========================================================

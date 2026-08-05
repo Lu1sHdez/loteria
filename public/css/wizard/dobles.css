@@ -1,0 +1,184 @@
+/* =====================================================
+   DOBLES - ESTILOS COMPLETOS
+   ===================================================== */
+
+/* =====================================================
+   RADIO BUTTONS DE UBICACIÓN (SOLO UNO SELECCIONABLE)
+   ===================================================== */
+
+   .j-ubicacion-radios {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 12px 0;
+    padding: 0;
+    /* 🔥 ELIMINADO: background, border-radius, border */
+}
+
+.j-ubicacion-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+
+.j-ubicacion-radio {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #333;
+    transition: all 0.2s;
+    user-select: none;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+.j-ubicacion-radio:hover {
+    background: #FFF5FB;
+}
+
+.j-ubicacion-radio input[type="radio"] {
+    display: none;
+}
+
+/* Radio custom - círculo */
+.j-radio-custom {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #FA299C;
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    background: white;
+}
+
+/* Radio seleccionado */
+.j-ubicacion-radio input:checked + .j-radio-custom {
+    border-color: #FA299C;
+    border-width: 2px;
+}
+
+.j-ubicacion-radio input:checked + .j-radio-custom::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #FA299C;
+}
+
+.j-ubicacion-label {
+    font-size: 13px;
+    color: #444;
+}
+
+/* =====================================================
+   MENSAJE INFORMATIVO - SIN FONDO
+   ===================================================== */
+
+.j-ubicacion-mensaje {
+    margin: 10px 0 15px 0;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.j-ubicacion-mensaje .j-destacado {
+    font-weight: 700;
+    color: #FA299C;
+}
+
+.j-ubicacion-mensaje .j-texto-aqua {
+    color: #24B8C8;
+    font-weight: 700;
+}
+
+/* =====================================================
+   MARCADOR ×2 EN VISTA PREVIA DE UBICACIÓN
+   ===================================================== */
+
+.j-grid-preview .cell.doble-ubicacion {
+    border: 2px solid #FA299C;
+    background: #FA299C;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 🔥 Imagen de ×2 dentro de la casilla (reemplaza al texto) */
+.j-grid-preview .cell .j-doble-imagen {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    z-index: 5;
+    pointer-events: none;
+    padding: 4px;
+    box-sizing: border-box;
+}
+
+/* =====================================================
+   BADGE ×2 EN VISTA PREVIA DE CASILLAS
+   ===================================================== */
+
+.j-casilla-preview-grid .cell .j-doble-badge {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #FA299C;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 1px 5px;
+    border-radius: 3px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    z-index: 5;
+    animation: pulse-doble 1.5s ease-in-out infinite;
+    line-height: 1.2;
+}
+
+/* Resaltar casilla doble en vista previa de casillas */
+.j-casilla-preview-grid .cell.doble {
+    border: 2px solid #FA299C !important;
+    box-shadow: 0 0 12px rgba(250, 41, 156, 0.3);
+    border-radius: 4px;
+}
+
+@keyframes pulse-doble {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 768px) {
+    .j-ubicacion-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+    
+    .j-grid-preview .cell .j-doble-imagen {
+        padding: 2px;
+    }
+}
+
+@media (max-width: 480px) {
+    .j-ubicacion-label {
+        font-size: 12px;
+    }
+    
+    .j-grid-preview .cell .j-doble-imagen {
+        padding: 1px;
+    }
+}
