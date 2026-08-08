@@ -37,7 +37,7 @@ if (!defined('ABSPATH')) {
             <!-- 1. Estilo de barajas -->
             <!-- ========================= -->
 
-            <div class="j-section">
+            <div class="j-section j-section-estilo-loteria">
 
                 <div class="j-panel-item">
                     <div class="subtitulo-aqua">

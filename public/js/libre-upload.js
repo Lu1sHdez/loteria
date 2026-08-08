@@ -52,10 +52,9 @@
                 this.targetIndex = null;
             });
 
-            // Limpiar todo
             document.getElementById('j-libre-clear-all').addEventListener('click', () => {
                 if (this.images.length === 0) return;
-                if (confirm('Eliminar todas las imagenes?')) {
+                if (confirm('¿Eliminar todas las imágenes?')) {
                     this.clearAll();
                 }
             });

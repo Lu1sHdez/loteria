@@ -47,7 +47,7 @@ const JuguemosAjax = {
 
     loadDecks(categoriaId) {
         const container = document.getElementById("juguemos-decks");
-        container.innerHTML = "Cargando diseños...";
+        container.innerHTML = `<p class="text-p-normal"> Cargando diseños...</p>`;
     
         fetch(
             Juguemos.ajax_url +
@@ -57,8 +57,7 @@ const JuguemosAjax = {
         .then(r => r.json())
         .then(response => {
             if (!response.success || !response.data.length) {
-                container.innerHTML = "<p>Actualmente no tenemos diseños en esta categoría. ¡Espéralos próximamente!</p>";
-                const btn = document.getElementById("j-decks-view-all");
+                    container.innerHTML = `<p class="text-p-normal" style="text-align: center;">Actualmente no tenemos diseños en esta categoría. <br><br> <span class="text-rosa-negrita">¡Espéralos próximamente! </span> </p>`;                const btn = document.getElementById("j-decks-view-all");
                 if (btn) {
                     btn.style.display = "none";
                 }

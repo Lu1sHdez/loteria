@@ -56,3 +56,9 @@
     display: flex;
     flex-direction: column;
 }
+
+.j-section-estilo-loteria {
+    min-height: 580px;          
+    display: flex;
+    flex-direction: column;
+}

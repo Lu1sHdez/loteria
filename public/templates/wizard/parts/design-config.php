@@ -92,7 +92,7 @@
     </button>
 
     <button class="j-mode" data-mode="libre">
-        Libre
+        Personalizadas
     </button>
 
 </div>

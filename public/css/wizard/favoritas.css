@@ -10,37 +10,28 @@
     margin-bottom: 15px;
 }
 
-/* Contador circular */
 .j-favoritas-counter-circle {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 2px;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    border: 3px solid #FA299C;
-    background: transparent;
-    font-size: 13px;
+    gap: 4px;
+    padding: 6px 18px;
+    min-width: 72px;
+    height: 36px;
+    border-radius: 8px;
+    border: 2px solid #FA299C;
+    background: #FA299C;
+    font-size: 14px;
     font-weight: 700;
-    color: #FA299C;
+    color: #FFFFFF;
     flex-shrink: 0;
     transition: all 0.3s ease;
 }
 
-.j-favoritas-counter-circle.complete {
-    background: #FA299C;
-    color: #FFFFFF;
-    border-color: #FA299C;
-}
-
+/* Eliminamos .complete porque ya no es necesario */
 .j-favoritas-counter-circle .j-counter-separator {
-    color: #CCC;
+    color: rgba(255, 255, 255, 0.7);
     font-weight: 300;
-}
-
-.j-favoritas-counter-circle.complete .j-counter-separator {
-    color: rgba(255,255,255,0.6);
 }
 
 /* Categorías */

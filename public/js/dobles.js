@@ -43,10 +43,8 @@
 
                         JuguemosState.ubicacionDoble = this.ubicacion;
                         
-                        // Actualizar vista previa de ubicación
                         this.actualizarPreviewUbicacion();
                         
-                        // Actualizar estado global
                         this.actualizarEstadoGlobal();
                         
                         // Forzar regeneración de tablas
@@ -215,7 +213,6 @@
             
             this.generarDobles(grid, barajas);
             
-            // Actualizar vista previa de ubicación
             this.actualizarPreviewUbicacion();
         }
 

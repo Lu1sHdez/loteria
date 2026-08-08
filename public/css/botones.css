@@ -36,9 +36,61 @@
     color: #5D5D5D;
 }
 
+.j-btn-primary{
+    min-width:220px;
+    height:48px;
+
+    display: inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:0 26px;
+
+    border:2px solid transparent;
+    border-radius:8px;
+
+    background:#FA299C;
+    color:#FFF;
+
+    font-size:16px;
+    font-weight:700;
+
+    cursor:pointer;
+    transition:.2s;
+}
+
+.j-btn-primary:hover,
+.j-btn-primary:focus{
+    background:#FFF;
+    color:#FA299C;
+    border-color:#FA299C;
+}
 
 
+/* ELIMINAR */
+.j-btn-primary-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 48px;
+    padding: 0 26px;
+    border: 2px solid #24B8C8;
+    border-radius: 8px;
+    background: #FFFFFF;
+    color: #24B8C8;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .2s;
+    white-space: nowrap;
+    width: auto;
+}
 
+.j-btn-primary-delete:hover,
+.j-btn-primary-delete:focus {
+    background: #24B8C8;
+    color: #FFFFFF;
+    border-color: #24B8C8;
+}
 
 /* ELIMINAR CATEGORIA */
 .j-delete-category{
@@ -174,20 +226,16 @@
     display:flex;
     align-items:center;
     gap:8px;
-
+    text-align:center;
     height:40px;
     padding:0 18px;
-
     border:2px solid #FA299C;
     border-radius:8px;
-
     background:#FFFFFF;
     color:#FA299C;
-
     font-family:'Cairo',sans-serif;
     font-size:15px;
     font-weight:700;
-
     cursor:pointer;
     transition:.2s;
 }

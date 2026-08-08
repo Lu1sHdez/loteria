@@ -269,8 +269,8 @@ createBoard(config, boardIndex, pageIndex) {
         // Configuración especial para Pocitos 3
         Object.assign(grid.style, {
             display: 'grid',
-            gridTemplateColumns: '1fr 0.6fr',
-            gridTemplateRows: '0.6fr 1fr',
+            gridTemplateColumns: '1fr 1fr',
+            gridTemplateRows: '1fr 1fr',
             gap: '2px',
             width: '100%',
             height: '100%',
@@ -316,7 +316,7 @@ createBoard(config, boardIndex, pageIndex) {
                 justifyContent: 'center',
                 overflow: 'hidden',
                 position: 'relative',
-                aspectRatio: i === 0 ? '1/2' : '2/3'
+                aspectRatio: 'auto'
             });
 
             const casilla = casillas[i];

@@ -189,11 +189,7 @@ if (!defined('ABSPATH')) {
                             <i class="icon-cut"></i>
                             <span id="j-summary-cutmarks"></span>
                         </div>
-                        <!-- En el resumen de pedido, agregar -->
-                        <div class="j-summary-chip">
-                            <i class="icon-ubicacion"></i>
-                            <span id="j-summary-ubicacion"></span>
-                        </div>
+       
 
                     </div>
 

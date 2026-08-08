@@ -247,19 +247,27 @@
             
             if (!$('#j-waiting-message').length) {
                 $('#juguemos-payment .j-section:last').before(`
-                    <div id="j-waiting-message" class="j-section" style="text-align:center;padding:30px;">
-                        <div class="j-spinner"></div>
-                        <h3 style="color:#1E2249;">Esperando confirmación de pago</h3>
-                        <p class="j-texto-normal">Has sido redirigido a ${method} para completar el pago.</p>
-                        <p style="font-size:14px;color:#999;">La página se actualizará automáticamente cuando el pago sea confirmado.</p>
-                        <button id="j-check-payment-status" class="j-btn-back" style="margin-top:15px;">Verificar estado ahora</button>
+                <div id="j-waiting-message" class="j-section" style="text-align:center;padding:30px;">
+                    <div class="j-spinner"></div>
+                    <h3 style="color:#1E2249;">Esperando confirmación de pago</h3>
+                    <p class="j-texto-normal">Has sido redirigido a ${method} para completar el pago.</p>
+                    <p style="font-size:14px;color:#999;">La página se actualizará automáticamente cuando el pago sea confirmado.</p>
+                    <div style="display:flex;justify-content:center;margin-top:15px;">
+                        <button id="j-check-payment-status" class="j-btn-primary" style="gap:10px;display:flex;align-items:center;justify-content:center;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="23 4 23 10 17 10"></polyline>
+                                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                            </svg>
+                            Verificar estado ahora
+                        </button>
                     </div>
-                `);
-                
-                $(document).on('click', '#j-check-payment-status', () => {
-                    this.checkPaymentManually();
-                });
-            }
+                </div>
+            `);
+    
+    $(document).on('click', '#j-check-payment-status', () => {
+        this.checkPaymentManually();
+    });
+}
         }
         
         checkPaymentManually() {
@@ -326,8 +334,9 @@
         startPaymentVerification(order_id) {
             let attempts = 0;
             const maxAttempts = 30;
+            const self = this;
             
-            const checkPayment = setInterval(() => {
+            const checkPayment = setInterval(function() {
                 attempts++;
                 
                 const paymentVerified = sessionStorage.getItem('juguemos_payment_verified') === 'true';
@@ -335,7 +344,7 @@
                 
                 if (paymentVerified && paymentToken) {
                     clearInterval(checkPayment);
-                    this.paymentSuccess();
+                    self.paymentSuccess();
                     return;
                 }
                 
@@ -348,22 +357,60 @@
                         nonce: Juguemos.nonce,
                         token: order_id
                     },
-                    success: (response) => {
+                    success: function(response) {
                         if (response.success && response.data && response.data.paid) {
                             clearInterval(checkPayment);
                             sessionStorage.setItem('juguemos_payment_verified', 'true');
                             sessionStorage.setItem('juguemos_payment_token', order_id);
-                            this.paymentSuccess();
+                            self.paymentSuccess();
                         }
                     }
                 });
                 
                 if (attempts >= maxAttempts) {
                     clearInterval(checkPayment);
-                    $('#j-waiting-message p:last').before(`
-                        <p style="color:#e74c3c;font-weight:bold;">El tiempo de espera ha terminado.</p>
-                        <p style="font-size:12px;color:#999;">Si ya realizaste el pago, haz clic en "Verificar estado ahora".</p>
-                    `);
+                    
+                    // Reemplazar mensaje de espera con opciones de reintento
+                    $('#j-waiting-message').html(
+                        '<div style="text-align:center;padding:20px;">' +
+                            '<h3 style="color:#FA299C;margin:0 0 10px 0;">El tiempo de espera ha terminado</h3>' +
+                            '<p class="j-texto-normal" style="color:#666;font-size:14px;text-align:center;">' +
+                                'El pago no se pudo confirmar automáticamente.' +
+                            '</p>' +
+                            '<p style="font-size:12px;color:#999;margin:5px 0 15px 0;text-align:center;">' +
+                                'Puedes intentar nuevamente o seleccionar otro método de pago.' +
+                            '</p>' +
+                            '<div style="display:flex;flex-direction:column;gap:10px;max-width:300px;margin:0 auto;">' +
+                                '<button id="j-retry-payment" class="j-btn-primary" style="background:#FA299C;border-color:#FA299C;width:100%;text-align:center;">' +
+                                    'Reintentar pago' +
+                                '</button>' +
+                                '<button id="j-back-to-payment-methods" class="j-btn-back" style="width:100%;text-align:center;justify-content:center;">' +
+                                    'Volver a m&eacute;todos de pago' +
+                                '</button>' +
+                            '</div>' +
+                        '</div>'
+                    );
+                    // Evento para reintentar
+                    $(document).off('click', '#j-retry-payment').on('click', '#j-retry-payment', function() {
+                        sessionStorage.removeItem('juguemos_payment_verified');
+                        sessionStorage.removeItem('juguemos_payment_token');
+                        sessionStorage.removeItem('juguemos_order_id');
+                        
+                        $('#j-waiting-message').remove();
+                        $('.j-payment-methods').show();
+                        $('#j-process-payment').show();
+                        $('#j-process-payment').prop('disabled', false);
+                        $('#j-payment-loading').hide();
+                    });
+                    
+                    // Evento para volver a métodos de pago
+                    $(document).off('click', '#j-back-to-payment-methods').on('click', '#j-back-to-payment-methods', function() {
+                        $('#j-waiting-message').remove();
+                        $('.j-payment-methods').show();
+                        $('#j-process-payment').show();
+                        $('#j-process-payment').prop('disabled', false);
+                        $('#j-payment-loading').hide();
+                    });
                 }
             }, 3000);
         }

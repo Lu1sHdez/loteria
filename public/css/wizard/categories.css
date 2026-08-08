@@ -224,3 +224,10 @@
 .j-toggle-barajas.inactive:hover .j-toggle-text{
     color:#FFF;
 }
+
+#juguemos-decks .text-p-normal {
+    grid-column: 1 / -1;
+    width: 100%;
+    text-align: center;
+    margin: 0;
+}

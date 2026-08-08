@@ -396,7 +396,7 @@
         }
 
         // =========================================================
-        // 🎯 MÉTODO PRINCIPAL: ACTUALIZAR VISTA PREVIA DE CASILLAS
+        // 🎯 MÉTODO PRINCIPAL: ACTUALIZAR VIST PREVIA DE CASILLAS
         // =========================================================
 
         actualizarPreviewCasillas() {

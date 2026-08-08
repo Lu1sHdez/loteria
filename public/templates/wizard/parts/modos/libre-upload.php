@@ -6,10 +6,17 @@ if (!defined('ABSPATH')) {
 
 <div id="j-libre-upload" style="display:none;" class="j-libre-upload">
     
-    <!-- Header -->
+    <!-- Header con contador -->
     <div class="j-libre-header">
-        <p class="text-p-negrita">Libres a escoger</p>
-        <p class="j-texto-normal">(54 figuras personalizadas)</p>
+        <div>
+            <p class="text-p-negrita">Libres a escoger</p>
+            <p class="j-texto-normal">(54 figuras personalizadas)</p>
+        </div>
+        <span class="j-libre-counter" id="j-libre-counter">
+            <span id="j-libre-seleccionadas">0</span>
+            <span class="j-counter-separator">/</span>
+            <span>54</span>
+        </span>
     </div>
 
     <!-- Navegación por grupos -->
@@ -21,13 +28,12 @@ if (!defined('ABSPATH')) {
 
     <!-- Controles -->
     <div class="j-libre-controls">
-        <button type="button" id="j-libre-select-images" class="j-btn-primary" style="background:#FA299C;border-color:#FA299C;font-size:14px;">
-            Seleccionar imagenes (54)
+        <button type="button" id="j-libre-select-images" class="j-btn-primary">
+            Seleccionar imágenes (54)
         </button>
-        <button type="button" id="j-libre-clear-all" class="j-delete">
-            Limpiar todo
+        <button type="button" id="j-libre-clear-all" class="j-btn-primary-delete">
+            Borrar todo
         </button>
-        <span id="j-libre-counter" class="j-libre-counter">0 / 54</span>
     </div>
 
     <input type="file" id="j-libre-file-input" accept="image/*" multiple style="display:none;">

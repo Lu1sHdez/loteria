@@ -1,7 +1,20 @@
 /* =====================================================
    LIBRE - UPLOAD DE IMÁGENES (SIN BORDES)
 ===================================================== */
+/* =====================================================
+   LIBRE - COMPLETADO (AQUA)
+===================================================== */
 
+.j-libre-status.success {
+    display: block;
+    background: #24B8C8;
+    color: #FFFFFF;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    text-align: center;
+}
 .j-libre-upload {
     background: #FFFFFF;
     border-radius: 12px;
@@ -9,9 +22,11 @@
 }
 
 .j-libre-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 15px;
 }
-
 .j-libre-nav {
     display: flex;
     gap: 10px;
@@ -72,14 +87,27 @@
 }
 
 .j-libre-counter {
-    font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 6px 18px;
+    min-width: 72px;
+    height: 36px;
+    border-radius: 8px;
+    border: 2px solid #FA299C;
+    background: #FA299C;
+    font-size: 14px;
     font-weight: 700;
-    color: #1E2249;
-    margin-left: 5px;
+    color: #FFFFFF;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+    margin-left: 5px; /* Espaciado opcional */
 }
 
-.j-libre-counter.complete {
-    color: #27ae60;
+.j-libre-counter .j-counter-separator {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 300;
 }
 
 .j-libre-grid {
@@ -184,12 +212,6 @@
     display: none;
 }
 
-.j-libre-status.success {
-    display: block;
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
 
 .j-libre-status.error {
     display: block;
