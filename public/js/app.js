@@ -319,15 +319,14 @@ document.addEventListener("DOMContentLoaded", () => {
     limpiarCasillas();
     drawMarcosPreview();
 
-    // ========== SIGUIENTE: VISTA PREVIA ==========
-    // ========== SIGUIENTE: VISTA PREVIA ==========
-document.getElementById("j-go-preview")?.addEventListener("click", () => {
+   // ========== SIGUIENTE: VISTA PREVIA ==========
+    document.getElementById("j-go-preview")?.addEventListener("click", () => {
     
     // 🔥 VALIDACIÓN PARA MODO LIBRE
     if (JuguemosState.mode === 'libre') {
         const count = JuguemosState.libreImagesCount || 0;
         if (count < 54) {
-            alert('⚠️ Debes subir las 54 imágenes personalizadas antes de continuar.');
+            alert('Debes subir las 54 imágenes personalizadas antes de continuar.');
             return;
         }
     }
@@ -348,32 +347,30 @@ document.getElementById("j-go-preview")?.addEventListener("click", () => {
         }
         
         if (totalFavoritas === 0) {
-            alert('⚠️ Selecciona al menos 1 favorita antes de continuar.');
+            alert('Selecciona al menos 1 favorita antes de continuar.');
             return;
         }
-        
-        console.log('✅ Favoritas seleccionadas:', totalFavoritas);
     }
 
     // 🔥 NUEVO: VALIDACIÓN PARA MODO DOBLES (opcional)
     if (JuguemosState.mode === 'dobles') {
         const cartasDobles = JuguemosState.cartasDobles || [];
         if (cartasDobles.length === 0) {
-            alert('⚠️ No se generaron cartas dobles. Intenta nuevamente.');
+            alert('No se generaron cartas dobles. Intenta nuevamente.');
             return;
         }
-        console.log('✅ Cartas dobles generadas:', cartasDobles.length);
+        console.log('Cartas dobles generadas:', cartasDobles.length);
     }
 
     // 🔥 NUEVO: VALIDACIÓN GENERAL - Que haya un diseño seleccionado
     if (!JuguemosState.deck) {
-        alert('⚠️ Selecciona un diseño de lotería primero.');
+        alert('Selecciona un diseño de lotería primero.');
         return;
     }
 
     // 🔥 NUEVO: VALIDACIÓN - Que haya barajas cargadas
     if (!JuguemosState.barajas || JuguemosState.barajas.length === 0) {
-        alert('⚠️ No se cargaron las barajas. Intenta seleccionar otro diseño.');
+        alert('No se cargaron las barajas. Intenta seleccionar otro diseño.');
         return;
     }
 
@@ -388,6 +385,51 @@ document.getElementById("j-go-preview")?.addEventListener("click", () => {
     document.querySelector('.juguemos-step[data-step="3"]')?.classList.add("active");
     window.scrollTo({ top: 0, behavior: "smooth" });
     PrintPaper.refresh();
+
+    // Verificar retorno de Stripe
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('payment') === 'stripe_success') {
+        const sessionId = urlParams.get('session_id');
+        const orderId = urlParams.get('order_id');
+        
+        if (sessionId && orderId) {
+            sessionStorage.setItem('juguemos_payment_token', orderId);
+            
+            $.ajax({
+                url: Juguemos.ajax_url,
+                method: 'POST',
+                data: {
+                    action: 'juguemos_verify_stripe',
+                    nonce: Juguemos.nonce,
+                    session_id: sessionId,
+                    order_id: orderId
+                },
+                success: function(response) {
+                    if (response.success && response.data && response.data.paid) {
+                        sessionStorage.setItem('juguemos_payment_verified', 'true');
+                        if (typeof JuguemosPaymentInstance !== 'undefined') {
+                            JuguemosPaymentInstance.paymentSuccess();
+                        }
+                    } else {
+                        // Intentar verificar manualmente
+                        setTimeout(function() {
+                            if (typeof JuguemosPaymentInstance !== 'undefined') {
+                                JuguemosPaymentInstance.checkPaymentManually();
+                            }
+                        }, 3000);
+                    }
+                },
+                error: function() {
+                    // Intentar verificar manualmente
+                    setTimeout(function() {
+                        if (typeof JuguemosPaymentInstance !== 'undefined') {
+                            JuguemosPaymentInstance.checkPaymentManually();
+                        }
+                    }, 3000);
+                }
+            });
+        }
+    }
 });
 
     // ========== EDITAR PEDIDO ==========
@@ -884,7 +926,7 @@ function llenarCasillasAutomatico() {
 
 function ejecutarLlenadoAleatorio() {
     if (!JuguemosState.barajas?.length) {
-        console.warn('⚠️ ejecutarLlenadoAleatorio: No hay barajas');
+        console.warn('ejecutarLlenadoAleatorio: No hay barajas');
         return;
     }
     
@@ -893,7 +935,7 @@ function ejecutarLlenadoAleatorio() {
     const totalTablas = (JuguemosState.quantity || 1) * (JuguemosState.pages || 1);
     
     if (!totalCasillas) {
-        console.warn('⚠️ ejecutarLlenadoAleatorio: totalCasillas es 0');
+        console.warn('ejecutarLlenadoAleatorio: totalCasillas es 0');
         return;
     }
 
@@ -949,7 +991,7 @@ function ejecutarLlenadoAleatorio() {
         
         // ✅ TERCERO: Si no hay favoritas, mostrar advertencia
         if (!tieneFavoritas || favoritas.length === 0) {
-            console.warn('⚠️ No hay favoritas seleccionadas en modo Favoritas');
+            console.warn('No hay favoritas seleccionadas en modo Favoritas');
             // No detenemos la ejecución, solo mostramos advertencia
         }
     }
@@ -1100,7 +1142,7 @@ function ejecutarLlenadoAleatorio() {
             modo: JuguemosState.mode
         });
     } else {
-        console.warn('⚠️ No se generaron tablas');
+        console.warn('No se generaron tablas');
     }
 }
 // =========================================================

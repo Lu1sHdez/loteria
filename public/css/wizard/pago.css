@@ -101,7 +101,7 @@
 
 .j-payment-method {
     padding: 12px 15px;
-    border: 2px solid #e8e8e8;
+    border: 2px solid #24B8C8;
     border-radius: 10px;
     background: white;
     cursor: pointer;
@@ -122,14 +122,14 @@
     object-fit: contain;
 }
 
-.j-payment-method:hover:not(:disabled) {
+.j-payment-method:hover{
     border-color: #24B8C8;
-    transform: translateY(-2px);
+    background: #f0f9fa;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 .j-payment-method.active {
-    border-color: #24B8C8;
+    border-color: #24B8C8;                                                      
     background: #f0f9fa;
     box-shadow: 0 4px 12px rgba(36, 184, 200, 0.15);
 }
@@ -265,3 +265,222 @@
 #j-download-spinner.active {
     display: inline-block;
 }
+
+
+/* public/css/wizard/pago.css - Agregar al final */
+
+.j-zelle-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+}
+
+.j-zelle-modal-content {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 460px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: jZelleModalIn 0.3s ease;
+}
+
+@keyframes jZelleModalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(-20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.j-zelle-close {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #999;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    line-height: 1;
+}
+
+.j-zelle-close:hover {
+    background: #f5f5f5;
+    color: #333;
+}
+
+.j-zelle-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.j-zelle-icon {
+    height: 48px;
+    margin-bottom: 8px;
+}
+
+.j-zelle-title {
+    font-size: 22px;
+    color: #1E2249;
+    margin: 0;
+    font-weight: 600;
+}
+
+.j-zelle-body {
+    padding: 0 4px;
+}
+
+.j-zelle-info {
+    background: #f8f9fa;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.j-zelle-label {
+    font-size: 12px;
+    color: #888;
+    margin: 0 0 4px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.j-zelle-amount {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1E2249;
+    margin: 0;
+}
+
+.j-zelle-phone {
+    font-size: 22px;
+    font-weight: 600;
+    color: #0066FF;
+    margin: 0;
+}
+
+.j-zelle-name {
+    font-size: 14px;
+    color: #666;
+    margin: 4px 0 0;
+}
+
+.j-zelle-steps {
+    background: #f0f7ff;
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin: 16px 0;
+    border-left: 4px solid #0066FF;
+}
+
+.j-zelle-steps-title {
+    font-weight: 600;
+    color: #1E2249;
+    margin: 0 0 8px 0;
+    font-size: 14px;
+}
+
+.j-zelle-steps-list {
+    margin: 0;
+    padding-left: 20px;
+    color: #444;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+.j-zelle-steps-list li {
+    margin-bottom: 4px;
+}
+
+.j-zelle-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.j-zelle-actions .j-btn-primary,
+.j-zelle-actions .j-btn-back {
+    flex: 1;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    text-align: center;
+}
+
+.j-zelle-actions .j-btn-primary {
+    background: #0066FF;
+    color: white;
+}
+
+.j-zelle-actions .j-btn-primary:hover {
+    background: #0052cc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
+}
+
+.j-zelle-actions .j-btn-back {
+    background: #f0f0f0;
+    color: #666;
+}
+
+.j-zelle-actions .j-btn-back:hover {
+    background: #e0e0e0;
+}
+
+.j-payment-info {
+    margin-top: 15px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.j-payment-info.success {
+    background: #d4edda;
+    color: #155724;
+    border-left: 4px solid #28a745;
+}
+
+.j-payment-info-icon {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.j-payment-info-content strong {
+    display: block;
+}
+
+.j-payment-info-content p {
+    margin: 4px 0 0 0;
+    font-size: 13px;
+}
+
+@media (max-width: 480px) {
+    .j-zelle-modal-content {
+        padding: 20px;
+        width: 95%;
+    }
+    .j-zelle-amount { font-size: 22px; }
+    .j-zelle-phone { font-size: 18px; }
+    .j-zelle-actions { flex-direction: column; }
+}
+
+

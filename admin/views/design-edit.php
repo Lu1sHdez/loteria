@@ -199,7 +199,7 @@ $barajas = Juguemos_Admin_Barajas::get_by_design(
         <input
             type="file"
             class="j-baraja-file"
-            accept=".webp,image/webp"
+            accept=".webp,.png,image/webp,image/png"
             hidden
             data-id="<?php echo $baraja->id; ?>">
 
@@ -261,7 +261,7 @@ $barajas = Juguemos_Admin_Barajas::get_by_design(
             <input
                 type="file"
                 class="j-baraja-file"
-                accept=".webp,image/webp"
+                accept=".webp,.png,image/webp,image/png"
                 hidden>
             <div class="j-baraja-placeholder">
                 + Agregar Imagen
@@ -319,8 +319,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const file = input.files[0];
 
-            if (file.type !== 'image/webp') {
-                alert('Solo se permiten imágenes WebP.');
+            // 🔥 Permitir WebP o PNG
+            if (!['image/webp', 'image/png'].includes(file.type)) {
+                alert('Solo se permiten imágenes WebP o PNG.');
                 input.value = '';
                 return;
             }
@@ -484,9 +485,8 @@ document.querySelectorAll('.j-baraja-card:not(.j-baraja-new) .j-baraja-file').fo
         const file = this.files[0];
         if (!file) return;
         
-        // Validar formato WebP
-        if (!file.type.includes('webp')) {
-            alert('Solo se permiten imágenes en formato WebP.');
+        if (!['image/webp', 'image/png'].includes(file.type)) {
+            alert('Solo se permiten imágenes en formato WebP o PNG.');
             this.value = '';
             return;
         }

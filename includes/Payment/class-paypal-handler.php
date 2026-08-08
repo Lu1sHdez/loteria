@@ -8,7 +8,6 @@ class Juguemos_PayPal_Handler {
     private $mode;
     
     public function __construct() {
-        // ✅ USAR LA CLASE PARA OBTENER LAS CREDENCIALES
         $creds = Juguemos_Payment_Settings::get_paypal_credentials();
         
         $this->client_id = $creds['client_id'];

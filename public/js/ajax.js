@@ -1,5 +1,9 @@
 const JuguemosAjax = {
 
+    // ==========================================
+    // CARGAR CATEGORÍAS
+    // ==========================================
+
     loadCategories() {
         fetch(
             Juguemos.ajax_url + "?action=juguemos_categories"
@@ -37,6 +41,10 @@ const JuguemosAjax = {
         });
     },
 
+    // ==========================================
+    // CARGAR DISEÑOS (GRID NORMAL + MODAL)
+    // ==========================================
+
     loadDecks(categoriaId) {
         const container = document.getElementById("juguemos-decks");
         container.innerHTML = "Cargando diseños...";
@@ -49,46 +57,58 @@ const JuguemosAjax = {
         .then(r => r.json())
         .then(response => {
             if (!response.success || !response.data.length) {
-                container.innerHTML = "<p>Actualmente no tenemos diseños en esta categoría. ¡Esperalos próximamente!</p>";
+                container.innerHTML = "<p>Actualmente no tenemos diseños en esta categoría. ¡Espéralos próximamente!</p>";
+                const btn = document.getElementById("j-decks-view-all");
+                if (btn) {
+                    btn.style.display = "none";
+                }
                 return;
             }
     
+            // Guardar todos los diseños para el modal
+            window.allDesigns = response.data;
+    
+            // Renderizar grid normal (todos los diseños)
             let html = "";
-            response.data.forEach((design, index) => {
-                const activeClass = index === 0 ? 'active' : '';
+
+            response.data.slice(0, 3).forEach((design, index) => {
+                const activeClass = index === 0 ? "active" : "";
+
                 html += `
                     <div class="j-deck ${activeClass}" data-id="${design.id}">
                         <div class="j-deck-image">
-                            <img
-                                src="${design.portada}"
-                                alt="${design.nombre}"
-                                loading="lazy"
-                            >
+                            <img src="${design.portada}" alt="${design.nombre}" loading="lazy">
                         </div>
-                        <div class="j-deck-name">
-                            ${design.nombre}
-                        </div>
+                        <div class="j-deck-name">${design.nombre}</div>
                     </div>
                 `;
             });
-    
+
             container.innerHTML = html;
+
+            // Mostrar u ocultar el botón
+            const btn = document.getElementById("j-decks-view-all");
+            if (btn) {
+                btn.style.display = response.data.length > 3 ? "block" : "none";
+            }
     
+            // Eventos de selección en el grid normal
             container.querySelectorAll(".j-deck").forEach(card => {
                 card.addEventListener("click", function() {
-                    container
-                        .querySelectorAll(".j-deck")
-                        .forEach(c => c.classList.remove("active"));
+                    container.querySelectorAll(".j-deck").forEach(c => c.classList.remove("active"));
                     this.classList.add("active");
-            
                     JuguemosAjax.seleccionarDiseno(this.dataset.id);
                 });
             });
-            
+    
+            // Seleccionar el primero automáticamente
             const firstDeck = container.querySelector('.j-deck');
             if (firstDeck) {
                 JuguemosAjax.seleccionarDiseno(firstDeck.dataset.id);
             }
+    
+            // Renderizar modal (con todos los diseños)
+            renderModalDecks();
         })
         .catch(error => {
             console.error('Error loading decks:', error);
@@ -96,6 +116,9 @@ const JuguemosAjax = {
         });
     },
 
+    // ==========================================
+    // SELECCIONAR DISEÑO
+    // ==========================================
 
     seleccionarDiseno(designId) {
         JuguemosState.deck = designId;
@@ -124,6 +147,10 @@ const JuguemosAjax = {
         }
     },
 
+    // ==========================================
+    // VISTA PREVIA DE DISEÑO
+    // ==========================================
+
     loadDesignPreview(designId) {
         fetch(
             Juguemos.ajax_url + "?action=juguemos_get_design&design_id=" + encodeURIComponent(designId)
@@ -138,7 +165,6 @@ const JuguemosAjax = {
             const design = response.data;
             const preview = document.getElementById("deck-preview");
             
-            // Solo la portada, sin mensajes de estado
             let html = `
                 <div class="j-preview-cover">
                     <img src="${design.portada}" alt="${design.nombre}">
@@ -155,7 +181,10 @@ const JuguemosAjax = {
         });
     },
 
-    // Carga las barajas en el estado (sin mostrarlas en el preview)
+    // ==========================================
+    // CARGAR BARAJAS
+    // ==========================================
+
     loadBarajas(designId) {
         return fetch(
             Juguemos.ajax_url +
@@ -175,6 +204,10 @@ const JuguemosAjax = {
             JuguemosState.barajas = [];
         });
     },
+
+    // ==========================================
+    // CARGAR PRECIO
+    // ==========================================
 
     loadPrice(pais, modo, cantidad) {
         fetch(
@@ -205,7 +238,85 @@ const JuguemosAjax = {
             console.error('Error loading price:', error);
         });
     },
+
     loadPreview() {
         console.log("Vista previa");
     }
 };
+
+// ==========================================
+// RENDERIZAR MODAL
+// ==========================================
+
+function renderModalDecks() {
+    const grid = document.getElementById("j-decks-modal-grid");
+    const allDesigns = window.allDesigns || [];
+    if (!grid) return;
+
+    let html = "";
+    allDesigns.forEach(design => {        
+        html += `
+            <div class="j-deck" data-id="${design.id}">
+                <div class="j-deck-image">
+                    <img src="${design.portada}" alt="${design.nombre}" loading="lazy">
+                </div>
+                <div class="j-deck-name">${design.nombre}</div>
+            </div>
+        `;
+    });
+
+    grid.innerHTML = html;
+
+    // Eventos de selección en el modal
+    grid.querySelectorAll(".j-deck").forEach(card => {
+        card.addEventListener("click", function() {
+            const id = this.dataset.id;
+
+            // Cerrar modal
+            document.getElementById("j-decks-modal").classList.remove("active");
+
+            // Seleccionar en el grid normal
+            const container = document.getElementById("juguemos-decks");
+            container.querySelectorAll(".j-deck").forEach(c => c.classList.remove("active"));
+
+            const selected = container.querySelector(`.j-deck[data-id="${id}"]`);
+            if (selected) {
+                selected.classList.add("active");
+            }
+
+            JuguemosAjax.seleccionarDiseno(id);
+        });
+    });
+}
+
+// ==========================================
+// EVENTOS DEL MODAL
+// ==========================================
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    // Abrir modal
+    document.getElementById("j-decks-view-all")?.addEventListener("click", function() {
+        document.getElementById("j-decks-modal").classList.add("active");
+        renderModalDecks();
+    });
+
+    // Cerrar modal con X
+    document.getElementById("j-decks-modal-close")?.addEventListener("click", function() {
+        document.getElementById("j-decks-modal").classList.remove("active");
+    });
+
+    // Cerrar modal al hacer clic fuera
+    document.getElementById("j-decks-modal")?.addEventListener("click", function(e) {
+        if (e.target === this) {
+            this.classList.remove("active");
+        }
+    });
+
+    // Cerrar modal con ESC
+    document.addEventListener("keydown", function(e) {
+        if (e.key === "Escape") {
+            document.getElementById("j-decks-modal")?.classList.remove("active");
+        }
+    });
+});

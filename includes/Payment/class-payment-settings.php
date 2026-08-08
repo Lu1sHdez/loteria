@@ -102,4 +102,29 @@ class Juguemos_Payment_Settings {
             'apple_pay_enabled' => self::is_apple_pay_enabled()
         ];
     }
+
+    /**
+     * Guarda las credenciales de Stripe
+     * @param string $publishable_key
+     * @param string $secret_key
+     * @param string $mode
+     * @return bool
+     */
+    public static function save_stripe_credentials($publishable_key, $secret_key, $mode = 'test') {
+        $updated = true;
+
+        if (!update_option('juguemos_stripe_publishable_key', sanitize_text_field($publishable_key))) {
+            $updated = false;
+        }
+
+        if (!update_option('juguemos_stripe_secret_key', sanitize_text_field($secret_key))) {
+            $updated = false;
+        }
+
+        if (!update_option('juguemos_stripe_mode', sanitize_text_field($mode))) {
+            $updated = false;
+        }
+
+        return $updated;
+    }
 }

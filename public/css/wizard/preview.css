@@ -1,34 +1,40 @@
-.preview-card{
-    border:6px solid #FA299C;
-    border-radius:25px;
-    padding:30px;
-    position:sticky;
-    top:30px;
-    min-height:650px;
+/* ==========================================
+   ESTILOS EXISTENTES (SE CONSERVAN)
+   ========================================== */
+
+.preview-card {
+    border: 6px solid #FA299C;
+    border-radius: 25px;
+    padding: 30px;
+    position: sticky;
+    top: 30px;
+    min-height: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
-#deck-preview{
-    min-height:0;
-    display:block;
-    color:#999;
+
+#deck-preview {
+    min-height: 0;
+    display: block;
+    color: #999;
     margin-bottom: -20px;
 }
 
 #deck-preview:empty,
-#deck-preview.j-preview-empty{
-    justify-content:center;
-    align-items:center;
-    text-align:center;
+#deck-preview.j-preview-empty {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
 
-.j-strip-confirmed{
-    outline:2px solid #24B8C8;
-    outline-offset:6px;
-    border-radius:8px;
+.j-strip-confirmed {
+    outline: 2px solid #24B8C8;
+    outline-offset: 6px;
+    border-radius: 8px;
 }
 
-
-
-
+/* ===== DECKS ===== */
 #juguemos-decks {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -79,68 +85,79 @@
     font-size: 14px;
 }
 
+/* ===== VISTA PREVIEW COVER ===== */
+.j-preview-cover {
+    display: flex;
+    margin-top: 0px;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+}
 
+.j-preview-cover img {
+    max-width: 100%;
+    max-height: 350px;
+    object-fit: contain;
+    border-radius: 12px;
+}
 
-    .j-preview-cover {
-        display: flex;
-        margin-top: 0px;
-        justify-content: center;
-        align-items: center;
-        flex: 1;
-    }
+.j-preview-title {
+    text-align: center;
+    color: #FA299C;
+}
 
-    .j-preview-cover img {
-        max-width: 100%;
-        max-height: 350px;
-        object-fit: contain;
-        border-radius: 12px;
-    }
+.j-preview-title p {
+    font-size: 18px;
+    font-weight: 700;
+    color: #FA299C;
+}
 
-    .j-preview-title {
-        text-align: center;
-        color: #FA299C;
-    }
+.j-preview-section {
+    margin-top: 30px;
+    padding-top: 20px;
+}
 
-    .j-preview-title p{
-        font-size: 18px;
-        font-weight: 700;
-        color: #FA299C;
-    }
-    .j-preview-section {
-        margin-top: 30px;    
-        padding-top: 20px;
-        border-top: 2px solid #f0f0f0;
-    }
-
-/* ===== 1. MARCA DE AGUA EN "Vista previa diseño" ===== */
-
+/* ===== MARCA DE AGUA EN "Vista previa diseño" ===== */
 .j-preview-cover {
     position: relative;
     overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .j-preview-cover::before {
     content: '';
     position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 60px;
-    right: 60px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     z-index: 5;
     pointer-events: none;
     background-image: url('/wp-content/uploads/2026/07/marca_agua.png');
-    background-size: cover;
+    background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
+    width: 100%;
+    height: 100%;
+    max-width: 350px;
+    max-height: 350px;
     opacity: 5;
 }
 
 .j-preview-cover img {
     display: block;
     width: 100%;
+    height: auto;
+    max-width: 100%;
+    max-height: 350px;
+    object-fit: contain;
+    border-radius: 12px;
+    position: relative;
+    z-index: 1;
 }
 
-/* ===== 2. MARCA DE AGUA EN "Vista previa casillas" ===== */
+/* ===== MARCA DE AGUA EN "Vista previa casillas" ===== */
 #j-casilla-preview-grid {
     position: relative;
     overflow: hidden;
@@ -166,3 +183,150 @@
     position: relative;
     z-index: 1;
 }
+
+/* ==========================================
+   NUEVAS CLASES INDEPENDIENTES
+   ========================================== */
+
+/* ===== VISTA PREVIA DE DISEÑO ===== */
+.j-preview-design-section {
+    margin-top: 10;
+    padding-top: 0;
+    border-top: none;
+}
+
+.j-preview-design-title {
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: #1FAFB4;
+}
+
+.j-preview-design-container {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.j-preview-design-container:empty,
+.j-preview-design-container.j-preview-empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100px;
+    color: #999;
+    font-size: 14px;
+    text-align: center;
+}
+
+.j-preview-design-container .j-preview-cover {
+    margin-top: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;                     /* ← Flex:1 como estaba originalmente */
+}
+
+.j-preview-design-container .j-preview-cover img {
+    max-width: 100%;
+    max-height: 350px;           /* ← 350px como estaba originalmente */
+    object-fit: contain;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.j-preview-design-container .j-preview-title {
+    text-align: center;
+    margin-top: 6px;
+}
+
+.j-preview-design-container .j-preview-title p {
+    font-size: 14px;
+    font-weight: 700;
+    color: #FA299C;
+    margin: 0;
+}
+
+.j-preview-ubicacion-section {
+    margin-top: 160px;
+    padding-top: 5px;
+}
+
+.j-preview-ubicacion-title {
+    font-size: 15px;
+    margin-bottom: 8px;
+    color: #1FAFB4;
+}
+
+.j-preview-ubicacion-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.j-preview-ubicacion-grid {
+    max-width: 200px;
+    width: 200px;
+}
+
+/* ===== VISTA PREVIA CASILLAS ===== */
+.j-preview-casillas-section {
+    margin-top: 90px;
+    padding-top: 5px;
+}
+
+.j-preview-casillas-title {
+    font-size: 15px;
+    margin-bottom: 8px;
+    color: #1FAFB4;
+}
+
+.j-preview-casillas-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.j-preview-casillas-grid {
+    max-width: 200px !important;
+    width: 200px !important;
+}
+
+/* ===== VISTA PREVIA MARCOS ===== */
+.j-preview-marcos-section {
+    margin-top: 80px;
+    padding-top: 5px;
+}
+
+.j-preview-marcos-title {
+    font-size: 15px;
+    margin-bottom: 8px;
+    color: #1FAFB4;
+}
+
+.j-preview-marcos-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.j-preview-marcos-grid {
+    max-width: 200px !important;
+    width: 200px !important;
+}
+
+/* ===== VISTA PREVIA RESUMEN ===== */
+.j-preview-summary-section {
+    margin-top: 5px;
+    padding-top: 5px;
+    border-top: 2px solid #f0f0f0;
+}
+
+.j-preview-summary-section .j-order-summary {
+    margin-top: 0;
+    padding-top: 5px;
+    border-top: none;
+}
+

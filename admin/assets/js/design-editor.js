@@ -25,14 +25,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const file = this.files[0];
 
-        if (file.type !== 'image/webp') {
-
-            alert('Solo se permiten imágenes WebP.');
-
+        if (!['image/webp', 'image/png'].includes(file.type)) {
+            alert('Solo se permiten imágenes WebP o PNG.');
             input.value = '';
-
             return;
-
         }
 
         const reader = new FileReader();

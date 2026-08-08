@@ -64,6 +64,11 @@ class Juguemos_Ajax
         add_action('wp_ajax_juguemos_verify_payment', [$this, 'verify_payment']);
         add_action('wp_ajax_nopriv_juguemos_verify_payment', [$this, 'verify_payment']);
 
+        add_action('wp_ajax_juguemos_verify_stripe', [$this, 'verify_stripe_payment']);
+        add_action('wp_ajax_nopriv_juguemos_verify_stripe', [$this, 'verify_stripe_payment']);
+        
+        add_action('wp_ajax_juguemos_mark_paid', [$this, 'mark_paid']);
+        add_action('wp_ajax_nopriv_juguemos_mark_paid', [$this, 'mark_paid']);
     }
 
     public function categories()
@@ -247,6 +252,54 @@ class Juguemos_Ajax
         }
 
         wp_send_json_success(['paid' => false]);
+    }
+
+    /**
+     * Verifica el pago con Stripe
+     */
+    public function verify_stripe_payment() {
+        check_ajax_referer('juguemos_nonce', 'nonce');
+        
+        $session_id = sanitize_text_field($_POST['session_id'] ?? '');
+        $order_id = sanitize_text_field($_POST['order_id'] ?? '');
+        
+        if (!$session_id || !$order_id) {
+            wp_send_json_error(['message' => 'Datos incompletos']);
+            return;
+        }
+        
+        $handler = new Juguemos_Stripe_Handler();
+        
+        // Verificar si ya está marcado como pagado
+        $paid = get_transient('juguemos_paid_' . $order_id);
+        if ($paid) {
+            wp_send_json_success(['paid' => true]);
+            return;
+        }
+        
+        // Verificar con Stripe
+        if ($handler->is_payment_completed($session_id)) {
+            set_transient('juguemos_paid_' . $order_id, true, HOUR_IN_SECONDS);
+            wp_send_json_success(['paid' => true]);
+            return;
+        }
+        
+        wp_send_json_success(['paid' => false]);
+    }
+    /**
+     * Marca un pago como completado manualmente (para Zelle)
+     */
+    public function mark_paid() {
+        check_ajax_referer('juguemos_nonce', 'nonce');
+        
+        $token = sanitize_text_field($_POST['token'] ?? '');
+        if (!$token) {
+            wp_send_json_error('Token inválido');
+            return;
+        }
+        
+        set_transient('juguemos_paid_' . $token, true, HOUR_IN_SECONDS);
+        wp_send_json_success(['paid' => true]);
     }
 
 }

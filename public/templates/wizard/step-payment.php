@@ -68,10 +68,23 @@ if (!defined('ABSPATH')) {
                         <img src="/wp-content/uploads/2026/07/paypal.png" alt="PayPal" class="j-payment-icon">
                         <span>PayPal</span>
                     </button>
+
+                    <?php 
+                        $stripe_creds = Juguemos_Payment_Settings::get_stripe_credentials();
+                        if ($stripe_creds['is_configured']): 
+                        ?>
+                        <button class="j-payment-method" data-method="stripe">
+                            <img src="/wp-content/uploads/2026/07/stripe.png" alt="Stripe" class="j-payment-icon">
+                            <span>Tarjeta de Crédito</span>
+                        </button>
+                        <?php endif;
+                    ?>
+
                     <button class="j-payment-method" data-method="apple-pay" disabled>
                         <img src="/wp-content/uploads/2026/07/apple-pay.png" alt="Apple Pay" class="j-payment-icon">
                         <span>Apple Pay</span>
                     </button>
+                    
                     <button class="j-payment-method" data-method="zelle" disabled>
                         <img src="/wp-content/uploads/2026/07/zelle.png" alt="Zelle" class="j-payment-icon">
                         <span>Zelle</span>

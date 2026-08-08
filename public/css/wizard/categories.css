@@ -112,15 +112,22 @@
 /* =====================================================
    BOTÓN INCLUIR BARAJAS
 ===================================================== */
+.j-toggle-barajas-wrapper {
+    display: flex;
+    justify-content: center;  
+    width: 100%;
+    margin-top: 20px;
+}
+
 
 .j-toggle-barajas{
     display:flex;
+    margin: 0 auto;
     align-items:center;
     gap:18px;
-
     display:inline-flex;
     width:auto;
-    height:60px;
+    height:45px;
     margin-top:20px;
     border:3px solid #FA299C;
     border-radius:999px;
@@ -136,8 +143,8 @@
 /* Círculo */
 
 .j-toggle-circle{
-    width:54px;
-    height:54px;
+    width:40px;
+    height:40px;
 
     display:flex;
     align-items:center;
@@ -160,7 +167,7 @@
 /* Texto */
 
 .j-toggle-text{
-    font:700 26px 'Cairo',sans-serif;
+    font:700 20px 'Cairo',sans-serif;
     color:#FFF;
     transition:color .25s ease;
 }

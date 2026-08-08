@@ -177,22 +177,16 @@ class Juguemos_Admin
                     </p>
                 </div>
             </div>
-
             <!-- ==========================================
-            TAB STRIPE (PREPARADO PARA FUTURO)
+            TAB STRIPE (ACTIVADO)
             ========================================== -->
             <div id="stripe-tab" class="tab-content" style="display:none;">
-                <div style="background:#f0f6ff;padding:15px;border-radius:4px;margin-bottom:20px;border-left:4px solid #0073aa;">
-                    <p style="margin:0;color:#0073aa;">
-                        <strong>Proximamente</strong> - La integracion con Stripe estara disponible en una version futura.
-                    </p>
-                </div>
 
                 <form method="post" action="">
                     <?php wp_nonce_field('juguemos_payment_settings', 'juguemos_payment_nonce'); ?>
                     <input type="hidden" name="section" value="stripe">
 
-                    <h2>Configuracion de Stripe</h2>
+                    <h2>Configuración de Stripe</h2>
                     <p class="description">Ingresa tus credenciales de Stripe para procesar pagos con tarjeta.</p>
 
                     <table class="form-table">
@@ -202,11 +196,11 @@ class Juguemos_Admin
                             </th>
                             <td>
                                 <input type="text" 
-                                       id="stripe_publishable_key" 
-                                       name="stripe_publishable_key" 
-                                       value="<?php echo esc_attr($stripe_creds['publishable_key']); ?>" 
-                                       class="regular-text"
-                                       placeholder="pk_test_...">
+                                    id="stripe_publishable_key" 
+                                    name="stripe_publishable_key" 
+                                    value="<?php echo esc_attr($stripe_creds['publishable_key']); ?>" 
+                                    class="regular-text"
+                                    placeholder="pk_test_...">
                                 <p class="description">Obtén tu Publishable Key desde <a href="https://dashboard.stripe.com/apikeys" target="_blank">Stripe Dashboard</a></p>
                             </td>
                         </tr>
@@ -216,11 +210,11 @@ class Juguemos_Admin
                             </th>
                             <td>
                                 <input type="password" 
-                                       id="stripe_secret_key" 
-                                       name="stripe_secret_key" 
-                                       value="<?php echo esc_attr($stripe_creds['secret_key']); ?>" 
-                                       class="regular-text"
-                                       placeholder="sk_test_...">
+                                    id="stripe_secret_key" 
+                                    name="stripe_secret_key" 
+                                    value="<?php echo esc_attr($stripe_creds['secret_key']); ?>" 
+                                    class="regular-text"
+                                    placeholder="sk_test_...">
                                 <p class="description">Obtén tu Secret Key desde <a href="https://dashboard.stripe.com/apikeys" target="_blank">Stripe Dashboard</a></p>
                             </td>
                         </tr>
@@ -234,7 +228,7 @@ class Juguemos_Admin
                                         Test (Pruebas)
                                     </option>
                                     <option value="live" <?php selected($stripe_creds['mode'] ?? 'test', 'live'); ?>>
-                                        Live (Produccion)
+                                        Live (Producción)
                                     </option>
                                 </select>
                             </td>
@@ -242,11 +236,31 @@ class Juguemos_Admin
                     </table>
 
                     <p class="submit">
-                        <button type="submit" name="save_payment_settings" class="button button-primary" disabled>
-                            Guardar Configuracion Stripe (Proximamente)
+                        <button type="submit" name="save_payment_settings" class="button button-primary">
+                            Guardar Configuración Stripe
                         </button>
                     </p>
                 </form>
+
+                <!-- Estado de Stripe -->
+                <div class="status-card <?php echo $stripe_creds['is_configured'] ? 'status-success' : 'status-error'; ?>">
+                    <h3>Estado de Stripe</h3>
+                    <p>
+                        <?php if ($stripe_creds['is_configured']): ?>
+                            <strong class="text-success">Configurado correctamente</strong>
+                            <br>
+                            <span class="text-muted">
+                                Modo: <strong><?php echo ucfirst($stripe_creds['mode'] ?? 'test'); ?></strong>
+                            </span>
+                        <?php else: ?>
+                            <strong class="text-error">No configurado</strong>
+                            <br>
+                            <span class="text-muted">
+                                Necesitas ingresar tu Publishable Key y Secret Key para habilitar Stripe.
+                            </span>
+                        <?php endif; ?>
+                    </p>
+                </div>
             </div>
 
             <!-- ==========================================
@@ -258,6 +272,8 @@ class Juguemos_Admin
                         <strong>Proximamente</strong> - Mas metodos de pago estaran disponibles en versiones futuras.
                     </p>
                 </div>
+
+                
 
                 <form method="post" action="">
                     <?php wp_nonce_field('juguemos_payment_settings', 'juguemos_payment_nonce'); ?>

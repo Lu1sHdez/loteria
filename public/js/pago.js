@@ -3,7 +3,8 @@
     
     class JuguemosPayment {
         constructor() {
-            this.isDownloading = false; 
+            this.isDownloading = false;
+            this.currentMethod = 'paypal'; // Método por defecto
             this.init();
         }
         
@@ -33,13 +34,29 @@
         }
         
         selectMethod(method) {
-            $('.j-payment-method').removeClass('active');
-            $('.j-payment-method[data-method="' + method + '"]').addClass('active');
+            this.currentMethod = method;
             
-            if (method === 'paypal') {
-                $('#j-process-payment').html(
-                    '<img src="/wp-content/uploads/2026/07/paypal.png" alt="PayPal" style="height:20px;vertical-align:middle;margin-right:8px;"> Pagar con PayPal'
-                );
+            $('.j-payment-method').removeClass('active');
+            $(`.j-payment-method[data-method="${method}"]`).addClass('active');
+            
+            const btn = $('#j-process-payment');
+            
+            switch(method) {
+                case 'paypal':
+                    btn.html('<img src="/wp-content/uploads/2026/07/paypal.png" alt="PayPal" style="height:20px;vertical-align:middle;margin-right:8px;"> Pagar con PayPal');
+                    btn.show();
+                    break;
+                case 'stripe':
+                    btn.html('<i class="fas fa-credit-card"></i> Pagar con Tarjeta');
+                    btn.show();
+                    break;
+                case 'zelle':
+                    btn.html('<i class="fas fa-mobile-alt"></i> Pagar con Zelle');
+                    btn.show();
+                    break;
+                default:
+                    btn.html('Pagar');
+                    btn.show();
             }
         }
         
@@ -52,67 +69,170 @@
             const amount = JuguemosState.total || 1.00;
             const currency = JuguemosState.currency || 'USD';
             
-            console.log('Pagando:', amount, currency);
+            console.log('Procesando pago:', this.currentMethod, amount, currency);
+            
+            switch(this.currentMethod) {
+                case 'paypal':
+                    this.processPayPal(amount, currency);
+                    break;
+                case 'stripe':
+                    this.processStripe(amount, currency);
+                    break;
+                case 'zelle':
+                    this.processZelle(amount);
+                    break;
+                default:
+                    alert('Método de pago no disponible');
+                    this.restoreButton(btn);
+            }
+        }
+        
+        // ==================== PAYPAL ====================
+        processPayPal(amount, currency) {
+            const order_id = sessionStorage.getItem('juguemos_order_id') || Date.now().toString();
+            sessionStorage.setItem('juguemos_order_id', order_id);
             
             fetch('/wp-content/plugins/juguemos/public/templates/payment/paypal-simple.php', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     amount: amount,
                     currency: currency,
-                    description: 'Lotería La Dama - Pedido'
+                    description: 'Lotería La Dama - Pedido',
+                    order_id: order_id
                 })
             })
-            .then(async response => {
-                const text = await response.text();
-                console.log('Respuesta cruda:', text);
-                
-                try {
-                    return JSON.parse(text);
-                } catch (e) {
-                    console.error('Error al parsear JSON:', e);
-                    console.error('Texto recibido:', text);
-                    throw new Error('El servidor no devolvió JSON válido');
-                }
-            })
+            .then(response => response.json())
             .then(data => {
-                console.log('Respuesta PayPal:', data);
-                
                 if (data.approve_url) {
                     window.open(data.approve_url, '_blank', 'width=800,height=600');
-                    this.showWaitingMessage();
-                    this.startPaymentVerification();
+                    this.showWaitingMessage('PayPal');
+                    this.startPaymentVerification(order_id);
                 } else {
                     alert('Error: ' + (data.error || 'No se pudo crear la orden'));
-                    btn.prop('disabled', false);
-                    btn.show();
-                    $('#j-payment-loading').hide();
+                    this.restoreButton($('#j-process-payment'));
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                
-                // ✅ VERIFICAR SI EL PAGO YA ESTÁ VERIFICADO
-                const paymentVerified = sessionStorage.getItem('juguemos_payment_verified') === 'true';
-                const paymentToken = sessionStorage.getItem('juguemos_payment_token');
-                
-                if (paymentVerified && paymentToken) {
-                    console.log('Pago ya verificado, mostrando descarga...');
-                    this.paymentSuccess();
-                    return;
-                }
-                
-                alert('Error de conexión. Intenta nuevamente.');
-                btn.prop('disabled', false);
-                btn.show();
-                $('#j-payment-loading').hide();
+                console.error('PayPal Error:', error);
+                this.handlePaymentError();
             });
         }
+        
+        // ==================== STRIPE ====================
+        processStripe(amount, currency) {
+            const order_id = sessionStorage.getItem('juguemos_order_id') || 'ORDER_' + Date.now();
+            sessionStorage.setItem('juguemos_order_id', order_id);
+            
+            fetch('/wp-content/plugins/juguemos/public/templates/payment/stripe-checkout.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    amount: amount,
+                    currency: currency,
+                    order_id: order_id
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Stripe response:', data);
                 
-        showWaitingMessage() {
-            // ✅ VERIFICAR ANTES DE MOSTRAR ESPERA
+                if (data.success && data.url) {
+                    // Redirigir a Stripe Checkout
+                    window.location.href = data.url;
+                } else {
+                    alert('Error: ' + (data.error || 'No se pudo iniciar el pago con Stripe'));
+                    this.restoreButton($('#j-process-payment'));
+                }
+            })
+            .catch(error => {
+                console.error('Stripe Error:', error);
+                alert('Error de conexión con Stripe');
+                this.restoreButton($('#j-process-payment'));
+            });
+        }
+        
+        // ==================== ZELLE ====================
+        processZelle(amount) {
+            const phone = "<?php echo get_option('juguemos_zelle_phone', '+1-832-350-3646'); ?>";
+            const order_id = sessionStorage.getItem('juguemos_order_id') || Date.now().toString();
+            
+            const message = `Hola, quiero pagar mi pedido de Lotería La Dama.\n\nTotal: $${amount.toFixed(2)}\nReferencia: ${order_id}\n\n✅ Ya envié el pago por Zelle al número ${phone}.`;
+            
+            // Mostrar instrucciones Zelle
+            $('#j-process-payment').hide();
+            $('#j-payment-loading').hide();
+            $('.j-payment-methods').hide();
+            
+            if (!$('#j-zelle-info').length) {
+                $('#juguemos-payment .j-section:last').before(`
+                    <div id="j-zelle-info" class="j-section" style="text-align:center;padding:30px;background:#f8f9fa;border-radius:12px;">
+                        <h3 style="color:#1E2249;">Pago por Zelle</h3>
+                        <p class="j-texto-normal">Envía el pago a:</p>
+                        <div style="background:#fff;padding:20px;border-radius:8px;margin:15px auto;max-width:300px;border:2px dashed #FA299C;">
+                            <strong style="font-size:20px;color:#FA299C;">${phone}</strong>
+                        </div>
+                        <p class="j-texto-normal"><strong>Total:</strong> $${amount.toFixed(2)} ${JuguemosState.currency || 'USD'}</p>
+                        <p class="j-texto-normal" style="font-size:14px;color:#666;">Después de enviar el pago, haz clic en "Ya pagué"</p>
+                        <div style="display:flex;gap:15px;justify-content:center;margin-top:20px;flex-wrap:wrap;">
+                            <button id="j-zelle-confirm" class="j-btn-primary" style="background:#25D366;border-color:#25D366;">
+                                ✅ Ya pagué
+                            </button>
+                            <button id="j-zelle-cancel" class="j-btn-back">
+                                Cancelar
+                            </button>
+                        </div>
+                    </div>
+                `);
+                
+                $('#j-zelle-confirm').on('click', () => {
+                    sessionStorage.setItem('juguemos_payment_verified', 'true');
+                    sessionStorage.setItem('juguemos_payment_token', order_id);
+                    
+                    // Marcar en el servidor
+                    $.ajax({
+                        url: Juguemos.ajax_url,
+                        method: 'POST',
+                        data: {
+                            action: 'juguemos_mark_paid',
+                            nonce: Juguemos.nonce,
+                            token: order_id
+                        }
+                    });
+                    
+                    this.paymentSuccess();
+                });
+                
+                $('#j-zelle-cancel').on('click', () => {
+                    $('#j-zelle-info').remove();
+                    $('.j-payment-methods').show();
+                    $('#j-process-payment').show();
+                    $('#j-process-payment').prop('disabled', false);
+                });
+            }
+        }
+        
+        // ==================== MÉTODOS DE UTILIDAD ====================
+        restoreButton(btn) {
+            btn.prop('disabled', false);
+            btn.show();
+            $('#j-payment-loading').hide();
+        }
+        
+        handlePaymentError() {
+            const paymentVerified = sessionStorage.getItem('juguemos_payment_verified') === 'true';
+            const paymentToken = sessionStorage.getItem('juguemos_payment_token');
+            
+            if (paymentVerified && paymentToken) {
+                this.paymentSuccess();
+                return;
+            }
+            
+            alert('Error de conexión. Intenta nuevamente.');
+            this.restoreButton($('#j-process-payment'));
+        }
+        
+        showWaitingMessage(method) {
             const paymentVerified = sessionStorage.getItem('juguemos_payment_verified') === 'true';
             const paymentToken = sessionStorage.getItem('juguemos_payment_token');
             
@@ -130,10 +250,9 @@
                     <div id="j-waiting-message" class="j-section" style="text-align:center;padding:30px;">
                         <div class="j-spinner"></div>
                         <h3 style="color:#1E2249;">Esperando confirmación de pago</h3>
-                        <p class="j-texto-normal">Has sido redirigido a PayPal para completar el pago.</p>
+                        <p class="j-texto-normal">Has sido redirigido a ${method} para completar el pago.</p>
                         <p style="font-size:14px;color:#999;">La página se actualizará automáticamente cuando el pago sea confirmado.</p>
                         <button id="j-check-payment-status" class="j-btn-back" style="margin-top:15px;">Verificar estado ahora</button>
-                        <p style="font-size:12px;color:#999;margin-top:10px;">Si ya pagaste, haz clic en "Verificar estado ahora"</p>
                     </div>
                 `);
                 
@@ -144,16 +263,11 @@
         }
         
         checkPaymentManually() {
-            console.log('Verificando pago manualmente...');
-            
             const paymentVerified = sessionStorage.getItem('juguemos_payment_verified') === 'true';
             const paymentToken = sessionStorage.getItem('juguemos_payment_token');
             
             if (paymentVerified && paymentToken) {
-                console.log('Pago confirmado!');
-                setTimeout(() => {
-                    this.paymentSuccess();
-                }, 100);
+                this.paymentSuccess();
                 return;
             }
             
@@ -166,7 +280,6 @@
                     token: sessionStorage.getItem('juguemos_payment_token') || ''
                 },
                 success: (response) => {
-                    console.log('Respuesta del servidor:', response);
                     if (response.success && response.data && response.data.paid) {
                         sessionStorage.setItem('juguemos_payment_verified', 'true');
                         this.paymentSuccess();
@@ -181,13 +294,10 @@
         }
         
         checkPaymentStatus() {
-            console.log('Verificando estado de pago...');
-            
             const paymentVerified = sessionStorage.getItem('juguemos_payment_verified') === 'true';
             const paymentToken = sessionStorage.getItem('juguemos_payment_token');
             
             if (paymentVerified && paymentToken) {
-                console.log('Pago ya verificado en sessionStorage');
                 setTimeout(() => {
                     this.paymentSuccess();
                 }, 100);
@@ -203,46 +313,59 @@
                     token: sessionStorage.getItem('juguemos_payment_token') || ''
                 },
                 success: (response) => {
-                    console.log('Respuesta verificación:', response);
                     if (response.success && response.data && response.data.paid) {
                         sessionStorage.setItem('juguemos_payment_verified', 'true');
                         this.paymentSuccess();
                     }
-                },
-                error: (xhr) => {
-                    console.log('Error al verificar:', xhr.responseText);
                 }
             });
             
             return false;
         }
         
-        startPaymentVerification() {
+        startPaymentVerification(order_id) {
             let attempts = 0;
             const maxAttempts = 30;
             
             const checkPayment = setInterval(() => {
                 attempts++;
-                console.log('Verificando pago... Intento ' + attempts);
                 
                 const paymentVerified = sessionStorage.getItem('juguemos_payment_verified') === 'true';
                 const paymentToken = sessionStorage.getItem('juguemos_payment_token');
                 
                 if (paymentVerified && paymentToken) {
                     clearInterval(checkPayment);
-                    console.log('Pago confirmado!');
                     this.paymentSuccess();
+                    return;
                 }
+                
+                // Verificar con el servidor
+                $.ajax({
+                    url: Juguemos.ajax_url,
+                    method: 'POST',
+                    data: {
+                        action: 'juguemos_verify_payment',
+                        nonce: Juguemos.nonce,
+                        token: order_id
+                    },
+                    success: (response) => {
+                        if (response.success && response.data && response.data.paid) {
+                            clearInterval(checkPayment);
+                            sessionStorage.setItem('juguemos_payment_verified', 'true');
+                            sessionStorage.setItem('juguemos_payment_token', order_id);
+                            this.paymentSuccess();
+                        }
+                    }
+                });
                 
                 if (attempts >= maxAttempts) {
                     clearInterval(checkPayment);
-                    console.log('Tiempo de espera agotado.');
                     $('#j-waiting-message p:last').before(`
                         <p style="color:#e74c3c;font-weight:bold;">El tiempo de espera ha terminado.</p>
                         <p style="font-size:12px;color:#999;">Si ya realizaste el pago, haz clic en "Verificar estado ahora".</p>
                     `);
                 }
-            }, 5000);
+            }, 3000);
         }
         
         paymentSuccess() {
@@ -253,7 +376,7 @@
             this.isDownloading = true;
             
             $('.j-payment-methods, #j-process-payment, #j-payment-loading').hide();
-            $('#j-waiting-message').remove();
+            $('#j-waiting-message, #j-zelle-info').remove();
             $('#j-download-section').show();
             
             const btnDownload = document.getElementById('j-download-pdf');

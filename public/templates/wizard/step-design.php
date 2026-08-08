@@ -47,20 +47,14 @@ if (!defined('ABSPATH')) {
 
                 <?php include __DIR__ . '/parts/design-categories.php'; ?>
 
-                <button type="button" id="j-incluir-barajas" class="j-toggle-barajas active">
-
-                    <span class="j-toggle-circle">
-                        <img
-                            id="j-toggle-icon"
-                            src="/wp-content/uploads/2026/07/incluir_on.png"
-                            alt="Incluir barajas">
-                    </span>
-
-                    <span class="j-toggle-text">
-                        Incluir barajas
-                    </span>
-
-                </button>
+                <div class="j-toggle-barajas-wrapper">
+                    <button type="button" id="j-incluir-barajas" class="j-toggle-barajas active">
+                        <span class="j-toggle-circle">
+                            <img id="j-toggle-icon" src="/wp-content/uploads/2026/07/incluir_on.png" alt="Incluir barajas">
+                        </span>
+                        <span class="j-toggle-text">Incluir barajas</span>
+                    </button>
+                </div>
 
                 <div id="j-incluir-status" class="j-incluir-status active">
                     Barajas incluidas en el diseño
@@ -85,7 +79,7 @@ if (!defined('ABSPATH')) {
             </div>
 
             
-            <div class="j-section">
+            <div class="j-section j-section-casillas-definir">
                 <?php include __DIR__ . '/parts/casillas-definir.php'; ?>
 
             </div>

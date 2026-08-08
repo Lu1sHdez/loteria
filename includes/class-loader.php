@@ -37,6 +37,7 @@ class Juguemos_Loader
         require_once JUGUEMOS_PATH . 'includes/Payment/class-paypal-handler.php';
         require_once JUGUEMOS_PATH . 'includes/Payment/class-paypal-return.php';
         require_once JUGUEMOS_PATH . 'includes/Payment/class-payment-settings.php';
+        require_once JUGUEMOS_PATH . 'includes/Payment/class-stripe-handler.php';
     }
 
 

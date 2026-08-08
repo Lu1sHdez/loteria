@@ -1,0 +1,201 @@
+.j-decks-view-all{
+    display:block;
+    width:max-content;
+    margin:16px auto 0;
+    padding:0;
+    background:none;
+    border:none;
+    outline:none;
+    color:#FA299C;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+    appearance:none;
+    -webkit-appearance:none;
+    box-shadow:none;
+}
+
+.j-decks-view-all:hover{
+    background:none;
+    color:#FA299C;
+    text-decoration:underline;
+}
+
+.j-decks-view-all:active {
+    transform: scale(0.98);
+}
+
+/* ==========================================
+   MODAL - VER TODOS LOS DISEÑOS
+   ========================================== */
+
+.j-decks-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99999;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(4px);
+}
+
+.j-decks-modal.active {
+    display: flex;
+}
+
+.j-decks-modal-content {
+    background: #fff;
+    border-radius: 16px;
+    padding: 30px 25px 25px;
+    max-width: 700px;
+    width: 92%;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    animation: modalFade 0.3s ease;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes modalFade {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.j-decks-modal-close {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    font-size: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #ccc;
+    transition: 0.2s;
+    line-height: 1;
+    padding: 4px 8px;
+}
+
+.j-decks-modal-close:hover {
+    color: #FA299C;
+    background: none;
+}
+
+.j-decks-modal-title {
+    margin: 0 0 5px 0;
+    color: #1E2249;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.j-decks-modal-subtitle {
+    color: #999;
+    font-size: 13px;
+    margin: 0 0 18px 0;
+}
+
+.j-decks-modal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 14px;
+}
+
+.j-decks-modal-grid .j-deck {
+    width: 100%;
+    cursor: pointer;
+    border: 2px solid #EAEAEA;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #FFFFFF;
+    transition: all 0.25s ease;
+}
+
+.j-decks-modal-grid .j-deck:hover {
+    border-color: #FA299C;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(250, 41, 156, 0.15);
+}
+
+.j-decks-modal-grid .j-deck.active {
+    border-color: #FA299C;
+}
+
+.j-decks-modal-grid .j-deck-image {
+    background: #FFFFFF;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    height: 140px;
+    overflow: hidden;
+}
+
+.j-decks-modal-grid .j-deck-image img {
+    display: block;
+    width: auto;
+    max-width: 100px;
+    max-height: 120px;
+    object-fit: contain;
+    border-radius: 6px;
+}
+
+.j-decks-modal-grid .j-deck-name {
+    padding: 6px 8px 10px;
+    text-align: center;
+    font-weight: 600;
+    color: #1E2249;
+    font-size: 13px;
+}
+
+/* Scroll del modal */
+.j-decks-modal-content::-webkit-scrollbar {
+    width: 5px;
+}
+
+.j-decks-modal-content::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 3px;
+}
+
+.j-decks-modal-content::-webkit-scrollbar-thumb {
+    background: #FA299C;
+    border-radius: 3px;
+}
+
+.j-decks-modal-content::-webkit-scrollbar-thumb:hover {
+    background: #d91a7a;
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+
+@media (max-width: 600px) {
+    .j-decks-modal-grid {
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 10px;
+    }
+
+    .j-decks-modal-grid .j-deck-image {
+        height: 110px;
+    }
+
+    .j-decks-modal-grid .j-deck-image img {
+        max-width: 80px;
+        max-height: 90px;
+    }
+
+    .j-decks-modal-content {
+        padding: 20px 15px 15px;
+    }
+
+    .j-decks-modal-title {
+        font-size: 18px;
+    }
+}
