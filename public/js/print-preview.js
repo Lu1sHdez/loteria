@@ -69,7 +69,7 @@ window.PrintPaper = {
             rows = Math.ceil(totalBoards / cols);
         }
 
-        const boardRatio = 2 / 3;
+        const boardRatio = JuguemosState.grid === 'pocitos3' ? 4 / 3 : 2 / 3;        
         let boardWidth = (availableWidth - (cols - 1) * gap) / cols;
         let boardHeight = (availableHeight - (rows - 1) * gap) / rows;
 
@@ -230,7 +230,7 @@ createBoard(config, boardIndex, pageIndex) {
         justifyContent: 'center',
         padding: isPocitos3 ? '4px' : '4px',
         boxSizing: 'border-box',
-        aspectRatio: isPocitos3 ? '1/1' : '2/3'
+        aspectRatio: isPocitos3 ? '4/3' : '2/3'    
     });
 
     const grid = document.createElement('div');
@@ -271,10 +271,10 @@ createBoard(config, boardIndex, pageIndex) {
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
             gridTemplateRows: '1fr 1fr',
-            gap: '2px',
+            gap: '0px',
             width: '100%',
             height: '100%',
-            padding: '2px',
+            padding: '0px',
             boxSizing: 'border-box'
         });
 
@@ -344,8 +344,8 @@ createBoard(config, boardIndex, pageIndex) {
                 Object.assign(img.style, {
                     width: '100%',
                     height: '100%',
-                    objectFit: 'contain',
-                    padding: '2px',
+                    objectFit: isPocitos3 ? 'fill' : 'contain',
+                    padding: isPocitos3 ? '0px' : '2px',
                     boxSizing: 'border-box'
                 });
                 

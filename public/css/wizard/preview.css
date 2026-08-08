@@ -264,6 +264,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 350px;
 }
 
 .j-preview-ubicacion-grid {
@@ -287,6 +288,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 350px;
 }
 
 .j-preview-casillas-grid {
@@ -310,6 +312,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 350px;
 }
 
 .j-preview-marcos-grid {
