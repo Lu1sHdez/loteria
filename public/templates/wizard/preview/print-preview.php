@@ -17,9 +17,7 @@ if (!defined('ABSPATH')) {
                 <div class="subtitulo-aqua">
                     3. Vista previa de impresión
                 </div>
-                <p class="j-texto-normal">
-                    Así se imprimirán tus tablas de lotería.
-                </p>
+
             </div>
             
             <!-- NUEVO: Botón actualizar -->
@@ -32,27 +30,55 @@ if (!defined('ABSPATH')) {
             </button>
         </div>
 
-        <!-- Información de configuración actual -->
-        <div class="j-preview-info" style="margin-top: 10px; padding: 12px; background: #f0f9fa; border-left: 4px solid #24B8C8; border-radius: 4px; font-size: 13px; color: #555;">
-            <span style="font-weight: 600;">📐 Configuración:</span>
-            <span id="j-preview-config">
-                <?php 
-                // Valores por defecto
-                $paper = isset($_SESSION['juguemos_paper']) ? $_SESSION['juguemos_paper'] : 'carta';
-                $orientation = isset($_SESSION['juguemos_orientation']) ? $_SESSION['juguemos_orientation'] : 'vertical';
-                $quantity = isset($_SESSION['juguemos_quantity']) ? $_SESSION['juguemos_quantity'] : 4;
-                $grid = isset($_SESSION['juguemos_grid']) ? $_SESSION['juguemos_grid'] : '4x4';
-                ?>
-                Papel: <strong><?php echo esc_html(ucfirst($paper)); ?></strong> | 
-                Orientación: <strong><?php echo esc_html($orientation); ?></strong> | 
-                Tablas: <strong><?php echo esc_html($quantity); ?></strong> | 
-                Grid: <strong><?php echo esc_html($grid); ?></strong>
-            </span>
-            <span id="j-last-update" style="margin-left: 15px; font-size: 11px; color: #999;">
-                Última actualización: <span id="j-update-time">--:--:--</span>
-            </span>
-        </div>
+            <div class="j-order-summary">
 
+                <p class="j-order-summary-title">
+                    Tu lotería incluye:
+                </p>
+
+                <div class="j-order-summary-items">
+
+                    <div class="j-summary-chip">
+                        <img src="/wp-content/uploads/2026/08/tablas.png" alt="Tablas" class="j-chip-icon-img">
+                        <span id="j-summary-tables"></span>
+                    </div>
+
+                    <div class="j-summary-chip">
+                        <img src="/wp-content/uploads/2026/08/baraja.png" alt="Barajas" class="j-chip-icon-img">
+                        <span id="j-summary-cards"></span>
+                    </div>
+
+                    <div class="j-summary-chip">
+                        <img src="/wp-content/uploads/2026/08/Papel.png" alt="Papel" class="j-chip-icon-img">
+                        <span id="j-summary-paper"></span>
+                    </div>
+
+                    <div class="j-summary-chip">
+                        <img src="/wp-content/uploads/2026/08/Orientacion.png" alt="Orientación" class="j-chip-icon-img">
+                        <span id="j-summary-orientation"></span>
+                    </div>
+
+                    <div class="j-summary-chip">
+                        <img src="/wp-content/uploads/2026/08/paginas.png" alt="Páginas" class="j-chip-icon-img">
+                        <span id="j-summary-pages"></span>
+                    </div>
+
+                    <div class="j-summary-chip">
+                        <span id="j-summary-grid"></span>
+                    </div>
+
+                    <div class="j-summary-chip">
+                        <img src="/wp-content/uploads/2026/08/baraja_corazon.png" alt="Modo" class="j-chip-icon-img">
+                        <span id="j-summary-mode"></span>
+                    </div>
+
+                    <div class="j-summary-chip">
+                        <img src="/wp-content/uploads/2026/08/Marcas_corte.png" alt="Marcas de corte" class="j-chip-icon-img">
+                        <span id="j-summary-cutmarks"></span>
+                    </div>
+
+                </div>
+            </div>
     </div>
 
     <div class="j-print-preview-wrapper" style="padding: 20px; background: #f5f5f5; border-radius: 8px; min-height: 400px;">
@@ -68,7 +94,6 @@ if (!defined('ABSPATH')) {
 
             <!-- Estado vacío -->
             <div id="j-preview-empty" style="display: none; text-align: center; padding: 60px 20px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-                <div style="font-size: 48px; margin-bottom: 15px;">📋</div>
                 <h3 style="color: #333; margin-bottom: 8px;">Configura tu pedido</h3>
                 <p style="color: #888; max-width: 400px; margin: 0 auto;">
                     Selecciona la cantidad de tablas, el diseño y las barajas para ver la vista previa.
@@ -80,112 +105,6 @@ if (!defined('ABSPATH')) {
     </div>
 
 </div>
-
-<style>
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-#j-print-preview {
-    min-height: 300px;
-    transition: all 0.3s ease;
-}
-
-.j-sheet {
-    background: white;
-    border: 2px solid #ddd;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    position: relative;
-    margin: 0 auto;
-    border-radius: 2px;
-}
-
-
-
-.j-print-board {
-    transition: all 0.2s ease;
-}
-
-.j-print-board:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.j-board-cell {
-    transition: all 0.2s ease;
-}
-
-.j-board-cell:hover {
-    transform: scale(1.02);
-    z-index: 2;
-}
-
-.j-cut-marks {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 10;
-}
-
-/* Botón refresh */
-.j-btn-refresh:hover {
-    background: #1d9ba8 !important;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(36, 184, 200, 0.4) !important;
-}
-
-.j-btn-refresh:active {
-    transform: translateY(0px);
-    box-shadow: 0 2px 4px rgba(36, 184, 200, 0.2) !important;
-}
-
-.j-btn-refresh.refreshing svg {
-    animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Scroll suave */
-.j-print-preview-wrapper {
-    overflow: auto;
-    max-height: 90vh;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .j-sheet {
-        transform: scale(0.7);
-        transform-origin: top center;
-    }
-    
-    .j-print-preview-wrapper {
-        padding: 10px !important;
-    }
-
-    .j-panel-header {
-        flex-direction: column;
-        align-items: flex-start !important;
-    }
-
-    .j-btn-refresh {
-        width: 100%;
-        justify-content: center;
-    }
-}
-
-@media (max-width: 480px) {
-    .j-sheet {
-        transform: scale(0.5);
-        transform-origin: top center;
-    }
-}
-</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -302,5 +221,3 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Print Preview PHP: Cargado correctamente');
 });
 </script>
-
-

@@ -473,7 +473,6 @@
     border-radius:16px;
     padding:14px 18px;
     margin-top:20px;
-
 }
 
 .j-order-summary-title{
@@ -488,12 +487,10 @@
 }
 
 .j-order-summary-items{
-
     display:flex;
-    align-items:center;
+    justify-content: center;
     flex-wrap:wrap;
     gap:10px;
-
 }
 
 .j-summary-chip{
@@ -512,7 +509,7 @@
     background:#DEF5F3;
 
     font-family:'Cairo',sans-serif;
-    font-size:14px;
+    font-size:12px;
     font-weight:700;
     color:#13BBC5;
 

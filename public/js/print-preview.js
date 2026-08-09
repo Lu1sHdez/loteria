@@ -1,9 +1,3 @@
-/**
- * =====================================================
- * PRINT PAPER ENGINE - Vista previa de impresión
- * =====================================================
- */
-
 window.PrintPaper = {
 
     // Configuración de grids
@@ -110,12 +104,8 @@ window.PrintPaper = {
     render() {
         const container = document.getElementById('j-print-preview');
         if (!container) {
-            console.warn('⚠️ PrintPaper: No se encontró #j-print-preview');
             return;
         }
-
-        console.log('🔄 PrintPaper: Renderizando...');
-        console.log('📐 Configuración:', JuguemosState);
 
         container.innerHTML = '';
 
