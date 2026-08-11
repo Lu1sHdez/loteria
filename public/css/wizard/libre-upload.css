@@ -27,6 +27,16 @@
     align-items: center;
     margin-bottom: 15px;
 }
+
+.j-libre-header .contenido-centrado {
+    flex: 1;
+    text-align: center;
+    margin: 0;
+}
+
+.j-libre-header .contenido-centrado p {
+    margin: 0;
+}
 .j-libre-nav {
     display: flex;
     gap: 10px;

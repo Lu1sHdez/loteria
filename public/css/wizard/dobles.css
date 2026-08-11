@@ -36,7 +36,7 @@
 }
 
 .j-ubicacion-radio:hover {
-    background: #FFF5FB;
+    background: none;
 }
 
 .j-ubicacion-radio input[type="radio"] {
@@ -47,7 +47,7 @@
 .j-radio-custom {
     width: 18px;
     height: 18px;
-    border: 2px solid #FA299C;
+    border: 2px solid #5D5D5D;
     border-radius: 50%;
     display: inline-block;
     position: relative;
@@ -58,7 +58,7 @@
 
 /* Radio seleccionado */
 .j-ubicacion-radio input:checked + .j-radio-custom {
-    border-color: #FA299C;
+    border-color: #5D5D5D;
     border-width: 2px;
 }
 
@@ -110,7 +110,6 @@
     overflow: hidden;
 }
 
-/* 🔥 Imagen de ×2 dentro de la casilla (reemplaza al texto) */
 .j-grid-preview .cell .j-doble-imagen {
     position: absolute;
     top: 50%;
@@ -180,5 +179,45 @@
     
     .j-grid-preview .cell .j-doble-imagen {
         padding: 1px;
+    }
+}
+
+
+/* =====================================================
+   ICONOS EN OPCIONES DE DOBLES
+   ===================================================== */
+
+   .j-ubicacion-radio {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #333;
+    transition: all 0.2s;
+    user-select: none;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+.j-ubicacion-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    flex-shrink: 0;
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .j-ubicacion-icon {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .j-ubicacion-icon {
+        width: 20px;
+        height: 20px;
     }
 }

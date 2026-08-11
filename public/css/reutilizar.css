@@ -34,6 +34,9 @@
     margin-top: 10px;   
     line-height: 1.4;
 }
+.j-texto-normal.sm{
+    font-size: 10px;
+}
 
 .j-select-papel{
     font-size:12px;

@@ -568,11 +568,11 @@ function updatePaperOptions() {
     select.innerHTML = isMexico ? `
         <option value="carta">Carta (21.59 × 27.94 cm)</option>
         <option value="oficio">Oficio (21.59 × 33.02 cm)</option>
-        <option value="a4">A4 (21 × 29.7 cm)</option>
+        <option value="a4">Tabloide (21 × 29.7 cm)</option>
     ` : `
         <option value="letter">Letter (8.5 × 11 in)</option>
         <option value="legal">Legal (8.5 × 14 in)</option>
-        <option value="a4">A4 (8.27 × 11.69 in)</option>
+        <option value="a4">Tabloid (8.27 × 11.69 in)</option>
     `;
     select.selectedIndex = 0;
     JuguemosState.paper = select.value;
@@ -1356,9 +1356,9 @@ function distribuirFavoritasPorTablas(favoritas, totalTablas, maxPorTabla) {
 // =========================================================
 // PROTECCIÓN
 // =========================================================
-/*     document.addEventListener('dragstart', e => e.preventDefault());
-    document.addEventListener('contextmenu', e => e.preventDefault()); */
-
+    document.addEventListener('dragstart', e => e.preventDefault());
+/*     document.addEventListener('contextmenu', e => e.preventDefault());
+ */
 // =========================================================
 // INICIALIZACIÓN FINAL
 // =========================================================

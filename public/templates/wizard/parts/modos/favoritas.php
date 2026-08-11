@@ -9,7 +9,7 @@ if (!defined('ABSPATH')) {
     
     <!-- FILA 1: Header + Contador -->
     <div class="j-favoritas-header">
-        <div>
+        <div class="contenido-centrado">
             <p class="text-p-negrita">Favoritas a escoger <span class="j-texto-normal"> (hasta 12 figuras)</span></p>
         </div>
         <div class="j-favoritas-counter-circle" id="j-favoritas-counter-circle">
@@ -47,18 +47,40 @@ if (!defined('ABSPATH')) {
                 >
                 <span class="j-favoritas-progress-number" id="j-favoritas-progress-number">0</span>
             </div>
-            <p class="text-p-negrita">Has seleccionado <span id="j-favoritas-count">0</span> de 12 favoritas</p>
+            <p class="j-texto-normal">Has seleccionado <br> <span class="text-rosa-normal" id="j-favoritas-count"> 0</span > <span class="text-rosa-normal">de</span> <span class="text-rosa-normal">12</span> favoritas</p>
 
         </div>
 
         <!-- Columna 2: Ubicación (vertical) -->
         <div class="j-favoritas-col j-favoritas-ubicacion">
-            <p class="text-p-negrita">Ubicación de favoritas</p>
-            <div class="j-ubicacion-opciones-vertical">
-                <button class="j-ubicacion-btn active" data-ubicacion="aleatoria">Aleatoria</button>
-                <button class="j-ubicacion-btn" data-ubicacion="centro">Centro</button>
-                <button class="j-ubicacion-btn" data-ubicacion="esquinas">Esquinas</button>
-                <button class="j-ubicacion-btn" data-ubicacion="marco">Marco</button>
+
+            <!-- Añadir estilo directo para eliminar el margen sobrante -->
+            <p class="j-ubicacion-titulo" style="margin-bottom: 8px;">Ubicación(es)</p>
+
+            <div class="j-ubicacion-opciones-vertica">
+                <button class="j-ubicacion-btn active" data-ubicacion="aleatoria">
+                    <span class="j-ubicacion-radio"></span>
+                    <img src="/wp-content/uploads/2026/08/fav-aleatoria.png" alt="Aleatoria" class="j-ubicacion-icon-img">
+                    <span class="j-ubicacion-texto">Aleatoria</span>
+                </button>
+
+                <button class="j-ubicacion-btn" data-ubicacion="centro">
+                    <span class="j-ubicacion-radio"></span>
+                    <img src="/wp-content/uploads/2026/08/fav-centro.png" alt="Centro" class="j-ubicacion-icon-img">
+                    <span class="j-ubicacion-texto">Centro</span>
+                </button>
+
+                <button class="j-ubicacion-btn" data-ubicacion="esquinas">
+                    <span class="j-ubicacion-radio"></span>
+                    <img src="/wp-content/uploads/2026/08/fav-esquinas.png" alt="Esquinas" class="j-ubicacion-icon-img">
+                    <span class="j-ubicacion-texto">Esquinas</span>
+                </button>
+
+                <button class="j-ubicacion-btn" data-ubicacion="marco">
+                    <span class="j-ubicacion-radio"></span>
+                    <img src="/wp-content/uploads/2026/08/fav-marco.png" alt="Marco" class="j-ubicacion-icon-img">
+                    <span class="j-ubicacion-texto">Marco</span>
+                </button>
             </div>
         </div>
 
@@ -68,7 +90,7 @@ if (!defined('ABSPATH')) {
             <img src="/wp-content/uploads/2026/08/icono-estrella.png" alt="Aleatoria">
             <span>Selección aleatoria</span>
         </button>
-            <p class="j-texto-normal">El sistema elige 12 cartas. Puedes reemplazar las que no te gusten.</p>
+            <p class="j-texto-normal sm">El sistema elige 12 cartas. Puedes reemplazar las que no te gusten.</p>
         </div>
 
     </div>

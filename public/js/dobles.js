@@ -274,6 +274,7 @@
             }
             return disponibles.slice(0, Math.min(cantidad, disponibles.length));
         }
+        
 
         obtenerCentro(grid, cantidad, usadas) {
             const cols = this.getColumnasGrid(grid);
@@ -285,30 +286,43 @@
             }
             
             const posiciones = [];
-            const centroCol = Math.floor(cols / 2);
-            const centroRow = Math.floor(rows / 2);
             
-            const direcciones = [
-                [0, 0], [0, 1], [1, 0], [0, -1], [-1, 0],
-                [1, 1], [1, -1], [-1, 1], [-1, -1],
-                [0, 2], [1, 2], [2, 2], [2, 1], [2, 0], [2, -1], [2, -2],
-                [1, -2], [0, -2], [-1, -2], [-2, -2], [-2, -1], [-2, 0], [-2, 1], [-2, 2]
-            ];
+            // 🔥 Para grid 4x4, el centro son las casillas 5, 6, 9, 10 (0-based)
+            // Para 2 casillas: [5, 6] (centro superior)
+            const centroPositions = this.getCentroPositions(grid);
             
-            for (const [dr, dc] of direcciones) {
+            for (const pos of centroPositions) {
                 if (posiciones.length >= cantidad) break;
-                const r = centroRow + dr;
-                const c = centroCol + dc;
-                if (r >= 0 && r < rows && c >= 0 && c < cols) {
-                    const pos = r * cols + c;
-                    if (!usadas.has(pos)) {
-                        posiciones.push(pos);
-                        usadas.add(pos);
-                    }
+                if (pos < total && !usadas.has(pos)) {
+                    posiciones.push(pos);
+                    usadas.add(pos);
                 }
             }
             
             return posiciones;
+        }
+        
+        /**
+         * 🔥 NUEVO: Obtiene las posiciones centrales según el grid
+         */
+        getCentroPositions(grid) {
+            switch(grid) {
+                case '4x4':
+                    // Centro: casillas 5, 6, 9, 10 (0-based)
+                    // Para 2 casillas: 5, 6 (centro superior)
+                    return [5, 6, 9, 10];
+                case '5x5':
+                    // Centro: csilla 12 (centro exacto)
+                    return [12, 7, 11, 13, 17];
+                case 'pocitos4':
+                    return [0, 1, 2, 3];
+                case 'pocitos3':
+                    return [0, 1, 2];
+                case 'cruzadas':
+                    return [1, 2, 5, 6];
+                default:
+                    return [0];
+            }
         }
 
         obtenerContraEsquinaDerIzq(grid, cantidad, usadas) {
@@ -322,28 +336,38 @@
             
             const posiciones = [];
             
-            for (let i = 0; i < Math.min(cols, rows) && posiciones.length < cantidad; i++) {
-                const pos = i * cols + (cols - 1 - i);
+            // 🔥 Para 4x4: posiciones 0 (esquina superior izquierda) y 15 (esquina inferior derecha)
+            const esquinas = [0, 15];
+            
+            for (const pos of esquinas) {
+                if (posiciones.length >= cantidad) break;
                 if (pos < total && !usadas.has(pos)) {
                     posiciones.push(pos);
                     usadas.add(pos);
                 }
             }
             
+            // Si faltan, buscar vecinos
             if (posiciones.length < cantidad) {
-                for (let i = 0; i < Math.min(cols, rows) && posiciones.length < cantidad; i++) {
-                    const pos = i * cols + (cols - 1 - i);
+                const vecinos = [];
+                for (const pos of esquinas) {
+                    if (pos >= total) continue;
                     const row = Math.floor(pos / cols);
                     const col = pos % cols;
-                    const vecinos = [
-                        (row - 1) * cols + col, (row + 1) * cols + col,
-                        row * cols + (col - 1), row * cols + (col + 1)
-                    ];
-                    for (const v of vecinos) {
-                        if (v >= 0 && v < total && !usadas.has(v) && posiciones.length < cantidad) {
-                            posiciones.push(v);
-                            usadas.add(v);
+                    const offsets = [[0,1], [1,0], [0,-1], [-1,0], [1,1], [1,-1], [-1,1], [-1,-1]];
+                    for (const [dr, dc] of offsets) {
+                        const nr = row + dr, nc = col + dc;
+                        if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+                            const idx = nr * cols + nc;
+                            if (!usadas.has(idx)) vecinos.push(idx);
                         }
+                    }
+                }
+                for (const v of vecinos) {
+                    if (posiciones.length >= cantidad) break;
+                    if (!usadas.has(v)) {
+                        posiciones.push(v);
+                        usadas.add(v);
                     }
                 }
             }
@@ -362,28 +386,38 @@
             
             const posiciones = [];
             
-            for (let i = 0; i < Math.min(cols, rows) && posiciones.length < cantidad; i++) {
-                const pos = i * cols + i;
+            // 🔥 Para 4x4: posiciones 3 (esquina superior derecha) y 12 (esquina inferior izquierda)
+            const esquinas = [3, 12];
+            
+            for (const pos of esquinas) {
+                if (posiciones.length >= cantidad) break;
                 if (pos < total && !usadas.has(pos)) {
                     posiciones.push(pos);
                     usadas.add(pos);
                 }
             }
             
+            // Si faltan, buscar vecinos
             if (posiciones.length < cantidad) {
-                for (let i = 0; i < Math.min(cols, rows) && posiciones.length < cantidad; i++) {
-                    const pos = i * cols + i;
+                const vecinos = [];
+                for (const pos of esquinas) {
+                    if (pos >= total) continue;
                     const row = Math.floor(pos / cols);
                     const col = pos % cols;
-                    const vecinos = [
-                        (row - 1) * cols + col, (row + 1) * cols + col,
-                        row * cols + (col - 1), row * cols + (col + 1)
-                    ];
-                    for (const v of vecinos) {
-                        if (v >= 0 && v < total && !usadas.has(v) && posiciones.length < cantidad) {
-                            posiciones.push(v);
-                            usadas.add(v);
+                    const offsets = [[0,1], [1,0], [0,-1], [-1,0], [1,1], [1,-1], [-1,1], [-1,-1]];
+                    for (const [dr, dc] of offsets) {
+                        const nr = row + dr, nc = col + dc;
+                        if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+                            const idx = nr * cols + nc;
+                            if (!usadas.has(idx)) vecinos.push(idx);
                         }
+                    }
+                }
+                for (const v of vecinos) {
+                    if (posiciones.length >= cantidad) break;
+                    if (!usadas.has(v)) {
+                        posiciones.push(v);
+                        usadas.add(v);
                     }
                 }
             }
@@ -392,23 +426,26 @@
         }
 
         obtenerCentroDiagonalDerIzq(grid, cantidad, usadas) {
-            const posiciones = [];
+            const cols = this.getColumnasGrid(grid);
+            const rows = this.getFilasGrid(grid);
+            const total = cols * rows;
             
-            const centroPos = this.obtenerCentro(grid, Math.min(4, cantidad), usadas);
-            for (const p of centroPos) {
-                if (!usadas.has(p) && posiciones.length < cantidad) {
-                    posiciones.push(p);
-                    usadas.add(p);
-                }
+            if (cantidad >= total) {
+                return Array.from({ length: total }, (_, i) => i);
             }
             
-            if (posiciones.length < cantidad) {
-                const diagonal = this.obtenerContraEsquinaDerIzq(grid, cantidad - posiciones.length, usadas);
-                for (const p of diagonal) {
-                    if (!usadas.has(p) && posiciones.length < cantidad) {
-                        posiciones.push(p);
-                        usadas.add(p);
-                    }
+            const posiciones = [];
+            
+            // 🔥 Para 4x4: diagonal derecha a izquierda (de arriba-derecha a abajo-izquierda)
+            // Posiciones: 3, 6, 9, 12
+            // Tomar las centrales primero: 6 y 9
+            const centrales = [6, 9, 3, 12];
+            
+            for (const pos of centrales) {
+                if (posiciones.length >= cantidad) break;
+                if (pos < total && !usadas.has(pos)) {
+                    posiciones.push(pos);
+                    usadas.add(pos);
                 }
             }
             
@@ -416,23 +453,26 @@
         }
 
         obtenerCentroDiagonalIzqDer(grid, cantidad, usadas) {
-            const posiciones = [];
+            const cols = this.getColumnasGrid(grid);
+            const rows = this.getFilasGrid(grid);
+            const total = cols * rows;
             
-            const centroPos = this.obtenerCentro(grid, Math.min(4, cantidad), usadas);
-            for (const p of centroPos) {
-                if (!usadas.has(p) && posiciones.length < cantidad) {
-                    posiciones.push(p);
-                    usadas.add(p);
-                }
+            if (cantidad >= total) {
+                return Array.from({ length: total }, (_, i) => i);
             }
             
-            if (posiciones.length < cantidad) {
-                const diagonal = this.obtenerContraEsquinaIzqDer(grid, cantidad - posiciones.length, usadas);
-                for (const p of diagonal) {
-                    if (!usadas.has(p) && posiciones.length < cantidad) {
-                        posiciones.push(p);
-                        usadas.add(p);
-                    }
+            const posiciones = [];
+            
+            // 🔥 Para 4x4: diagonal izquierda a derecha (de arriba-izquierda a abajo-derecha)
+            // Posiciones: 0, 5, 10, 15
+            // Tomar las centrales primero: 5 y 10
+            const centrales = [5, 10, 0, 15];
+            
+            for (const pos of centrales) {
+                if (posiciones.length >= cantidad) break;
+                if (pos < total && !usadas.has(pos)) {
+                    posiciones.push(pos);
+                    usadas.add(pos);
                 }
             }
             
@@ -449,34 +489,28 @@
             }
             
             const posiciones = [];
-            const centroRow = Math.floor(rows / 2);
             
-            for (let c = 0; c < cols && posiciones.length < cantidad; c++) {
-                const pos = centroRow * cols + c;
-                if (!usadas.has(pos)) {
+            // 🔥 Para 4x4: fila central superior o inferior
+            // Intentar fila superior primero (5,6), si no disponible, usar inferior (9,10)
+            const opciones = [
+                [5, 6],   // Fila 1 - centro
+                [9, 10],  // Fila 2 - centro
+                [4, 7],   // Fila 1 - extremos
+                [8, 11]   // Fila 2 - extremos
+            ];
+            
+            for (const opcion of opciones) {
+                if (posiciones.length >= cantidad) break;
+                let disponibles = opcion.filter(p => p < total && !usadas.has(p));
+                for (const pos of disponibles) {
+                    if (posiciones.length >= cantidad) break;
                     posiciones.push(pos);
                     usadas.add(pos);
                 }
             }
             
-            if (posiciones.length < cantidad) {
-                for (let offset = 1; offset < rows && posiciones.length < cantidad; offset++) {
-                    const filas = [centroRow - offset, centroRow + offset];
-                    for (const r of filas) {
-                        if (r < 0 || r >= rows) continue;
-                        for (let c = 0; c < cols && posiciones.length < cantidad; c++) {
-                            const pos = r * cols + c;
-                            if (!usadas.has(pos)) {
-                                posiciones.push(pos);
-                                usadas.add(pos);
-                            }
-                        }
-                    }
-                }
-            }
-            
             return posiciones;
-        }
+        }   
 
         obtenerCentroVertical(grid, cantidad, usadas) {
             const cols = this.getColumnasGrid(grid);
@@ -488,29 +522,23 @@
             }
             
             const posiciones = [];
-            const centroCol = Math.floor(cols / 2);
             
-            for (let r = 0; r < rows && posiciones.length < cantidad; r++) {
-                const pos = r * cols + centroCol;
-                if (!usadas.has(pos)) {
+            // 🔥 Para 4x4: columna central izquierda o derecha
+            // Intentar columna izquierda primero (5,9), si no disponible, usar derecha (6,10)
+            const opciones = [
+                [5, 9],   // Columna 1 - centro
+                [6, 10],  // Columna 2 - centro
+                [1, 13],  // Columna 1 - extremos
+                [2, 14]   // Columna 2 - extremos
+            ];
+            
+            for (const opcion of opciones) {
+                if (posiciones.length >= cantidad) break;
+                let disponibles = opcion.filter(p => p < total && !usadas.has(p));
+                for (const pos of disponibles) {
+                    if (posiciones.length >= cantidad) break;
                     posiciones.push(pos);
                     usadas.add(pos);
-                }
-            }
-            
-            if (posiciones.length < cantidad) {
-                for (let offset = 1; offset < cols && posiciones.length < cantidad; offset++) {
-                    const colsOffset = [centroCol - offset, centroCol + offset];
-                    for (const c of colsOffset) {
-                        if (c < 0 || c >= cols) continue;
-                        for (let r = 0; r < rows && posiciones.length < cantidad; r++) {
-                            const pos = r * cols + c;
-                            if (!usadas.has(pos)) {
-                                posiciones.push(pos);
-                                usadas.add(pos);
-                            }
-                        }
-                    }
                 }
             }
             

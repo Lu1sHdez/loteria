@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
     
     <!-- Header con contador -->
     <div class="j-libre-header">
-        <div>
+        <div class="contenido-centrado">
             <p class="text-p-negrita">Libres a escoger <span class="j-texto-normal">(54 figuras personalizadas)</span>   </p>
         </div>
         <span class="j-libre-counter" id="j-libre-counter">

@@ -5,6 +5,16 @@
     margin-bottom: 15px;
 }
 
+.j-favoritas-header .contenido-centrado {
+    flex: 1;
+    text-align: center;
+    margin: 0;
+}
+
+.j-favoritas-header .contenido-centrado p {
+    margin: 0;
+}
+
 .j-favoritas-counter-circle {
     display: flex;
     align-items: center;
@@ -132,7 +142,6 @@
     border-radius: 4px;
 }
 
-/* Nombre */
 .j-favoritas-nombre {
     font-size: 10px;
     font-weight: 600;
@@ -142,7 +151,6 @@
     line-height: 1.2;
 }
 
-/* Popular badge - DEBAJO de la baraja */
 .j-popular-badge {
     display: inline-flex;
     align-items: center;
@@ -161,9 +169,6 @@
     font-size: 7px;
 }
 
-/* ==========================================
-   FILA DE 3 COLUMNAS (Progreso | Ubicación | Botón)
-========================================== */
 .j-favoritas-row {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -175,11 +180,14 @@
 .j-favoritas-col {
     display: flex;
     flex-direction: column;
+    border: 2px solid #D8D8D8;
+    border-radius: 8px;
+    padding: 10px 5px;
+    height: 150px;
+    gap: 2px;
+    background: #FFFFFF;
 }
 
-/* ==========================================
-   COLUMNA 1: PROGRESO
-========================================== */
 .j-favoritas-progress .text-p-negrita {
     font-size: 13px;
     font-weight: 600;
@@ -246,51 +254,80 @@
     text-align: center;
 }
 
-/* ==========================================
-   COLUMNA 2: UBICACIÓN
-========================================== */
-.j-favoritas-ubicacion .text-p-negrita {
+.j-ubicacion-titulo {
     font-size: 13px;
     font-weight: 600;
-    margin-bottom: 4px;
+    margin: 0 0 1px 0;
+    color: #1E2249;
 }
 
 .j-ubicacion-opciones-vertical {
     display: flex;
+    margin-top: 0;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
 }
 
 .j-ubicacion-btn {
-    padding: 4px 12px;
-    border: 2px solid #E5E5E5;
-    border-radius: 14px;
-    background: #FFFFFF;
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    padding: 1px;
+    background: none;
     cursor: pointer;
-    font-weight: 600;
-    font-size: 11px;
+    font-weight: 500;
+    border: none !important;
+    font-size: 13px;
     color: #5D5D5D;
-    transition: 0.2s;
     text-align: left;
     width: 100%;
-    max-width: 140px;
+    position: relative;
 }
 
+.j-ubicacion-btn .j-ubicacion-radio {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #D8D8D8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+    background: #FFFFFF;
+}
+.j-ubicacion-btn:focus,
 .j-ubicacion-btn:hover {
-    border-color: #FA299C;
-    background: #FA299C;
-    color: #FFFFFF;
+    background: none;
 }
 
-.j-ubicacion-btn.active {
+.j-ubicacion-btn.active .j-ubicacion-radio {
+    border-color:  #5D5D5D;
     background: #FA299C;
-    border-color: #FA299C;
-    color: #FFFFFF;
+    box-shadow: inset 0 0 0 3px #FFFFFF;
 }
 
-/* ==========================================
-   COLUMNA 3: BOTÓN ALEATORIO
-========================================== */
+.j-ubicacion-btn.active .j-ubicacion-radio::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #FA299C;
+    display: block;
+}
+
+.j-ubicacion-icon-img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.j-ubicacion-texto {
+    font-size: 13px;
+    color: #5D5D5D;
+}
+
 .j-favoritas-accion {
     display: flex;
     flex-direction: column;
@@ -311,21 +348,10 @@
     flex-shrink: 0;
 }
 
-.j-favoritas-accion .j-texto-normal {
-    font-size: 11px;
-    color: #999;
-    margin: 0;
-    line-height: 1.3;
-}
-
-/* Ocultar grid de seleccionadas (ya no se usa) */
 .j-favoritas-seleccionadas {
     display: none;
 }
 
-/* ==========================================
-   SCROLLBAR
-========================================== */
 .j-favoritas-grid-wrapper::-webkit-scrollbar {
     width: 4px;
 }
@@ -340,9 +366,6 @@
     border-radius: 2px;
 }
 
-/* ==========================================
-   RESPONSIVE
-========================================== */
 @media (max-width: 900px) {
     .j-favoritas-row {
         grid-template-columns: 1fr 1fr;
@@ -384,11 +407,6 @@
     }
 }
 
-
-/* =====================================================
-   INDICADOR DE FAVORITA EN VISTA PREVIA
-===================================================== */
-
 .j-casilla-preview-grid .cell {
     position: relative;
 }
@@ -413,9 +431,13 @@
     50% { transform: scale(1.2); }
 }
 
-
 .j-favoritas-mensaje {
     width: 100%;
     text-align: center;
     margin: 0;
+}
+
+.contenido-centrado {
+    text-align: center;
+    width: 100%;
 }

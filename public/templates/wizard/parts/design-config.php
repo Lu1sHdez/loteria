@@ -76,14 +76,13 @@
 
 <p class="text-p-negrita">Tipo de tablas</p>
 
-
 <div class="j-modes">
 
     <button class="j-mode active" data-mode="sencilla">
         Sencilla
     </button>
 
-    <button class="j-mode" data-mode="dobles">
+    <button class="j-mode" data-mode="dobles" id="j-mode-dobles">
         Dobles
     </button>
 
@@ -91,10 +90,71 @@
         Favoritas
     </button>
 
-    <button class="j-mode" data-mode="libre">
+    <button class="j-mode" data-mode="libre" id="j-mode-libre">
         Personalizadas
     </button>
 
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const doblesBtn = document.getElementById('j-mode-dobles');
+    const libreBtn = document.getElementById('j-mode-libre');
+    const gridButtons = document.querySelectorAll('.j-grid');
 
+    function toggleModesByGrid() {
+        const activeGrid = document.querySelector('.j-grid.active');
+        const gridType = activeGrid ? activeGrid.dataset.grid : '';
+
+        // Lógica para Pocitos de 3
+        if (gridType === 'pocitos3') {
+            // Ocultar Dobles y Personalizadas
+            doblesBtn.style.display = 'none';
+            libreBtn.style.display = 'none';
+
+            // Si "Dobles" estaba activo, cambiar a "Sencilla"
+            if (doblesBtn.classList.contains('active')) {
+                doblesBtn.classList.remove('active');
+                document.querySelector('.j-mode[data-mode="sencilla"]').classList.add('active');
+                document.querySelector('.j-mode[data-mode="sencilla"]').dispatchEvent(new Event('click'));
+            }
+            // Si "Personalizadas" estaba activo, cambiar a "Sencilla"
+            if (libreBtn.classList.contains('active')) {
+                libreBtn.classList.remove('active');
+                document.querySelector('.j-mode[data-mode="sencilla"]').classList.add('active');
+                document.querySelector('.j-mode[data-mode="sencilla"]').dispatchEvent(new Event('click'));
+            }
+        }
+        // Lógica para Pocitos de 4
+        else if (gridType === 'pocitos4') {
+            // Ocultar solo Personalizadas (Dobles se muestra)
+            doblesBtn.style.display = ''; // Asegurar que se muestre
+            libreBtn.style.display = 'none';
+
+            // Si "Personalizadas" estaba activo, cambiar a "Sencilla"
+            if (libreBtn.classList.contains('active')) {
+                libreBtn.classList.remove('active');
+                document.querySelector('.j-mode[data-mode="sencilla"]').classList.add('active');
+                document.querySelector('.j-mode[data-mode="sencilla"]').dispatchEvent(new Event('click'));
+            }
+        }
+        // Para cualquier otro grid (4x4, 5x5, cruzadas)
+        else {
+            // Mostrar todas las opciones
+            doblesBtn.style.display = '';
+            libreBtn.style.display = '';
+        }
+    }
+
+    // Ejecutar al cargar y al cambiar de grid
+    gridButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Esperar a que se actualice la clase 'active'
+            setTimeout(toggleModesByGrid, 50);
+        });
+    });
+
+    // Ejecutar inicialmente
+    toggleModesByGrid();
+});
+</script>
