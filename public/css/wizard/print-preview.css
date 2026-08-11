@@ -224,10 +224,6 @@
     aspect-ratio: 2 / 3;
 }
 
-.j-board-cell img {
-    object-fit: contain !important;
-}
-
 
 /* =====================================================
    =====================================================
@@ -497,3 +493,7 @@
     transform: none !important;
     z-index: 7 !important;
 }
+
+
+
+

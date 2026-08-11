@@ -98,20 +98,311 @@ window.PrintPaper = {
         };
     },
 
+    generateBarajaSheets(paper, scale) {
+        const barajas = JuguemosState.barajas || [];
+        if (barajas.length === 0) return [];
+    
+        const sheets = [];
+        const totalBarajas = barajas.length;
+    
+        const sheetWidth = paper.width * scale;
+        const sheetHeight = paper.height * scale;
+        const isHorizontal = sheetWidth > sheetHeight;
+    
+        const margin = 5; // Margen en píxeles
+        const gap = 2; // Espacio entre cartas
+        const maxCardsPerSheet = 10;
+    
+        const availableWidth = sheetWidth - (margin * 2);
+        const availableHeight = sheetHeight - (margin * 2);
+    
+        // 🔥 DETERMINAR DISTRIBUCIÓN ÓPTIMA
+        // Probar diferentes configuraciones y elegir la que mejor se adapte
+        let bestConfig = null;
+        let bestCoverage = 0;
+    
+        // Posibles configuraciones (columnas x filas)
+        const configs = [
+            { cols: 2, rows: 5 }, // 10 cartas
+            { cols: 5, rows: 2 }, // 10 cartas
+            { cols: 3, rows: 3 }, // 9 cartas
+            { cols: 3, rows: 4 }, // 12 cartas
+            { cols: 4, rows: 3 }, // 12 cartas
+            { cols: 3, rows: 5 }, // 15 cartas
+            { cols: 5, rows: 3 }, // 15 cartas
+            { cols: 2, rows: 6 }, // 12 cartas
+            { cols: 6, rows: 2 }, // 12 cartas
+            { cols: 4, rows: 4 }, // 16 cartas
+            { cols: 2, rows: 7 }, // 14 cartas
+            { cols: 7, rows: 2 }, // 14 cartas
+        ];
+    
+        const cardAspectRatio = 2 / 3; // Ancho/Alto de una carta
+    
+        for (const config of configs) {
+            const { cols, rows } = config;
+            const cardsPerSheet = cols * rows;
+            
+            // Si necesitamos menos cartas que las que caben, saltar
+            if (cardsPerSheet > maxCardsPerSheet) continue;
+            // Si caben muy pocas, saltar
+            if (cardsPerSheet < Math.min(totalBarajas, 4)) continue;
+    
+            // Calcular tamaño de carta para esta configuración
+            let cardWidth = (availableWidth - ((cols - 1) * gap)) / cols;
+            let cardHeight = cardWidth / cardAspectRatio;
+    
+            // Verificar si cabe en altura
+            const neededHeight = (rows * cardHeight) + ((rows - 1) * gap);
+            
+            if (neededHeight > availableHeight) {
+                // Ajustar por altura
+                cardHeight = (availableHeight - ((rows - 1) * gap)) / rows;
+                cardWidth = cardHeight * cardAspectRatio;
+                
+                // Verificar si cabe en ancho
+                const neededWidth = (cols * cardWidth) + ((cols - 1) * gap);
+                if (neededWidth > availableWidth) {
+                    // No cabe ni ajustando, pasar a siguiente configuración
+                    continue;
+                }
+            }
+    
+            // Calcular cobertura (qué tan bien usa el espacio)
+            const actualWidth = (cols * cardWidth) + ((cols - 1) * gap);
+            const actualHeight = (rows * cardHeight) + ((rows - 1) * gap);
+            const coverage = (actualWidth * actualHeight) / (availableWidth * availableHeight);
+    
+            // Si es mejor cobertura o es la primera configuración válida
+            if (!bestConfig || coverage > bestCoverage) {
+                bestConfig = {
+                    cols,
+                    rows,
+                    cardWidth: Math.floor(cardWidth),
+                    cardHeight: Math.floor(cardHeight),
+                    cardsPerSheet,
+                    coverage
+                };
+                bestCoverage = coverage;
+            }
+        }
+    
+        // Si no encontramos configuración, usar una por defecto
+        if (!bestConfig) {
+            bestConfig = {
+                cols: isHorizontal ? 3 : 2,
+                rows: isHorizontal ? 2 : 3,
+                cardWidth: Math.floor((availableWidth - (3 * gap)) / (isHorizontal ? 4 : 3)),
+                cardHeight: 0,
+                cardsPerSheet: 0,
+                coverage: 0
+            };
+            bestConfig.cardHeight = Math.floor(bestConfig.cardWidth / cardAspectRatio);
+            bestConfig.cardsPerSheet = bestConfig.cols * bestConfig.rows;
+        }
+    
+        // Recalcular dimensiones finales con los valores redondeados
+        const { cols, rows, cardWidth, cardHeight, cardsPerSheet } = bestConfig;
+    
+        const gridWidth = (cols * cardWidth) + ((cols - 1) * gap);
+        const gridHeight = (rows * cardHeight) + ((rows - 1) * gap);
+    
+        const offsetX = Math.round((sheetWidth - gridWidth) / 2);
+        const offsetY = Math.round((sheetHeight - gridHeight) / 2);
+    
+        const sheetsNeeded = Math.ceil(totalBarajas / cardsPerSheet);
+    
+        console.log(`📐 Hoja: ${sheetWidth}x${sheetHeight}px`);
+        console.log(`🃏 Distribución: ${cols}x${rows} = ${cardsPerSheet} barajas`);
+        console.log(`🃏 Tamaño carta: ${cardWidth}x${cardHeight}px`);
+        console.log(`📊 Ocupación: ${(bestConfig.coverage * 100).toFixed(1)}%`);
+    
+        for (let sheetIndex = 0; sheetIndex < sheetsNeeded; sheetIndex++) {
+            const sheet = document.createElement('div');
+            sheet.className = 'j-sheet j-sheet-barajas';
+            sheet.dataset.page = `Barajas ${sheetIndex + 1}`;
+    
+            Object.assign(sheet.style, {
+                position: 'relative',
+                width: sheetWidth + 'px',
+                height: sheetHeight + 'px',
+                backgroundColor: '#FFFFFF',
+                overflow: 'hidden',
+                border: '2px solid #e0e0e0',
+                borderRadius: '6px',
+                boxSizing: 'border-box',
+                margin: '0 auto 20px auto'
+            });
+    
+            const cardsContainer = document.createElement('div');
+            cardsContainer.className = 'j-barajas-grid';
+    
+            Object.assign(cardsContainer.style, {
+                display: 'grid',
+                gridTemplateColumns: `repeat(${cols}, ${cardWidth}px)`,
+                gridTemplateRows: `repeat(${rows}, ${cardHeight}px)`,
+                gap: gap + 'px',
+                position: 'absolute',
+                left: offsetX + 'px',
+                top: offsetY + 'px',
+                width: gridWidth + 'px',
+                height: gridHeight + 'px',
+                padding: '0',
+                margin: '0',
+                boxSizing: 'border-box'
+            });
+    
+            const startIndex = sheetIndex * cardsPerSheet;
+            const endIndex = Math.min(startIndex + cardsPerSheet, totalBarajas);
+    
+            for (let i = startIndex; i < endIndex; i++) {
+                const baraja = barajas[i];
+                if (!baraja) continue;
+    
+                const card = document.createElement('div');
+                card.className = 'j-baraja-card';
+    
+                Object.assign(card.style, {
+                    width: '100%',
+                    height: '100%',
+                    padding: '0',
+                    margin: '0',
+                    boxSizing: 'border-box',
+                    border: '1.5px solid #d0d0d0',
+                    borderRadius: '4px',
+                    overflow: 'hidden',
+                    backgroundColor: '#FFFFFF',
+                    position: 'relative'
+                });
+    
+                const img = document.createElement('img');
+                img.src = baraja.imagen;
+                img.alt = baraja.nombre || `Baraja ${baraja.numero}`;
+    
+                Object.assign(img.style, {
+                    position: 'absolute',
+                    left: '0',
+                    top: '0',
+                    width: '100%',
+                    height: '100%',
+                    display: 'block',
+                    boxSizing: 'border-box',
+                    objectFit: 'contain',
+                    objectPosition: 'center center'
+                });
+    
+                img.onerror = function() {
+                    this.style.display = 'none';
+                    const fallback = document.createElement('span');
+                    fallback.textContent = baraja.nombre || '❌';
+                    Object.assign(fallback.style, {
+                        fontSize: '12px',
+                        textAlign: 'center',
+                        padding: '4px',
+                        color: '#666',
+                        fontFamily: 'Cairo, sans-serif'
+                    });
+                    card.appendChild(fallback);
+                };
+    
+                card.appendChild(img);
+                cardsContainer.appendChild(card);
+            }
+    
+            sheet.appendChild(cardsContainer);
+    
+            if (JuguemosState.cutMarks) {
+                this.addCutMarksToBarajas(sheet, paper, scale, {
+                    cols,
+                    rows,
+                    cardWidth,
+                    cardHeight,
+                    gap,
+                    offsetX,
+                    offsetY,
+                    gridWidth,
+                    gridHeight,
+                    totalCards: endIndex - startIndex
+                });
+            }
+    
+            sheets.push(sheet);
+        }
+    
+        console.log(`${sheets.length} hoja(s) de barajas extras generadas`);
+        return sheets;
+    },
+    
+    addCutMarksToBarajas(sheet, paper, scale, layout) {
+        const marks = document.createElement('div');
+        Object.assign(marks.style, {
+            position: 'absolute',
+            top: '0',
+            left: '0',
+            width: '100%',
+            height: '100%',
+            pointerEvents: 'none',
+            zIndex: '10',
+            overflow: 'hidden'
+        });
+        
+        const { cols, rows, cardWidth, cardHeight, gap, offsetX, offsetY, gridWidth, gridHeight, totalCards } = layout;
+        
+        // Solo mostrar marcas si hay más de una carta
+        if (totalCards > 1) {
+            // Contorno exterior - solo si hay más de una carta
+            const contorno = document.createElement('div');
+            Object.assign(contorno.style, {
+                position: 'absolute',
+                top: (offsetY - gap / 2) + 'px',
+                left: (offsetX - gap / 2) + 'px',
+                width: (gridWidth + gap) + 'px',
+                height: (gridHeight + gap) + 'px',
+                border: '2px dashed #999', // 🔥 Más sutil
+                borderRadius: '4px',
+                pointerEvents: 'none',
+                opacity: '0.4', // 🔥 Más transparente
+                boxSizing: 'border-box'
+            });
+            marks.appendChild(contorno);
+            
+            // Líneas verticales entre columnas (solo si hay más de 1 columna)
+            if (cols > 1) {
+                for (let col = 1; col < cols; col++) {
+                    const x = offsetX + (cardWidth * col) + (gap * (col - 0.5));
+                    this.createCutLine(marks, 'vertical', x, offsetY, gridHeight);
+                }
+            }
+            
+            // Líneas horizontales entre filas (solo si hay más de 1 fila)
+            if (rows > 1) {
+                for (let row = 1; row < rows; row++) {
+                    const y = offsetY + (cardHeight * row) + (gap * (row - 0.5));
+                    this.createCutLine(marks, 'horizontal', y, offsetX, gridWidth);
+                }
+            }
+        }
+        
+        sheet.appendChild(marks);
+    },
+
     /**
      * Renderizar vista previa completa
      */
+    // En print-preview.js - REEMPLAZAR el método render() existente
+
     render() {
         const container = document.getElementById('j-print-preview');
         if (!container) {
             return;
         }
-
+    
         container.innerHTML = '';
-
+    
         const paper = this.getPaperConfig();
         const totalPages = Number(JuguemosState.pages) || 1;
-
+        const incluirBarajas = JuguemosState.barajasIncluidas !== false;
+    
         const maxWidth = Math.min(container.clientWidth - 20, 2000);
         const maxHeight = window.innerHeight - 150;
         
@@ -126,15 +417,52 @@ window.PrintPaper = {
         if (paper.orientation === 'vertical') {
             scale = Math.min(scaleX, scale * 1.1);
         }
-
+    
+        // Guardar layout para usar en barajas
+        this.currentPaper = paper;
+        this.currentScale = scale;
+    
         console.log(`📏 Escala calculada: ${scale.toFixed(2)}x (${paper.width}mm x ${paper.height}mm)`);
-
+    
+        // 🔥 1. Generar páginas de tablas de juego
         for (let page = 0; page < totalPages; page++) {
             const sheet = this.createSheet(paper, scale, page);
             container.appendChild(sheet);
         }
-
-        console.log(`PrintPaper: ${totalPages} página(s) renderizada(s)`);
+    
+        // 🔥 2. Generar páginas de barajas sueltas (SOLO si está activado)
+        if (incluirBarajas) {
+            const barajaSheets = this.generateBarajaSheets(paper, scale);
+            
+            // 🔥 SOLO AÑADIR SEPARADOR SI HAY BARAJAS
+            if (barajaSheets.length > 0) {
+                // Añadir un separador visual entre tablas y barajas
+                const separator = document.createElement('div');
+                separator.style.cssText = `
+                    width: 100%;
+                    text-align: center;
+                    padding: 30px 0 20px 0;
+                    border-top: 3px solid #e0e0e0;
+                    margin: 30px 0 20px 0;
+                    color: #666;
+                    font-family: 'Cairo', sans-serif;
+                    font-size: 16px;
+                    font-weight: bold;
+                    letter-spacing: 2px;
+                `;
+                separator.textContent = 'BARAJAS INCLUIDAS';
+                container.appendChild(separator);
+                
+                // Añadir las hojas de barajas
+                barajaSheets.forEach(sheet => {
+                    container.appendChild(sheet);
+                });
+            }
+            
+            console.log(`🃏 ${barajaSheets.length} hoja(s) de barajas añadidas`);
+        }
+    
+        console.log(`PrintPaper: ${totalPages} página(s) de juego + ${incluirBarajas ? 'barajas' : 'sin barajas'} renderizada(s)`);
     },
 
     /**
@@ -282,7 +610,6 @@ createBoard(config, boardIndex, pageIndex) {
             { row: '2', col: '2' }            // Casilla 2: abajo derecha
         ];
 
-        const mostrarBarajas = JuguemosState.barajasIncluidas !== false;
 
         for (let i = 0; i < 3; i++) {
             const cell = document.createElement('div');
@@ -313,7 +640,7 @@ createBoard(config, boardIndex, pageIndex) {
             const esFavorita = tieneFavoritas && casilla && favoritas.some(f => f && f.numero === casilla.numero);
             const esDoble = esModoDobles && casilla && numerosDobles.includes(parseInt(casilla.numero));
 
-            if (casilla && mostrarBarajas) {
+            if (casilla) {
                 const img = document.createElement('img');
                 
                 // MODO LIBRE
@@ -410,9 +737,6 @@ createBoard(config, boardIndex, pageIndex) {
         padding: isPocitos4 ? '0px' : '2px',
         boxSizing: 'border-box'
     });
-
-    const mostrarBarajas = JuguemosState.barajasIncluidas !== false;
-
     // Generar celdas
     for (let i = 0; i < total; i++) {
         const cell = document.createElement('div');
@@ -460,7 +784,7 @@ createBoard(config, boardIndex, pageIndex) {
         // 🔥 Verificar si es doble
         const esDoble = esModoDobles && casilla && numerosDobles.includes(parseInt(casilla.numero));
 
-        if (casilla && mostrarBarajas) {
+        if (casilla) {
             const img = document.createElement('img');
             
             // 🔥 MODO LIBRE: Usar imágenes subidas por el usuario
@@ -481,8 +805,7 @@ createBoard(config, boardIndex, pageIndex) {
             Object.assign(img.style, {
                 width: '100%',
                 height: '100%',
-                objectFit: 'contain',
-                padding: '2px',
+                objectFit: 'cover',
                 boxSizing: 'border-box'
             });
             

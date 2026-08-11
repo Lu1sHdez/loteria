@@ -48,7 +48,7 @@ if (!defined('ABSPATH')) {
                 <?php include __DIR__ . '/parts/design-categories.php'; ?>
 
                 <div class="j-toggle-barajas-wrapper">
-                    <button type="button" id="j-incluir-barajas" class="j-toggle-barajas active">
+                    <button type="button" id="j-incluir-barajas" class="j-toggle-barajas inactive">
                         <span class="j-toggle-circle">
                             <img id="j-toggle-icon" src="/wp-content/uploads/2026/07/incluir_on.png" alt="Incluir barajas">
                         </span>
@@ -56,7 +56,7 @@ if (!defined('ABSPATH')) {
                     </button>
                 </div>
 
-                <div id="j-incluir-status" class="j-incluir-status active">
+                <div id="j-incluir-status" class="j-incluir-status inactive">
                     Barajas incluidas en el diseño
                 </div>
 

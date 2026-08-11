@@ -256,25 +256,36 @@ document.addEventListener("DOMContentLoaded", () => {
     aplicarColores();
     updateOrderSummary();
 
-    // ========== TOGGLE INCLUIR BARAJAS ==========
-    const btnIncluir = document.getElementById("j-incluir-barajas");
-    const toggleIcon = document.getElementById("j-toggle-icon");
-    if (btnIncluir) {
-        const setActive = (active) => {
-            JuguemosState.barajasIncluidas = active;
-            btnIncluir.classList.toggle("active", active);
-            toggleIcon.src =
-                `/wp-content/uploads/2026/07/incluir_${active ? "on" : "off"}.png`;
-            updateOrderSummary();
-            if (typeof PrintPaper !== "undefined") {
-                setTimeout(() => PrintPaper.refresh(), 150);
-            }
-        };
-        setActive(true);
-        btnIncluir.addEventListener("click", () => {
-            setActive(!JuguemosState.barajasIncluidas);
-        });
-    }
+// ========== TOGGLE INCLUIR BARAJAS ==========
+const btnIncluir = document.getElementById("j-incluir-barajas");
+const toggleIcon = document.getElementById("j-toggle-icon");
+if (btnIncluir) {
+    const setActive = (active) => {
+        JuguemosState.barajasIncluidas = active;
+        btnIncluir.classList.toggle("active", active);
+        btnIncluir.classList.toggle("inactive", !active);
+        toggleIcon.src =
+            `/wp-content/uploads/2026/07/incluir_${active ? "on" : "off"}.png`;
+        
+        // 🔥 ELIMINAR el texto del status - OCULTAR COMPLETAMENTE
+        const statusText = document.getElementById("j-incluir-status");
+        if (statusText) {
+            statusText.style.display = 'none';  // Ocultar el elemento
+        }
+        
+        updateOrderSummary();
+        if (typeof PrintPaper !== "undefined") {
+            setTimeout(() => PrintPaper.refresh(), 150);
+        }
+    };
+    
+    // Por defecto DESACTIVADO
+    setActive(false);
+    
+    btnIncluir.addEventListener("click", () => {
+        setActive(!JuguemosState.barajasIncluidas);
+    });
+}
 
     // ========== SELECCIÓN ALEATORIA ==========
     const btnAleatoria = document.querySelector(".j-casilla-btn");
