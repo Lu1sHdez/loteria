@@ -15,43 +15,41 @@
             this.categoriaActual = null;
             this.ubicacion = 'aleatoria';
             
-            // ⭐ Barajas populares (por número)
-            this.populares = [3, 6, 17, 18, 4, 7, 19, 1];
-            
-            // 📂 Categorías predefinidas
+            this.populares = [3, 6, 27, 46, 4, 35, 1];
+
             this.categorias = {
                 'personajes': {
                     nombre: '👤 Personajes',
-                    numeros: [3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 7]
+                    numeros: [3, 4, 6, 12, 13, 14, 25, 26, 32, 34, 38, 42]
                 },
                 'amor': {
                     nombre: '❤️ Amor y emociones',
-                    numeros: [6, 16]
+                    numeros: [27, 41]
                 },
                 'naturaleza': {
                     nombre: '☀️ Naturaleza y clima',
-                    numeros: [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+                    numeros: [5, 10, 11, 23, 28, 35, 39, 46, 49]
                 },
                 'animales': {
                     nombre: '🐦 Animales',
-                    numeros: [1, 2, 28, 29, 30, 31, 32, 33, 34]
+                    numeros: [1, 19, 20, 24, 30, 33, 40, 45, 50, 54]
                 },
                 'cultura': {
                     nombre: '🎵 Cultura y tradición',
-                    numeros: [35, 36, 37, 38]
+                    numeros: [16, 17, 18, 43, 47, 48, 53]
                 },
                 'objetos': {
                     nombre: '🔮 Objetos simbólicos',
-                    numeros: [39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50]
+                    numeros: [7, 8, 9, 15, 21, 22, 29, 31, 36, 44, 51, 52]
                 },
                 'fuerza': {
                     nombre: '⚔️ Fuerza y fortuna',
-                    numeros: [5, 1, 39, 34]
+                    numeros: [2, 37]
                 }
             };
             
             this.container = document.getElementById('j-favoritas-option');
-            this.initialized = false; // ✅ Flag para controlar inicialización
+            this.initialized = false; 
             this.init();
         }
 
@@ -74,10 +72,10 @@
             this.bindEvents();
             this.renderCategorias(categoriasOrdenadas);
             
-            // ✅ INICIALIZAR: Esperar a que las barajas estén cargadas
+            // INICIALIZAR: Esperar a que las barajas estén cargadas
             this.cargarGridInicial();
             
-            // ✅ Suscribirse a cambios en barajas
+            //  Suscribirse a cambios en barajas
             this.observarBarajas();
             
             console.log('📋 FavoritasManager iniciado');
@@ -302,12 +300,10 @@
                 
                 grid.appendChild(item);
             });
-            
             if (encontradas === 0) {
                 grid.innerHTML = `
-                    <p style="color:#999;text-align:center;padding:20px;">
-                        No hay barajas en esta categoría<br>
-                        <span style="font-size:12px;color:#ccc;">Prueba con otra categoría</span>
+                    <p class="j-favoritas-grid-wrapper">
+                        <span class="j-favoritas-mensaje">Prueba con otra categoría</span>
                     </p>
                 `;
             }

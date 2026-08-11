@@ -10,8 +10,7 @@ if (!defined('ABSPATH')) {
     <!-- FILA 1: Header + Contador -->
     <div class="j-favoritas-header">
         <div>
-            <p class="text-p-negrita">Favoritas a escoger</p>
-            <p class="j-texto-normal">(hasta 12 figuras)</p>
+            <p class="text-p-negrita">Favoritas a escoger <span class="j-texto-normal"> (hasta 12 figuras)</span></p>
         </div>
         <div class="j-favoritas-counter-circle" id="j-favoritas-counter-circle">
             <span id="j-favoritas-seleccionadas">0</span>
@@ -37,7 +36,6 @@ if (!defined('ABSPATH')) {
         
         <!-- Columna 1: Progreso -->
         <div class="j-favoritas-col j-favoritas-progress">
-            <p class="text-p-negrita">Has seleccionado <span id="j-favoritas-count">0</span> de 12 favoritas</p>
             <div class="j-favoritas-progress-range">
                 <input 
                     type="range" 
@@ -45,10 +43,12 @@ if (!defined('ABSPATH')) {
                     min="0" 
                     max="12" 
                     value="0"
-                    readonly
+                    disabled
                 >
                 <span class="j-favoritas-progress-number" id="j-favoritas-progress-number">0</span>
             </div>
+            <p class="text-p-negrita">Has seleccionado <span id="j-favoritas-count">0</span> de 12 favoritas</p>
+
         </div>
 
         <!-- Columna 2: Ubicación (vertical) -->
@@ -64,9 +64,10 @@ if (!defined('ABSPATH')) {
 
         <!-- Columna 3: Botón aleatorio -->
         <div class="j-favoritas-col j-favoritas-accion">
-            <button class="j-casilla-btn" id="j-favoritas-aleatoria">
-                Selección aleatoria
-            </button>
+        <button class="j-btn-back" id="j-favoritas-aleatoria">
+            <img src="/wp-content/uploads/2026/08/icono-estrella.png" alt="Aleatoria">
+            <span>Selección aleatoria</span>
+        </button>
             <p class="j-texto-normal">El sistema elige 12 cartas. Puedes reemplazar las que no te gusten.</p>
         </div>
 
