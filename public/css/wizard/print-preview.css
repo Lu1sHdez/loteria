@@ -182,12 +182,28 @@
     background-size: cover;
     opacity: 1;
 }
-
+.j-barajas-grid:not(.pdf-export)::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none;
+    background-image: url('/wp-content/uploads/2026/07/marca_agua.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    opacity: 2;
+}
 /* ==========================================
    CONTENIDO DEL GRID
    ========================================== */
 
 .j-board-grid > * {
+    position: relative;
+    z-index: 6;
+}
+
+.j-barajas-grid > * {
     position: relative;
     z-index: 6;
 }

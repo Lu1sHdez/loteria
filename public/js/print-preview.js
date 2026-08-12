@@ -100,7 +100,23 @@ window.PrintPaper = {
     },
 
     generateBarajaSheets(paper, scale) {
-        const barajas = JuguemosState.barajas || [];
+        // 🔥 Obtener barajas según el modo
+        let barajas = [];
+        
+        if (JuguemosState.mode === 'libre' && JuguemosState.libreImages && JuguemosState.libreImages.length > 0) {
+            // Modo libre: usar imágenes personalizadas
+            barajas = JuguemosState.libreImages.map((img, index) => {
+                return {
+                    numero: index + 1,
+                    nombre: `Personalizada ${index + 1}`,
+                    imagen: img.data || img
+                };
+            });
+        } else {
+            // Modo normal: usar barajas del diseño
+            barajas = JuguemosState.barajas || [];
+        }
+        
         if (barajas.length === 0) return [];
     
         const sheets = [];
