@@ -259,11 +259,10 @@
             
             const barajasDisponibles = this.getBarajasDelDiseno();
             
-            // 🔥 MEJORADO: Mensaje más claro cuando no hay diseño
             if (barajasDisponibles.length === 0) {
                 grid.innerHTML = `
                     <p style="color:#999;text-align:center;padding:20px;">
-                        🎯 Selecciona un diseño primero<br>
+                        Selecciona un diseño primero<br>
                         <span style="font-size:12px;color:#ccc;">Las barajas aparecerán automáticamente</span>
                     </p>
                 `;
@@ -282,8 +281,10 @@
                 const item = document.createElement('div');
                 item.className = `j-favoritas-item${isSelected ? ' selected' : ''}`;
                 
+                // 🔥 AQUÍ ESTÁ EL CAMBIO - El corazón en el centro
                 let html = `
                     <img src="${baraja.imagen}" alt="${baraja.nombre}" loading="lazy">
+                    ${isSelected ? '<span class="j-heart-center">❤️</span>' : ''}
                     <span class="j-favoritas-nombre">${baraja.nombre}</span>
                     <span class="j-check-circle">✓</span>
                 `;
@@ -408,18 +409,13 @@
             JuguemosState.favoritas = this.seleccionadas;
             JuguemosState.favoritasUbicacion = this.ubicacion;
             
-            // Obtener grid actual
             const grid = JuguemosState.grid || '4x4';
             const totalCasillas = this.getTotalCasillas(grid);
-            
-            // Obtener el contenedor de vista previa
             const container = document.getElementById('j-casilla-preview-grid');
             if (!container) return;
             
-            // Configurar grid
             container.dataset.grid = grid;
             
-            // 🔥 Si no hay favoritas, mostrar vacío
             if (this.seleccionadas.length === 0) {
                 container.innerHTML = Array(totalCasillas)
                     .fill('<div class="cell empty"></div>')
@@ -427,10 +423,8 @@
                 return;
             }
             
-            // ✅ OBTENER POSICIONES SEGÚN UBICACIÓN
             const posiciones = this.obtenerPosicionesUbicacion(grid, this.seleccionadas.length);
             
-            // 🔥 CONSTRUIR VISTA PREVIA
             let html = '';
             const favoritasNumeros = this.seleccionadas.map(f => parseInt(f.numero));
             
@@ -439,7 +433,6 @@
                 let baraja = null;
                 
                 if (esFavorita) {
-                    // Encontrar qué favorita va en esta posición
                     const idx = posiciones.indexOf(i);
                     if (idx < this.seleccionadas.length) {
                         baraja = this.seleccionadas[idx];
@@ -448,9 +441,9 @@
                 
                 if (baraja) {
                     html += `
-                        <div class="cell favorita" data-index="${i}" title="${baraja.nombre} ⭐ Favorita">
+                        <div class="cell favorita" data-index="${i}" title="${baraja.nombre} ❤️ Favorita">
                             <img src="${baraja.imagen}" alt="${baraja.nombre}" loading="lazy">
-                            <span class="j-favorita-badge">⭐</span>
+                            <span class="j-favorita-badge">❤️</span>
                         </div>
                     `;
                 } else {
@@ -459,14 +452,6 @@
             }
             
             container.innerHTML = html;
-            
-            // ✅ Log para depuración
-            console.log('📍 Vista previa actualizada:', {
-                ubicacion: this.ubicacion,
-                favoritas: this.seleccionadas.length,
-                posiciones: posiciones,
-                total: totalCasillas
-            });
         }
 
         // =========================================================
@@ -813,7 +798,4 @@
             }, 100);
         }
     });
-
-    console.log('📦 Favoritas.js cargado (versión unificada con detección de barajas)');
-
 })();
