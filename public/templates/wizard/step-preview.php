@@ -1,9 +1,3 @@
-<?php
-if (!defined('ABSPATH')) {
-    exit;
-}
-?>
-
 <section id="juguemos-preview-completo" class="j-step">
     
     <div class="titulo-seccion-contenedor">
@@ -22,17 +16,21 @@ if (!defined('ABSPATH')) {
                 <div class="j-print-options-grid">
                     <!-- Tamaño de papel -->
                     <div class="j-print-option">
-                        <p class="text-p-negrita">Tamaño de papel</p>
-                        <p class="j-texto-normal">Selecciona el tamaño del papel para la impresión.</p>
+                        <div class="j-print-option-header">
+                            <p class="text-p-negrita">Tamaño de papel</p>
+                            <span class="j-tooltip-icon" data-tooltip="Selecciona el tamaño del papel para la impresión.">i</span>
+                        </div>
                         <div class="j-select-wrapper">
                             <select id="j-paper-size" class="j-select j-select-papel"></select>
                         </div>
-                    </div>  
+                    </div>
 
                     <!-- Orientación -->
                     <div class="j-print-option">
-                        <p class="text-p-negrita">Orientación</p>
-                        <p class="j-texto-normal">Elige la orientación que deseas para tus tablas de lotería.</p>
+                        <div class="j-print-option-header">
+                            <p class="text-p-negrita">Orientación</p>
+                            <span class="j-tooltip-icon" data-tooltip="Elige la orientación que deseas para tus tablas de lotería.">i</span>
+                        </div>
                         <div class="j-orientation-options">
                             <button type="button" class="j-orientation active" data-orientation="vertical">
                                 <div class="j-orientation-icon vertical"></div>
@@ -47,8 +45,10 @@ if (!defined('ABSPATH')) {
 
                     <!-- Cantidad de tablas por hoja -->
                     <div class="j-print-option">
-                        <p class="text-p-negrita">Cantidad de tablas por hoja</p>
-                        <p class="j-texto-normal">Define la cantidad de tablas que querrás por hoja.</p>
+                        <div class="j-print-option-header">
+                            <p class="text-p-negrita">Tablas por hoja</p>
+                            <span class="j-tooltip-icon" data-tooltip="Define la cantidad de tablas que querrás por hoja.">i</span>
+                        </div>
                         <div class="j-tables-per-page-control">
                             <button type="button" class="j-tables-per-page-btn j-tables-per-page-minus">
                                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -66,8 +66,10 @@ if (!defined('ABSPATH')) {
 
                     <!-- Cantidad de páginas -->
                     <div class="j-print-option">
-                        <p class="text-p-negrita">Cantidad de páginas</p>
-                        <p class="j-texto-normal">Define la cantidad de páginas que querrás imprimir.</p>
+                        <div class="j-print-option-header">
+                            <p class="text-p-negrita">Cantidad de páginas</p>
+                            <span class="j-tooltip-icon" data-tooltip="Define la cantidad de páginas que querrás imprimir.">i</span>
+                        </div>
                         <div class="j-tables-per-page-control">
                             <button type="button" class="j-tables-per-page-btn j-pages-minus">
                                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -84,52 +86,39 @@ if (!defined('ABSPATH')) {
                     </div>
 
                     <!-- Marcas de corte -->
-                    <div class="j-print-option">
-
-                    <p class="text-p-negrita">Marcas de corte</p>
-
-                    <p class="j-texto-normal">
-                        Activa para mostrar marcas de corte en la vista previa e impresión.
-                    </p>
-
-                    <label class="j-switch">
-                        <input type="checkbox" id="j-cut-marks-toggle" checked>
-                        <span class="j-switch-slider">
-                            <span class="j-switch-thumb">
-                                ✂
-                            </span>
-                        </span>
-                    </label>
-
-                    <div class="j-crop-preview" id="j-cut-marks-preview">
-
-                        <!-- Horizontales -->
-                        <span class="j-line h top"></span>
-                        <span class="j-line h middle-1"></span>
-                        <span class="j-line h middle-2"></span>
-                        <span class="j-line h bottom"></span>
-
-                        <!-- Verticales -->
-                        <span class="j-line v left"></span>
-                        <span class="j-line v center-1"></span>
-                        <span class="j-line v center-2"></span>
-                        <span class="j-line v right"></span>
-
-                        <div class="j-crop-preview-grid">
-                            <div></div><div></div><div></div>
-                            <div></div><div></div><div></div>
-                            <div></div><div></div><div></div>
+                    <div class="j-print-option j-print-option-cutmarks">
+                        <div class="j-print-option-header">
+                            <p class="text-p-negrita">Marcas de corte</p>
+                            <span class="j-tooltip-icon" data-tooltip="Activa para mostrar marcas de corte en la vista previa e impresión.">i</span>
+                            <label class="j-switch">
+                                <input type="checkbox" id="j-cut-marks-toggle" checked>
+                                <span class="j-switch-slider">
+                                    <span class="j-switch-thumb">✂</span>
+                                </span>
+                            </label>
                         </div>
-
+                        <div class="j-cutmarks-wrapper">
+                            
+                            <div class="j-crop-preview" id="j-cut-marks-preview">
+                                <span class="j-line h top"></span>
+                                <span class="j-line h middle-1"></span>
+                                <span class="j-line h middle-2"></span>
+                                <span class="j-line h bottom"></span>
+                                <span class="j-line v left"></span>
+                                <span class="j-line v center-1"></span>
+                                <span class="j-line v center-2"></span>
+                                <span class="j-line v right"></span>
+                                <div class="j-crop-preview-grid">
+                                    <div></div><div></div><div></div>
+                                    <div></div><div></div><div></div>
+                                    <div></div><div></div><div></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-
-                    </div>
-
-
                 </div> <!-- Cierre de j-print-options-grid -->
-                
-
             </div> <!-- Cierre de j-section -->
+            
             <?php require __DIR__ . '/preview/print-preview.php'; ?>
 
             <div class="j-preview-header">
@@ -137,15 +126,10 @@ if (!defined('ABSPATH')) {
                     <span>←</span>
                     <span>Editar pedido</span>
                 </button>
-
-                <button
-                    type="button"
-                    id="j-confirm-order"
-                    class="j-btn-next">
+                <button type="button" id="j-confirm-order" class="j-btn-next">
                     Confirmar pedido →
                 </button>
             </div>
-        </div> <!-- Cierre de juguemos-left -->
-    </div> <!-- Cierre de j-step-body -->
-
+        </div>
+    </div>
 </section>

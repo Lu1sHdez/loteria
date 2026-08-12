@@ -1,616 +1,522 @@
-.j-section-next{
-    display:flex;
-    justify-content:center;
-    margin-top:10px;
+/* =====================================================
+   OPCIONES DE IMPRESIÓN - COMPLETO Y SIMPLIFICADO
+   ===================================================== */
+
+   .j-print-options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px;
+    align-items: start;
 }
 
-.j-print-options-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit, minmax(180px,1fr));
-    gap:28px;
-    align-items:start;
+.j-print-option {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
 }
 
-.j-select{
-    font-size:12px;
+/* --- HEADERS CON TOOLTIP --- */
+.j-print-option-header {
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
 
-
-
-
-/* ==========================
-   ORIENTACIÓN
-========================== */
-
-.j-orientation-options{
-    display:flex;
-    gap:16px;
-    margin-top:8px;
+.j-print-option-header .text-p-negrita {
+    font-size: 13px;
+    margin: 0;
 }
 
-.j-orientation{
-    width:130px;
-    height:150px;
-
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:18px;
-
-    background:#FFF;
-    border:1px solid #D0D0D0;
-    border-radius:18px;
-
-    cursor:pointer;
-    transition:.2s;
-
-    padding:15px;
+.j-tooltip-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #1FAFB4;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: help;
+    position: relative;
+    flex-shrink: 0;
+    transition: background 0.2s;
 }
+
+.j-tooltip-icon:hover {
+    background: #FA299C;
+}
+
+.j-tooltip-icon::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 400;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    z-index: 100;
+}
+
+.j-tooltip-icon:hover::after {
+    opacity: 1;
+}
+
+/* --- SELECT --- */
+.j-select {
+    font-size: 12px;
+    width: 100%;
+    height: 34px;
+    padding: 0 10px;
+    border: 2px solid #E5E5E5;
+    border-radius: 8px;
+    background: #FFF;
+    font-family: 'Cairo', sans-serif;
+    font-weight: 600;
+    color: #1E2249;
+    cursor: pointer;
+    transition: border-color 0.25s;
+    appearance: auto;
+}
+
+.j-select:hover,
+.j-select:focus {
+    border-color: #1FAFB4;
+    outline: none;
+}
+
+/* --- ORIENTACIÓN --- */
+.j-orientation-options {
+    display: flex;
+    gap: 8px;
+}
+
+.j-orientation {
+    width: 72px;
+    height: 82px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: #FFF;
+    border: 1px solid #D0D0D0;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+    padding: 6px 8px;
+}
+
 .j-orientation:hover,
-.j-orientation.active{
-    background:#DEF5F3;
-    border-color:#08ADA1;
+.j-orientation.active {
+    background: #DEF5F3;
+    border-color: #08ADA1;
+}
+
+.j-orientation-label {
+    font-family: 'Cairo', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    color: #8A8A8A;
 }
 
 .j-orientation:hover .j-orientation-label,
-.j-orientation.active .j-orientation-label{
-    color:#08ADA1;
+.j-orientation.active .j-orientation-label {
+    color: #08ADA1;
 }
 
-.j-orientation:hover .j-orientation-icon,
-.j-orientation.active .j-orientation-icon{
-    border-color:#08ADA1;
+.j-orientation-icon {
+    border: 3px solid #9D9D9D;
+    transition: 0.2s;
 }
 
-.j-orientation-label{
-    font-family:'Cairo',sans-serif;
-    font-size:16px;
-    font-weight:700;
-    color:#8A8A8A;
+.j-orientation.active .j-orientation-icon {
+    border-color: #08ADA1;
 }
 
-.j-orientation.active .j-orientation-label{
-    color:#08ADA1;
+.j-orientation-icon.vertical {
+    width: 22px;
+    height: 44px;
 }
 
-/* ==========================
-   ICONOS
-========================== */
-
-.j-orientation-icon{
-    border:4px solid #9D9D9D;
-    transition:.2s;
+.j-orientation-icon.horizontal {
+    width: 44px;
+    height: 22px;
 }
 
-.j-orientation.active .j-orientation-icon{
-    border-color:#08ADA1;
+/* --- STEPPERS (tablas y páginas) --- */
+.j-tables-per-page-control {
+    display: flex;
+    align-items: center;
+    width: 100px;
+    height: 32px;
+    border: 2px solid #1FAFB4;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #FFF;
+    flex-shrink: 0;
 }
 
-.j-orientation-icon.vertical{
-    width:42px;
-    height:82px;
-}
-
-.j-orientation-icon.horizontal{
-    width:82px;
-    height:42px;
-}
-
-
-/* =====================================================
-   CANTIDAD DE TABLAS POR HOJA
-===================================================== */
-
-.j-tables-per-page-control{
-    display:flex;
-    align-items:center;
-
-    width:140px;
-    height:40px;
-
-    border:2px solid #1FAFB4;
-    border-radius:10px;
-
-    overflow:hidden;
-
-    background:#FFFFFF;
-    flex-shrink:0;
-}
-
-.j-tables-per-page-input{
-    flex:1;
-
-    height:100%;
-
-    border:0;
-    outline:none;
-
-    text-align:center;
-
-    font-family:'Cairo',sans-serif;
-    font-size:20px;
-    font-weight:700;
-
-    color:#5D5D5D;
-    background:#FFFFFF;
-
-    padding:0 4px;
-
-    appearance:textfield;
-    -moz-appearance:textfield;
+.j-tables-per-page-input {
+    flex: 1;
+    height: 100%;
+    border: 0;
+    outline: none;
+    text-align: center;
+    font-family: 'Cairo', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #5D5D5D;
+    background: #FFF;
+    padding: 0 2px;
+    appearance: textfield;
+    -moz-appearance: textfield;
 }
 
 .j-tables-per-page-input::-webkit-outer-spin-button,
-.j-tables-per-page-input::-webkit-inner-spin-button{
-    -webkit-appearance:none;
-    margin:0;
+.j-tables-per-page-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
-.j-tables-per-page-btn{
-
-    width:38px;
-    height:100%;
-
-    border:0;
-
-    background:#1FAFB4;
-    color:#FFFFFF;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    cursor:pointer;
-
-    transition:.2s;
-
-    padding:0;
-
-    line-height:1;
+.j-tables-per-page-btn {
+    width: 28px;
+    height: 100%;
+    border: 0;
+    background: #1FAFB4;
+    color: #FFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.2s;
+    padding: 0;
+    line-height: 1;
 }
 
-.j-tables-per-page-btn:hover{
-
-    background:#179B95;
-
+.j-tables-per-page-btn:hover {
+    background: #179B95;
 }
 
 .j-tables-per-page-btn:focus,
-.j-tables-per-page-btn:focus-visible,
-.j-tables-per-page-btn:active{
-
-    outline:none;
-    box-shadow:none;
-
+.j-tables-per-page-btn:active {
+    outline: none;
+    box-shadow: none;
 }
 
-.j-tables-per-page-btn::-moz-focus-inner{
-
-    border:0;
-
+/* --- MARCAS DE CORTE --- */
+.j-print-option-cutmarks {
+    grid-column: span 1;
 }
 
+.j-cutmarks-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
 
+/* Switch */
+.j-switch {
+    display: inline-block;
+    cursor: pointer;
+    flex-shrink: 0;
+}
 
+.j-switch input {
+    display: none;
+}
 
-
-
-/* ==========================================
-   Vista previa de la hoja
-========================================== */
-
-.j-preview-sheet{
+.j-switch-slider {
+    width: 36px;
+    height: 22px;
+    background: #D7DDE3;
+    border-radius: 999px;
     position: relative;
-    width: 300px;
-    margin: 20px auto;
-    padding: 20px;
-    background: #fff;
-    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    transition: 0.25s;
 }
 
-/* ==========================================
-   Grid
-========================================== */
-
-.j-preview-grid{
-
-    position: relative;
-
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-
-    padding: 12px;
-
-    border: 2px dashed #d5d5d5;
+.j-switch-thumb {
+    position: absolute;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background: #FFF;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    color: #23B5C4;
+    transition: 0.25s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
 }
 
-/* Línea horizontal */
-
-.j-preview-grid::before{
-
-    content:"";
-
-    position:absolute;
-
-    left:-2px;
-    right:-2px;
-    top:50%;
-
-    border-top:2px dashed #d5d5d5;
-
-    transform:translateY(-50%);
+.j-switch input:checked + .j-switch-slider {
+    background: #23B5C4;
 }
 
-/* Líneas verticales */
-
-.j-preview-grid::after{
-
-    content:"";
-
-    position:absolute;
-
-    inset:0;
-
-    background:
-        linear-gradient(
-            to right,
-
-            transparent 33.333%,
-            #d5d5d5 33.333%,
-            #d5d5d5 calc(33.333% + 2px),
-            transparent calc(33.333% + 2px),
-
-            transparent 66.666%,
-            #d5d5d5 66.666%,
-            #d5d5d5 calc(66.666% + 2px),
-            transparent calc(66.666% + 2px)
-        );
-
-    pointer-events:none;
+.j-switch input:checked + .j-switch-slider .j-switch-thumb {
+    transform: translateX(14px);
 }
 
-/* ==========================================
-   Cartas
-========================================== */
-
-.j-preview-cell{
-
-    aspect-ratio:63/88;
-
-    background:#dff7f6;
-
-    border-radius:5px;
-
-    z-index:2;
+.j-switch input:not(:checked) + .j-switch-slider {
+    background: #D7DDE3;
 }
-/* ==========================================
-   Marcas de corte - Vista previa
-========================================== */
 
-.j-crop-preview{
+.j-switch input:not(:checked) + .j-switch-slider .j-switch-thumb {
+    transform: translateX(0);
+}
+
+/* Crop preview */
+.j-crop-preview {
     position: relative;
     display: inline-block;
-    padding: 30px;
-    margin-top: 20px;
-
-    transform: translateX(-50px);
+    padding: 4px;
 }
 
-.j-crop-preview-grid{
+.j-crop-preview-grid {
     display: grid;
-    grid-template-columns: repeat(3, 52px);
-    grid-template-rows: repeat(3, 52px);
-    gap: 18px;
+    grid-template-columns: repeat(3, 18px);
+    grid-template-rows: repeat(3, 18px);
+    gap: 4px;
     position: relative;
     z-index: 2;
 }
 
-.j-crop-preview-grid div{
-    width: 52px;
-    height: 52px;
+.j-crop-preview-grid div {
+    width: 18px;
+    height: 18px;
     background: #DEF5F3;
+    border-radius: 2px;
 }
 
-/* ==========================================
-   Líneas guía
-========================================== */
-
-.j-line{
+/* Líneas guía */
+.j-line {
     position: absolute;
     z-index: 1;
 }
 
-/* =========================
-   Horizontales
-========================= */
-
-.j-line.h{
-    left: 16px;
-    right: 16px;
-    height: 2px;
-    background: repeating-linear-gradient(
-        to right,
-        #BFC5CC 0 8px,
-        transparent 8px 14px
-    );
+.j-line.h {
+    left: 4px;
+    right: 4px;
+    height: 1px;
+    background: repeating-linear-gradient(to right, #BFC5CC 0 4px, transparent 4px 6px);
 }
 
-.j-line.h.top{
-    top: 16px;
+.j-line.h.top {
+    top: 3px;
 }
 
-.j-line.h.middle-1{
-    top: 90px;
+.j-line.h.middle-1 {
+    top: 29px; /* 18 + 4 + 3 + 4 */
 }
 
-.j-line.h.middle-2{
-    top: 160px;
+.j-line.h.middle-2 {
+    top: 51px; /* 18*2 + 4*2 + 3 + 4 */
 }
 
-.j-line.h.bottom{
-    bottom: 16px;
+.j-line.h.bottom {
+    bottom: 3px;
 }
 
-/* =========================
-   Verticales
-========================= */
-
-.j-line.v{
-    top: 16px;
-    bottom: 16px;
-    width: 2px;
-    background: repeating-linear-gradient(
-        to bottom,
-        #BFC5CC 0 8px,
-        transparent 8px 14px
-    );
+.j-line.v {
+    top: 3px;
+    bottom: 3px;
+    width: 1px;
+    background: repeating-linear-gradient(to bottom, #BFC5CC 0 4px, transparent 4px 6px);
 }
 
-.j-line.v.left{
-    left: 16px;
+.j-line.v.left {
+    left: 3px;
 }
 
-.j-line.v.center-1{
-    left: 90px;
+.j-line.v.center-1 {
+    left: 29px;
 }
 
-.j-line.v.center-2{
-    left: 160px;
+.j-line.v.center-2 {
+    left: 51px;
 }
 
-.j-line.v.right{
-    right: 16px;
+.j-line.v.right {
+    right: 3px;
 }
 
-/* ==========================================
-   Switch
-========================================== */
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    .j-print-options-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
 
-.j-switch{
-    display:inline-block;
-    cursor:pointer;
+    .j-orientation {
+        width: 60px;
+        height: 68px;
+        padding: 4px 6px;
+    }
+
+    .j-orientation-icon.vertical {
+        width: 18px;
+        height: 36px;
+    }
+
+    .j-orientation-icon.horizontal {
+        width: 36px;
+        height: 18px;
+    }
+
+    .j-crop-preview-grid {
+        grid-template-columns: repeat(3, 16px);
+        grid-template-rows: repeat(3, 16px);
+        gap: 3px;
+    }
+
+    .j-crop-preview-grid div {
+        width: 16px;
+        height: 16px;
+    }
+
+    .j-line.h.middle-1 {
+        top: 24px;
+    }
+
+    .j-line.h.middle-2 {
+        top: 42px;
+    }
+
+    .j-line.v.center-1 {
+        left: 24px;
+    }
+
+    .j-line.v.center-2 {
+        left: 42px;
+    }
 }
 
-.j-switch input{
-    display:none;
-}
-
-.j-switch-slider{
-
-    width:72px;
-    height:40px;
-
-    background:#23B5C4;
-
-    border-radius:999px;
-
-    position:relative;
-
-    display:flex;
-    align-items:center;
-
-    transition:.25s;
-}
-
-.j-switch-thumb{
-
-    position:absolute;
-
-    left:4px;
-
-    width:32px;
-    height:32px;
-
-    background:#FFF;
-
-    border-radius:50%;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    font-size:16px;
-    color:#23B5C4;
-
-    transition:.25s;
-
-    box-shadow:0 3px 8px rgba(0,0,0,.18);
-}
-
-/* Activado */
-
-.j-switch input:checked + .j-switch-slider{
-    background:#23B5C4;
-}
-
-.j-switch input:checked + .j-switch-slider .j-switch-thumb{
-    transform:translateX(32px);
-}
-
-/* Desactivado */
-
-.j-switch input:not(:checked) + .j-switch-slider{
-    background:#D7DDE3;
-}
-
-.j-switch input:not(:checked) + .j-switch-slider .j-switch-thumb{
-    transform:translateX(0);
+@media (max-width: 480px) {
+    .j-print-options-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 
+/* =====================================================
+   RESUMEN DEL PEDIDO - CHIPS
+   ===================================================== */
 
-
-
-/* ==========================================
-   RESUMEN DEL PEDIDO
-========================================== */
-
-.j-order-summary{
-
-    background:#DFF8F7;
-    border-radius:16px;
-    padding:14px 18px;
-    margin-top:20px;
+.j-order-summary {
+    background: #DFF8F7;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-top: 12px;
 }
 
-.j-order-summary-title{
-
-    margin:0 0 12px;
-
-    font-family:'Cairo',sans-serif;
-    font-size:17px;
-    font-weight:700;
-    color:#4F4F4F;
-
+.j-order-summary-title {
+    margin: 0 0 8px 0;
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #4F4F4F;
 }
-
-.j-order-summary-items{
-    display:flex;
+.j-section-next{
+    display: flex;
     justify-content: center;
-    flex-wrap:wrap;
-    gap:10px;
-}
-
-.j-summary-chip{
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-
-    min-height:36px;
-    padding:0 14px;
-
-    border:1.5px solid #20C8CF;
-    border-radius:11px;
-
-    background:#DEF5F3;
-
-    font-family:'Cairo',sans-serif;
-    font-size:12px;
-    font-weight:700;
-    color:#13BBC5;
-
-    white-space:nowrap;
-
-    transition:.25s;
+    align-items: center;
+    margin-top: 10px;
+    width: 100%;
 
 }
 
-.j-summary-chip span{
-
-    display:flex;
-    align-items:center;
-    line-height:1.1;
-
+.j-order-summary-items {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
 }
 
-.j-summary-chip:hover{
-
-    transform:translateY(-2px);
-
+.j-summary-chip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 30px;
+    padding: 0 12px;
+    border: 1.5px solid #20C8CF;
+    border-radius: 10px;
+    background: #DEF5F3;
+    font-family: 'Cairo', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: #13BBC5;
+    white-space: nowrap;
+    transition: 0.25s;
 }
 
-.j-summary-chip i{
-
-    width:18px;
-    height:18px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    color:#13BBC5;
-    font-size:16px;
-
+.j-summary-chip:hover {
+    transform: translateY(-2px);
 }
 
-.j-summary-chip span{
-
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-
-    text-align:center;
-    line-height:1.05;
-
+.j-chip-icon-img {
+    width: 14px;
+    height: 14px;
+    object-fit: contain;
+    display: block;
 }
 
-.j-board-grid[data-grid="4x4"]{
-    grid-template-columns:repeat(4,1fr);
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 768px) {
+    .j-order-summary {
+        padding: 10px 12px;
+    }
+
+    .j-order-summary-title {
+        font-size: 13px;
+    }
+
+    .j-summary-chip {
+        font-size: 10px;
+        min-height: 26px;
+        padding: 0 10px;
+    }
+
+    .j-chip-icon-img {
+        width: 12px;
+        height: 12px;
+    }
 }
 
-.j-board-grid[data-grid="5x5"]{
-    grid-template-columns:repeat(5,1fr);
-}
+@media (max-width: 480px) {
+    .j-order-summary {
+        padding: 8px 10px;
+    }
 
-.j-board-grid[data-grid="pocitos3"]{
-    grid-template-columns:repeat(3,1fr);
-}
+    .j-order-summary-title {
+        font-size: 12px;
+    }
 
-/* ==========================================
-   DISTRIBUCIÓN ESPECIAL PARA GRIDS
-========================================== */
+    .j-summary-chip {
+        font-size: 9px;
+        min-height: 22px;
+        padding: 0 8px;
+        gap: 4px;
+    }
 
-
-/* Cruzadas - X */
-/* Cruzadas - X (4x4) */
-.j-board-grid[data-grid="cruzadas"] {
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(4, 1fr);
-}
-
-.j-board-grid[data-grid="cruzadas"] .j-board-cell:nth-child(1) { 
-    grid-column: 1; 
-    grid-row: 1; 
-}
-.j-board-grid[data-grid="cruzadas"] .j-board-cell:nth-child(2) { 
-    grid-column: 2; 
-    grid-row: 2; 
-}
-.j-board-grid[data-grid="cruzadas"] .j-board-cell:nth-child(3) { 
-    grid-column: 3; 
-    grid-row: 3; 
-}
-.j-board-grid[data-grid="cruzadas"] .j-board-cell:nth-child(4) { 
-    grid-column: 4; 
-    grid-row: 4; 
-}
-.j-board-grid[data-grid="cruzadas"] .j-board-cell:nth-child(5) { 
-    grid-column: 4; 
-    grid-row: 1; 
-}
-.j-board-grid[data-grid="cruzadas"] .j-board-cell:nth-child(6) { 
-    grid-column: 3; 
-    grid-row: 2; 
-}
-.j-board-grid[data-grid="cruzadas"] .j-board-cell:nth-child(7) { 
-    grid-column: 2; 
-    grid-row: 3; 
-}
-.j-board-grid[data-grid="cruzadas"] .j-board-cell:nth-child(8) { 
-    grid-column: 1; 
-    grid-row: 4; 
+    .j-chip-icon-img {
+        width: 10px;
+        height: 10px;
+    }
 }

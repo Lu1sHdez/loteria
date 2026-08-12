@@ -96,12 +96,12 @@ if (!defined('ABSPATH')) {
             </div>
 
             <div class="j-section j-section-next">
-            <button
-                type="button"
-                id="j-go-preview"
-                class="j-btn-primary">
-                Siguiente: Vista Previa →
-            </button>
+                <button
+                    type="button"
+                    id="j-go-preview"
+                    class="j-btn-primary">
+                    Siguiente: Vista Previa →
+                </button>
             </div>
 
         </div>

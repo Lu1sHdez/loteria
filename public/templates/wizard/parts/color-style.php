@@ -12,7 +12,7 @@ $marco_colores = [
 
 <div class="j-color-style">
 
-    <p class="text-p-negrita">Color de marco de baraja</p>
+    <p class="text-p-negrita">Color de Marco y Relleno de Baraja</p>
 
     <div class="j-marco-colores">
         <?php foreach ($marco_colores as $index => $hex): ?>

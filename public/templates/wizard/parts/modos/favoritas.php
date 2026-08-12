@@ -11,7 +11,6 @@ if (!defined('ABSPATH')) {
     <div class="j-favoritas-header">
         <div class="contenido-centrado">
             <p class="text-p-negrita">Favoritas a escoger <span class="j-texto-normal"> (hasta 12 figuras)</span></p>
-            <span id="j-favoritas-limit-msg">máximo 1 por tabla en Pocitos 3</span>
         </div>
         <div class="j-favoritas-counter-circle" id="j-favoritas-counter-circle">
             <span id="j-favoritas-seleccionadas">0</span>
