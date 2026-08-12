@@ -61,20 +61,6 @@
 .j-casilla-btn:active{
     transform:scale(.98);
 }
-
-/* Inactivo */
-
-.j-casilla-btn.inactive{
-    background:#FFF;
-    border-color:#D9D9D9;
-    color:#999;
-}
-
-.j-casilla-btn.inactive:hover{
-    background:#F5F5F5;
-    border-color:#D9D9D9;
-    color:#666;
-}
 /* =====================================================
    VISTA PREVIA DE UBICACIÓN
 ===================================================== */

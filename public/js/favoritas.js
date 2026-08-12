@@ -314,6 +314,14 @@
         // =========================================================
 
         toggleSeleccion(baraja) {
+            if (JuguemosState.grid === 'pocitos3') {
+                const totalTablas = (JuguemosState.quantity || 1) * (JuguemosState.pages || 1);
+                if (this.seleccionadas.length >= totalTablas) {
+                    alert(`Pocitos 3 solo permite ${totalTablas} favorita(s) (1 por tabla).`);
+                    return;
+                }
+            }
+
             const numero = parseInt(baraja.numero);
             const index = this.seleccionadas.findIndex(s => parseInt(s.numero) === numero);
             

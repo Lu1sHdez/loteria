@@ -37,6 +37,7 @@ window.PrintPaper = {
             rawHeight: size.height
         };
     },
+
     getBoardLayout(paper, scale) {
         const totalBoards = Number(JuguemosState.quantity) || 1;
         const margin = 15;
@@ -109,75 +110,56 @@ window.PrintPaper = {
         const sheetHeight = paper.height * scale;
         const isHorizontal = sheetWidth > sheetHeight;
     
-        const margin = 5; // Margen en píxeles
-        const gap = 2; // Espacio entre cartas
+        const margin = 5;
+        const gap = 2;
         const maxCardsPerSheet = 10;
     
         const availableWidth = sheetWidth - (margin * 2);
         const availableHeight = sheetHeight - (margin * 2);
     
-        // 🔥 DETERMINAR DISTRIBUCIÓN ÓPTIMA
-        // Probar diferentes configuraciones y elegir la que mejor se adapte
         let bestConfig = null;
         let bestCoverage = 0;
     
-        // Posibles configuraciones (columnas x filas)
         const configs = [
-            { cols: 2, rows: 5 }, // 10 cartas
-            { cols: 5, rows: 2 }, // 10 cartas
-            { cols: 3, rows: 3 }, // 9 cartas
-            { cols: 3, rows: 4 }, // 12 cartas
-            { cols: 4, rows: 3 }, // 12 cartas
-            { cols: 3, rows: 5 }, // 15 cartas
-            { cols: 5, rows: 3 }, // 15 cartas
-            { cols: 2, rows: 6 }, // 12 cartas
-            { cols: 6, rows: 2 }, // 12 cartas
-            { cols: 4, rows: 4 }, // 16 cartas
-            { cols: 2, rows: 7 }, // 14 cartas
-            { cols: 7, rows: 2 }, // 14 cartas
+            { cols: 2, rows: 5 }, { cols: 5, rows: 2 },
+            { cols: 3, rows: 3 }, { cols: 3, rows: 4 },
+            { cols: 4, rows: 3 }, { cols: 3, rows: 5 },
+            { cols: 5, rows: 3 }, { cols: 2, rows: 6 },
+            { cols: 6, rows: 2 }, { cols: 4, rows: 4 },
+            { cols: 2, rows: 7 }, { cols: 7, rows: 2 }
         ];
     
-        const cardAspectRatio = 2 / 3; // Ancho/Alto de una carta
+        const cardAspectRatio = 2 / 3; 
     
         for (const config of configs) {
             const { cols, rows } = config;
             const cardsPerSheet = cols * rows;
             
-            // Si necesitamos menos cartas que las que caben, saltar
             if (cardsPerSheet > maxCardsPerSheet) continue;
-            // Si caben muy pocas, saltar
             if (cardsPerSheet < Math.min(totalBarajas, 4)) continue;
     
-            // Calcular tamaño de carta para esta configuración
             let cardWidth = (availableWidth - ((cols - 1) * gap)) / cols;
             let cardHeight = cardWidth / cardAspectRatio;
     
-            // Verificar si cabe en altura
             const neededHeight = (rows * cardHeight) + ((rows - 1) * gap);
             
             if (neededHeight > availableHeight) {
-                // Ajustar por altura
                 cardHeight = (availableHeight - ((rows - 1) * gap)) / rows;
                 cardWidth = cardHeight * cardAspectRatio;
                 
-                // Verificar si cabe en ancho
                 const neededWidth = (cols * cardWidth) + ((cols - 1) * gap);
                 if (neededWidth > availableWidth) {
-                    // No cabe ni ajustando, pasar a siguiente configuración
                     continue;
                 }
             }
     
-            // Calcular cobertura (qué tan bien usa el espacio)
             const actualWidth = (cols * cardWidth) + ((cols - 1) * gap);
             const actualHeight = (rows * cardHeight) + ((rows - 1) * gap);
             const coverage = (actualWidth * actualHeight) / (availableWidth * availableHeight);
     
-            // Si es mejor cobertura o es la primera configuración válida
             if (!bestConfig || coverage > bestCoverage) {
                 bestConfig = {
-                    cols,
-                    rows,
+                    cols, rows,
                     cardWidth: Math.floor(cardWidth),
                     cardHeight: Math.floor(cardHeight),
                     cardsPerSheet,
@@ -187,7 +169,6 @@ window.PrintPaper = {
             }
         }
     
-        // Si no encontramos configuración, usar una por defecto
         if (!bestConfig) {
             bestConfig = {
                 cols: isHorizontal ? 3 : 2,
@@ -201,7 +182,6 @@ window.PrintPaper = {
             bestConfig.cardsPerSheet = bestConfig.cols * bestConfig.rows;
         }
     
-        // Recalcular dimensiones finales con los valores redondeados
         const { cols, rows, cardWidth, cardHeight, cardsPerSheet } = bestConfig;
     
         const gridWidth = (cols * cardWidth) + ((cols - 1) * gap);
@@ -211,11 +191,6 @@ window.PrintPaper = {
         const offsetY = Math.round((sheetHeight - gridHeight) / 2);
     
         const sheetsNeeded = Math.ceil(totalBarajas / cardsPerSheet);
-    
-        console.log(`📐 Hoja: ${sheetWidth}x${sheetHeight}px`);
-        console.log(`🃏 Distribución: ${cols}x${rows} = ${cardsPerSheet} barajas`);
-        console.log(`🃏 Tamaño carta: ${cardWidth}x${cardHeight}px`);
-        console.log(`📊 Ocupación: ${(bestConfig.coverage * 100).toFixed(1)}%`);
     
         for (let sheetIndex = 0; sheetIndex < sheetsNeeded; sheetIndex++) {
             const sheet = document.createElement('div');
@@ -313,15 +288,8 @@ window.PrintPaper = {
     
             if (JuguemosState.cutMarks) {
                 this.addCutMarksToBarajas(sheet, paper, scale, {
-                    cols,
-                    rows,
-                    cardWidth,
-                    cardHeight,
-                    gap,
-                    offsetX,
-                    offsetY,
-                    gridWidth,
-                    gridHeight,
+                    cols, rows, cardWidth, cardHeight, gap,
+                    offsetX, offsetY, gridWidth, gridHeight,
                     totalCards: endIndex - startIndex
                 });
             }
@@ -329,7 +297,6 @@ window.PrintPaper = {
             sheets.push(sheet);
         }
     
-        console.log(`${sheets.length} hoja(s) de barajas extras generadas`);
         return sheets;
     },
     
@@ -348,9 +315,7 @@ window.PrintPaper = {
         
         const { cols, rows, cardWidth, cardHeight, gap, offsetX, offsetY, gridWidth, gridHeight, totalCards } = layout;
         
-        // Solo mostrar marcas si hay más de una carta
         if (totalCards > 1) {
-            // Contorno exterior - solo si hay más de una carta
             const contorno = document.createElement('div');
             Object.assign(contorno.style, {
                 position: 'absolute',
@@ -358,15 +323,14 @@ window.PrintPaper = {
                 left: (offsetX - gap / 2) + 'px',
                 width: (gridWidth + gap) + 'px',
                 height: (gridHeight + gap) + 'px',
-                border: '2px dashed #999', // 🔥 Más sutil
+                border: '2px dashed #999',
                 borderRadius: '4px',
                 pointerEvents: 'none',
-                opacity: '0.4', // 🔥 Más transparente
+                opacity: '0.4',
                 boxSizing: 'border-box'
             });
             marks.appendChild(contorno);
             
-            // Líneas verticales entre columnas (solo si hay más de 1 columna)
             if (cols > 1) {
                 for (let col = 1; col < cols; col++) {
                     const x = offsetX + (cardWidth * col) + (gap * (col - 0.5));
@@ -374,7 +338,6 @@ window.PrintPaper = {
                 }
             }
             
-            // Líneas horizontales entre filas (solo si hay más de 1 fila)
             if (rows > 1) {
                 for (let row = 1; row < rows; row++) {
                     const y = offsetY + (cardHeight * row) + (gap * (row - 0.5));
@@ -386,16 +349,9 @@ window.PrintPaper = {
         sheet.appendChild(marks);
     },
 
-    /**
-     * Renderizar vista previa completa
-     */
-    // En print-preview.js - REEMPLAZAR el método render() existente
-
     render() {
         const container = document.getElementById('j-print-preview');
-        if (!container) {
-            return;
-        }
+        if (!container) return;
     
         container.innerHTML = '';
     
@@ -418,25 +374,17 @@ window.PrintPaper = {
             scale = Math.min(scaleX, scale * 1.1);
         }
     
-        // Guardar layout para usar en barajas
         this.currentPaper = paper;
         this.currentScale = scale;
     
-        console.log(`📏 Escala calculada: ${scale.toFixed(2)}x (${paper.width}mm x ${paper.height}mm)`);
-    
-        // 🔥 1. Generar páginas de tablas de juego
         for (let page = 0; page < totalPages; page++) {
             const sheet = this.createSheet(paper, scale, page);
             container.appendChild(sheet);
         }
     
-        // 🔥 2. Generar páginas de barajas sueltas (SOLO si está activado)
         if (incluirBarajas) {
             const barajaSheets = this.generateBarajaSheets(paper, scale);
-            
-            // 🔥 SOLO AÑADIR SEPARADOR SI HAY BARAJAS
             if (barajaSheets.length > 0) {
-                // Añadir un separador visual entre tablas y barajas
                 const separator = document.createElement('div');
                 separator.style.cssText = `
                     width: 100%;
@@ -452,22 +400,11 @@ window.PrintPaper = {
                 `;
                 separator.textContent = 'BARAJAS INCLUIDAS';
                 container.appendChild(separator);
-                
-                // Añadir las hojas de barajas
-                barajaSheets.forEach(sheet => {
-                    container.appendChild(sheet);
-                });
+                barajaSheets.forEach(sheet => container.appendChild(sheet));
             }
-            
-            console.log(`🃏 ${barajaSheets.length} hoja(s) de barajas añadidas`);
         }
-    
-        console.log(`PrintPaper: ${totalPages} página(s) de juego + ${incluirBarajas ? 'barajas' : 'sin barajas'} renderizada(s)`);
     },
 
-    /**
-     * Crear una hoja
-     */
     createSheet(paper, scale, pageIndex) {
         const sheet = document.createElement('div');
         sheet.className = 'j-sheet';
@@ -506,7 +443,12 @@ window.PrintPaper = {
         });
 
         for (let i = 0; i < layout.totalBoards; i++) {
-            const board = this.createBoard(this.gridConfig[JuguemosState.grid || '4x4'] || this.gridConfig['4x4'], i, pageIndex);
+            const board = this.createBoard(
+                this.gridConfig[JuguemosState.grid || '4x4'] || this.gridConfig['4x4'],
+                i,
+                pageIndex,
+                layout.cols
+            );
             board.style.width = layout.boardWidth + 'px';
             board.style.height = layout.boardHeight + 'px';
             board.style.flexShrink = '0';
@@ -523,107 +465,285 @@ window.PrintPaper = {
         return sheet;
     },
 
-    /**
- * Crear una tabla (board) con su grid de casillas
- */
-createBoard(config, boardIndex, pageIndex) {
-    const board = document.createElement('div');
-    board.className = 'j-print-board';
-    board.dataset.board = boardIndex + 1;
-    board.dataset.page = pageIndex + 1;
-
-    const gridType = JuguemosState.grid || '4x4';
-    const isPocitos3 = gridType === 'pocitos3';
-    const isPocitos4 = gridType === 'pocitos4';
-    const isCruzadas = gridType === 'cruzadas';
-
-    // Configuración base del board
-    Object.assign(board.style, {
-        border: `2px solid ${JuguemosState.marcoColor || '#FA299C'}`,
-        borderRadius: '4px',
-        overflow: 'hidden',
-        backgroundColor: JuguemosState.fondoColor || '#FFFFFF',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: isPocitos3 ? '4px' : '4px',
-        boxSizing: 'border-box',
-        aspectRatio: isPocitos3 ? '4/3' : '2/3'    
-    });
-
-    const grid = document.createElement('div');
-    grid.className = 'j-board-grid';
-    grid.dataset.grid = gridType;
-
-    // Obtener casillas para esta tabla
-    const todasLasTablas = JuguemosState.todasLasTablas || [];
-    const casillasAsignadas = JuguemosState.casillasAsignadas || [];
+    createBoard(config, boardIndex, pageIndex, cols) {
+        const totalBoardsPorPagina = JuguemosState.quantity || 1;
+        const totalTablas = totalBoardsPorPagina * (JuguemosState.pages || 1);
     
-    const indexGlobal = (pageIndex * (JuguemosState.quantity || 1)) + boardIndex;
+        const board = document.createElement('div');
+        board.className = 'j-print-board';
+        board.dataset.board = boardIndex + 1;
+        board.dataset.page = pageIndex + 1;
     
-    let casillasParaEstaTabla;
-    if (todasLasTablas[indexGlobal]) {
-        casillasParaEstaTabla = todasLasTablas[indexGlobal];
-    } else if (todasLasTablas.length > 0) {
-        const baseTabla = todasLasTablas[boardIndex % todasLasTablas.length] || casillasAsignadas;
-        casillasParaEstaTabla = [...baseTabla];
-    } else {
-        casillasParaEstaTabla = casillasAsignadas;
-    }
-
-    // 🔥 OBTENER FAVORITAS PARA RESALTAR
-    const favoritas = JuguemosState.favoritas || [];
-    const tieneFavoritas = favoritas.length > 0 && JuguemosState.mode === 'favoritas';
-
-    // 🔥 OBTENER CARTAS DOBLES PARA RESALTAR
-    const cartasDobles = JuguemosState.cartasDobles || [];
-    const numerosDobles = cartasDobles.map(c => parseInt(c.numero));
-    const esModoDobles = JuguemosState.mode === 'dobles';
-
-    // ==========================================
-    // CASO ESPECIAL: POCITOS 3
-    // ==========================================
-    if (isPocitos3) {
-        // Configuración especial para Pocitos 3
+        const gridType = JuguemosState.grid || '4x4';
+        const isPocitos3 = gridType === 'pocitos3';
+        const isPocitos4 = gridType === 'pocitos4';
+        const isCruzadas = gridType === 'cruzadas';
+    
+        Object.assign(board.style, {
+            border: `2px solid ${JuguemosState.marcoColor || '#FA299C'}`,
+            borderRadius: '4px',
+            overflow: 'hidden',
+            backgroundColor: JuguemosState.fondoColor || '#FFFFFF',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: isPocitos3 ? '4px' : '4px',
+            boxSizing: 'border-box',
+            aspectRatio: isPocitos3 ? '4/3' : '2/3'    
+        });
+    
+        const grid = document.createElement('div');
+        grid.className = 'j-board-grid';
+        grid.dataset.grid = gridType;
+    
+        const todasLasTablas = JuguemosState.todasLasTablas || [];
+        const casillasAsignadas = JuguemosState.casillasAsignadas || [];
+        
+        const indexGlobal = (pageIndex * totalBoardsPorPagina) + boardIndex;
+        
+        let casillasParaEstaTabla;
+        if (todasLasTablas[indexGlobal]) {
+            casillasParaEstaTabla = todasLasTablas[indexGlobal];
+        } else if (todasLasTablas.length > 0) {
+            const baseTabla = todasLasTablas[boardIndex % todasLasTablas.length] || casillasAsignadas;
+            casillasParaEstaTabla = [...baseTabla];
+        } else {
+            casillasParaEstaTabla = casillasAsignadas;
+        }
+    
+        const favoritas = JuguemosState.favoritas || [];
+        const tieneFavoritas = favoritas.length > 0 && JuguemosState.mode === 'favoritas';
+    
+        const cartasDobles = JuguemosState.cartasDobles || [];
+        const numerosDobles = cartasDobles.map(c => parseInt(c.numero));
+        const esModoDobles = JuguemosState.mode === 'dobles';
+    
+        if (isPocitos3) {
+            Object.assign(grid.style, {
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gridTemplateRows: '1fr 1fr',
+                gap: '0px',
+                width: '100%',
+                height: '100%',
+                padding: '0px',
+                boxSizing: 'border-box'
+            });
+    
+            const casillas = [
+                casillasParaEstaTabla[0] || null,
+                casillasParaEstaTabla[1] || null,
+                casillasParaEstaTabla[2] || null
+            ];
+    
+            const posicionesGrid = [
+                { row: '1 / 3', col: '1' },
+                { row: '1', col: '2' },
+                { row: '2', col: '2' }
+            ];
+    
+            // 🔥 Calcular columnas reales
+            let columnas = 0;
+            if (typeof cols === 'number' && cols > 0) {
+                columnas = cols;
+            } else {
+                const n = totalBoardsPorPagina;
+                if (n > 2 && n <= 4) columnas = 2;
+                else if (n > 4 && n <= 6) columnas = 3;
+                else if (n > 6) columnas = Math.ceil(Math.sqrt(n));
+            }
+    
+            // 🔥 Calcular fila actual y si hay tabla debajo
+            const indexActual = (pageIndex * totalBoardsPorPagina) + boardIndex;
+    
+            for (let i = 0; i < 3; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'j-board-cell';
+                cell.dataset.index = i;
+                
+                const pos = posicionesGrid[i];
+                if (pos) {
+                    cell.style.gridRow = pos.row;
+                    cell.style.gridColumn = pos.col;
+                }
+                
+                Object.assign(cell.style, {
+                    border: `1px solid ${JuguemosState.marcoColor || '#FA299C'}`,
+                    borderRadius: '2px',
+                    backgroundColor: JuguemosState.fondoColor || '#FFFFFF',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    overflow: 'hidden',
+                    position: 'relative',
+                    aspectRatio: 'auto'
+                });
+    
+                const casilla = casillas[i];
+                const esFavorita = tieneFavoritas && casilla && favoritas.some(f => f && f.numero === casilla.numero);
+                const esDoble = esModoDobles && casilla && numerosDobles.includes(parseInt(casilla.numero));
+    
+                if (casilla) {
+                    const img = document.createElement('img');
+                    let imagenSrc = casilla.imagen;
+                    
+                    // 🔥 Lógica para i === 0 (izquierda) - imagen completa
+                    if (i === 0) {
+                        Object.assign(img.style, {
+                            position: 'absolute',
+                            top: '0',
+                            left: '0',
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            objectPosition: 'center center',
+                            display: 'block',
+                            boxSizing: 'border-box'
+                        });
+                    } 
+                    // 🔥 Lógica para i === 1 (superior derecha) - SIEMPRE MITAD INFERIOR
+                    else if (i === 1) {
+                        Object.assign(img.style, {
+                            position: 'absolute',
+                            top: '-100%',
+                            left: '0',
+                            width: '100%',
+                            height: '200%',
+                            objectFit: 'cover',
+                            objectPosition: 'bottom center',
+                            display: 'block',
+                            boxSizing: 'border-box'
+                        });
+                    } 
+                    // 🔥 Lógica para i === 2 (inferior derecha) - SIEMPRE MITAD SUPERIOR
+                    else if (i === 2) {
+                        // Usar la imagen de la baraja 2 de la tabla de ABAJO
+                        if (columnas > 0) {
+                            const indexDebajo = indexActual + columnas;
+                            if (indexDebajo < totalTablas && todasLasTablas[indexDebajo]) {
+                                const tablaDebajo = todasLasTablas[indexDebajo];
+                                if (tablaDebajo && tablaDebajo[1]) {
+                                    imagenSrc = tablaDebajo[1].imagen;
+                                }
+                            }
+                        }
+                        
+                        // SIEMPRE MITAD SUPERIOR
+                        Object.assign(img.style, {
+                            position: 'absolute',
+                            top: '0',
+                            left: '0',
+                            width: '100%',
+                            height: '200%',
+                            objectFit: 'cover',
+                            objectPosition: 'top center',
+                            display: 'block',
+                            boxSizing: 'border-box'
+                        });
+                    }
+                    
+                    // Asignar src después de que imagenSrc esté definida
+                    if (JuguemosState.mode === 'libre' && JuguemosState.libreImages && JuguemosState.libreImages.length > 0) {
+                        const libreIndex = casilla.numero ? casilla.numero - 1 : i;
+                        if (JuguemosState.libreImages[libreIndex]) {
+                            img.src = JuguemosState.libreImages[libreIndex].data;
+                            img.alt = casilla.nombre || `Libre ${libreIndex + 1}`;
+                        } else {
+                            img.src = imagenSrc;
+                            img.alt = casilla.nombre;
+                        }
+                    } else {
+                        img.src = imagenSrc;
+                        img.alt = casilla.nombre || 'Baraja';
+                    }
+                    
+                    img.onerror = function() {
+                        this.style.display = 'none';
+                        cell.textContent = casilla.nombre || '❌';
+                        cell.style.fontSize = '8px';
+                        cell.style.textAlign = 'center';
+                        cell.style.color = '#333';
+                    };
+                    
+                    cell.appendChild(img);
+                    
+                    if (esFavorita) {
+                        const badge = document.createElement('span');
+                        badge.textContent = '⭐';
+                        Object.assign(badge.style, {
+                            position: 'absolute',
+                            top: '1px',
+                            right: '1px',
+                            fontSize: '8px',
+                            lineHeight: '1',
+                            zIndex: '5',
+                            textShadow: '0 0 3px rgba(255,255,255,0.8)'
+                        });
+                        cell.appendChild(badge);
+                    }
+                } else {
+                    cell.textContent = '';
+                    Object.assign(cell.style, {
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        boxShadow: 'none'
+                    });
+                }
+    
+                grid.appendChild(cell);
+            }
+    
+            board.appendChild(grid);
+            return board;
+        }
+    
+        const { cols: gridCols, rows: gridRows, total } = config;
+        
+        let gapValue = '2px';
+        if (isPocitos4) gapValue = '0px';
+        
+        let finalCols = gridCols;
+        let finalRows = gridRows;
+        
+        if (isPocitos4) {
+            gridCols = 2;
+            gridRows = 2;
+        }
+        
         Object.assign(grid.style, {
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gridTemplateRows: '1fr 1fr',
-            gap: '0px',
+            gridTemplateColumns: `repeat(${finalCols}, 1fr)`,
+            gridTemplateRows: `repeat(${finalRows}, 1fr)`,
+            gap: gapValue,
             width: '100%',
             height: '100%',
-            padding: '0px',
+            padding: isPocitos4 ? '0px' : '2px',
             boxSizing: 'border-box'
         });
-
-        // Obtener las 3 casillas en el orden correcto
-        const casillas = [
-            casillasParaEstaTabla[0] || null,
-            casillasParaEstaTabla[1] || null,
-            casillasParaEstaTabla[2] || null
-        ];
-
-        // Posiciones especiales para Pocitos 3
-        const posicionesGrid = [
-            { row: '1 / 3', col: '1' },      // Casilla 0: izquierda (ocupa 2 filas)
-            { row: '1', col: '2' },           // Casilla 1: arriba derecha
-            { row: '2', col: '2' }            // Casilla 2: abajo derecha
-        ];
-
-
-        for (let i = 0; i < 3; i++) {
+    
+        for (let i = 0; i < total; i++) {
             const cell = document.createElement('div');
             cell.className = 'j-board-cell';
             cell.dataset.index = i;
             
-            // Posicionamiento especial
-            const pos = posicionesGrid[i];
-            if (pos) {
-                cell.style.gridRow = pos.row;
-                cell.style.gridColumn = pos.col;
+            if (isCruzadas) {
+                const positions = {
+                    0: { row: 1, col: 1 },
+                    1: { row: 2, col: 2 },
+                    2: { row: 3, col: 3 },
+                    3: { row: 4, col: 4 },
+                    4: { row: 1, col: 4 },
+                    5: { row: 2, col: 3 },
+                    6: { row: 3, col: 2 },
+                    7: { row: 4, col: 1 }
+                };
+                const pos = positions[i];
+                if (pos) {
+                    cell.style.gridRow = pos.row;
+                    cell.style.gridColumn = pos.col;
+                }
             }
             
-            // Estilo de celda
             Object.assign(cell.style, {
                 border: `1px solid ${JuguemosState.marcoColor || '#FA299C'}`,
                 borderRadius: '2px',
@@ -633,17 +753,17 @@ createBoard(config, boardIndex, pageIndex) {
                 justifyContent: 'center',
                 overflow: 'hidden',
                 position: 'relative',
-                aspectRatio: 'auto'
+                aspectRatio: '2/3'
             });
-
-            const casilla = casillas[i];
+    
+            const casilla = casillasParaEstaTabla && casillasParaEstaTabla[i] ? casillasParaEstaTabla[i] : null;
+            
             const esFavorita = tieneFavoritas && casilla && favoritas.some(f => f && f.numero === casilla.numero);
             const esDoble = esModoDobles && casilla && numerosDobles.includes(parseInt(casilla.numero));
-
+    
             if (casilla) {
                 const img = document.createElement('img');
                 
-                // MODO LIBRE
                 if (JuguemosState.mode === 'libre' && JuguemosState.libreImages && JuguemosState.libreImages.length > 0) {
                     const libreIndex = casilla.numero ? casilla.numero - 1 : i;
                     if (JuguemosState.libreImages[libreIndex]) {
@@ -661,8 +781,7 @@ createBoard(config, boardIndex, pageIndex) {
                 Object.assign(img.style, {
                     width: '100%',
                     height: '100%',
-                    objectFit: isPocitos3 ? 'fill' : 'contain',
-                    padding: isPocitos3 ? '0px' : '2px',
+                    objectFit: 'cover',
                     boxSizing: 'border-box'
                 });
                 
@@ -676,7 +795,6 @@ createBoard(config, boardIndex, pageIndex) {
                 
                 cell.appendChild(img);
                 
-                // BADGE DE FAVORITA
                 if (esFavorita) {
                     const badge = document.createElement('span');
                     badge.textContent = '⭐';
@@ -691,175 +809,30 @@ createBoard(config, boardIndex, pageIndex) {
                     });
                     cell.appendChild(badge);
                 }
-                
-                
             } else {
-                // Celda vacía
-                cell.textContent = '';
-                Object.assign(cell.style, {
-                    backgroundColor: 'transparent',
-                    border: 'none',
-                    boxShadow: 'none'
-                });
+                if (isPocitos4) {
+                    cell.textContent = '';
+                    Object.assign(cell.style, {
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        boxShadow: 'none'
+                    });
+                } else {
+                    cell.textContent = i + 1;
+                    Object.assign(cell.style, {
+                        fontSize: '10px',
+                        color: '#ccc',
+                        fontWeight: 'bold'
+                    });
+                }
             }
-
+    
             grid.appendChild(cell);
         }
-
+    
         board.appendChild(grid);
         return board;
-    }
-
-    // ==========================================
-    // GRIDS NORMALES (4x4, 5x5, pocitos4, cruzadas)
-    // ==========================================
-    const { cols, rows, total } = config;
-    
-    // Configurar grid CSS
-    let gapValue = '2px';
-    if (isPocitos4) gapValue = '0px';
-    
-    let gridCols = cols;
-    let gridRows = rows;
-    
-    if (isPocitos4) {
-        gridCols = 2;
-        gridRows = 2;
-    }
-    
-    Object.assign(grid.style, {
-        display: 'grid',
-        gridTemplateColumns: `repeat(${gridCols}, 1fr)`,
-        gridTemplateRows: `repeat(${gridRows}, 1fr)`,
-        gap: gapValue,
-        width: '100%',
-        height: '100%',
-        padding: isPocitos4 ? '0px' : '2px',
-        boxSizing: 'border-box'
-    });
-    // Generar celdas
-    for (let i = 0; i < total; i++) {
-        const cell = document.createElement('div');
-        cell.className = 'j-board-cell';
-        cell.dataset.index = i;
-        
-        // 🔥 POSICIONAMIENTO ESPECIAL PARA CRUZADAS
-        if (isCruzadas) {
-            const positions = {
-                0: { row: 1, col: 1 },
-                1: { row: 2, col: 2 },
-                2: { row: 3, col: 3 },
-                3: { row: 4, col: 4 },
-                4: { row: 1, col: 4 },
-                5: { row: 2, col: 3 },
-                6: { row: 3, col: 2 },
-                7: { row: 4, col: 1 }
-            };
-            const pos = positions[i];
-            if (pos) {
-                cell.style.gridRow = pos.row;
-                cell.style.gridColumn = pos.col;
-            }
-        }
-        
-        // Estilo de celda
-        Object.assign(cell.style, {
-            border: `1px solid ${JuguemosState.marcoColor || '#FA299C'}`,
-            borderRadius: '2px',
-            backgroundColor: JuguemosState.fondoColor || '#FFFFFF',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            overflow: 'hidden',
-            position: 'relative',
-            aspectRatio: '2/3'
-        });
-
-        // Obtener casilla
-        const casilla = casillasParaEstaTabla && casillasParaEstaTabla[i] ? casillasParaEstaTabla[i] : null;
-        
-        // Verificar si es favorita
-        const esFavorita = tieneFavoritas && casilla && favoritas.some(f => f && f.numero === casilla.numero);
-        
-        // 🔥 Verificar si es doble
-        const esDoble = esModoDobles && casilla && numerosDobles.includes(parseInt(casilla.numero));
-
-        if (casilla) {
-            const img = document.createElement('img');
-            
-            // 🔥 MODO LIBRE: Usar imágenes subidas por el usuario
-            if (JuguemosState.mode === 'libre' && JuguemosState.libreImages && JuguemosState.libreImages.length > 0) {
-                const libreIndex = casilla.numero ? casilla.numero - 1 : i;
-                if (JuguemosState.libreImages[libreIndex]) {
-                    img.src = JuguemosState.libreImages[libreIndex].data;
-                    img.alt = casilla.nombre || `Libre ${libreIndex + 1}`;
-                } else {
-                    img.src = casilla.imagen;
-                    img.alt = casilla.nombre;
-                }
-            } else {
-                img.src = casilla.imagen;
-                img.alt = casilla.nombre || 'Baraja';
-            }
-            
-            Object.assign(img.style, {
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                boxSizing: 'border-box'
-            });
-            
-            img.onerror = function() {
-                this.style.display = 'none';
-                cell.textContent = casilla.nombre || '❌';
-                cell.style.fontSize = '8px';
-                cell.style.textAlign = 'center';
-                cell.style.color = '#333';
-            };
-            
-            cell.appendChild(img);
-            
-            // 🔥 BADGE DE FAVORITA
-            if (esFavorita) {
-                const badge = document.createElement('span');
-                badge.textContent = '⭐';
-                Object.assign(badge.style, {
-                    position: 'absolute',
-                    top: '1px',
-                    right: '1px',
-                    fontSize: '8px',
-                    lineHeight: '1',
-                    zIndex: '5',
-                    textShadow: '0 0 3px rgba(255,255,255,0.8)'
-                });
-                cell.appendChild(badge);
-            }
-            
-        } else {
-            if (isPocitos4) {
-                cell.textContent = '';
-                Object.assign(cell.style, {
-                    backgroundColor: 'transparent',
-                    border: 'none',
-                    boxShadow: 'none'
-                });
-            } else {
-                cell.textContent = i + 1;
-                Object.assign(cell.style, {
-                    fontSize: '10px',
-                    color: '#ccc',
-                    fontWeight: 'bold'
-                });
-            }
-        }
-
-        grid.appendChild(cell);
-    }
-
-    board.appendChild(grid);
-    return board;
-},
-
+    },
 
     addCutMarks(sheet, paper, scale, layout) {
         layout = layout || this.getBoardLayout(paper, scale);
@@ -912,9 +885,6 @@ createBoard(config, boardIndex, pageIndex) {
         sheet.style.position = 'relative';
     },
 
-    /**
-     * Crear una línea discontinua individual
-     */
     createCutLine(container, direction, position, start, length) {
         position = Math.round(position);
         start = Math.round(start);
@@ -963,9 +933,6 @@ createBoard(config, boardIndex, pageIndex) {
         }
     },
 
-    /**
-     * Refrescar vista previa
-     */
     refresh() {
         setTimeout(() => {
             this.render();

@@ -295,35 +295,25 @@ if (btnIncluir) {
         btnAleatoria.textContent = 'Selección Aleatoria';
 
         btnAleatoria.addEventListener("click", function() {
-            const isActive = this.classList.toggle('active');
-            if (isActive) {
-                this.textContent = 'Selección Aleatoria';
-                this.classList.remove('inactive');
-                this.classList.add('active');
+            if (!JuguemosState.deck) {
+                alert('Primero selecciona un diseño.');
+                return;
+            }
 
-                if (!JuguemosState.deck) {
-                    alert('Primero selecciona un diseño.');
-                    this.classList.remove('active');
-                    this.classList.add('inactive');
-                    this.textContent = 'Selección Aleatoria';
-                    return;
-                }
-
-                if (JuguemosState.barajas.length === 0) {
-                    JuguemosAjax.loadBarajas(JuguemosState.deck).then(() => {
-                        llenarCasillasAleatorio();
-                        updateOrderSummary();
-                    });
-                } else {
+            if (JuguemosState.barajas.length === 0) {
+                JuguemosAjax.loadBarajas(JuguemosState.deck).then(() => {
                     llenarCasillasAleatorio();
                     updateOrderSummary();
-                }
+                });
             } else {
-                this.textContent = 'Selección Aleatoria';
-                this.classList.remove('active');
-                this.classList.add('inactive');
-                limpiarCasillas();
+                llenarCasillasAleatorio();
+                updateOrderSummary();
             }
+            
+            // 🔥 Mantener el botón siempre como "inactive" (sin resaltar)
+            this.classList.remove('active');
+            this.classList.add('inactive');
+            this.textContent = 'Selección Aleatoria';
         });
     }
 
@@ -944,13 +934,40 @@ function ejecutarLlenadoAleatorio() {
     const grid = JuguemosState.grid || '4x4';
     const totalCasillas = getTotalCasillas(grid);
     const totalTablas = (JuguemosState.quantity || 1) * (JuguemosState.pages || 1);
+
+    if (JuguemosState.mode === 'favoritas' && JuguemosState.grid === 'pocitos3') {
+        // Obtener favoritas del manager
+        let favoritas = [];
+        if (window.FavoritasManagerInstance) {
+            favoritas = window.FavoritasManagerInstance.getFavoritas();
+        }
+        
+        // 🔥 LIMITAR: máximo = totalTablas (1 favorita por tabla)
+        if (favoritas.length > totalTablas) {
+            // Mezclar y tomar solo totalTablas
+            const mezcladas = [...favoritas];
+            for (let i = mezcladas.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [mezcladas[i], mezcladas[j]] = [mezcladas[j], mezcladas[i]];
+            }
+            favoritas = mezcladas.slice(0, totalTablas);
+            
+            // Actualizar estado
+            JuguemosState.favoritas = favoritas;
+            if (window.FavoritasManagerInstance) {
+                // Forzar actualización en el manager (opcional)
+            }
+        }
+        
+        console.log(`🔒 Pocitos 3: Limitado a ${favoritas.length} favoritas para ${totalTablas} tablas`);
+    }
     
     if (!totalCasillas) {
         console.warn('ejecutarLlenadoAleatorio: totalCasillas es 0');
         return;
     }
 
-    console.log('🔄 ejecutarLlenadoAleatorio - Iniciando:', {
+    console.log('ejecutarLlenadoAleatorio - Iniciando:', {
         modo: JuguemosState.mode,
         grid: grid,
         totalCasillas: totalCasillas,
@@ -1155,6 +1172,8 @@ function ejecutarLlenadoAleatorio() {
     } else {
         console.warn('No se generaron tablas');
     }
+
+
 }
 // =========================================================
 // FUNCIÓN PARA OBTENER POSICIONES DE FAVORITAS

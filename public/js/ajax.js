@@ -131,13 +131,7 @@ const JuguemosAjax = {
                 }, 200);
             }
         });
-    
-        const btnAleatoria = document.querySelector(".j-casilla-btn");
-        if (btnAleatoria) {
-            btnAleatoria.classList.remove('active');
-            btnAleatoria.classList.add('inactive');
-            btnAleatoria.textContent = 'Selección Aleatoria';
-        }
+        
         if (typeof limpiarCasillas === 'function') {
             limpiarCasillas();
         }
