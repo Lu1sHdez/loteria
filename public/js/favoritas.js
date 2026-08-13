@@ -202,12 +202,14 @@
                     // ✅ Actualizar estado global
                     JuguemosState.favoritasUbicacion = this.ubicacion;
                     
-                    // ✅ Regenerar vista previa
+                    // ✅ Primero actualizar vista previa de casillas
                     this.actualizarPreviewCasillas();
                     
-                    // ✅ Forzar regeneración de tablas
+                    // ✅ Luego forzar regeneración de tablas (después de actualizar la vista)
                     if (typeof llenarCasillasAutomatico === 'function') {
-                        setTimeout(() => llenarCasillasAutomatico(), 100);
+                        setTimeout(() => {
+                            llenarCasillasAutomatico();
+                        }, 100);
                     }
                 });
             });
@@ -400,11 +402,9 @@
             }
         }
 
-        // =========================================================
-        // 🎯 MÉTODO PRINCIPAL: ACTUALIZAR VIST PREVIA DE CASILLAS
-        // =========================================================
-
         actualizarPreviewCasillas() {
+            console.log('🔄 actualizarPreviewCasillas - Favoritas:', this.seleccionadas.length);
+            console.log('🔄 actualizarPreviewCasillas - Ubicacion:', this.ubicacion);
             // Actualizar estado global
             JuguemosState.favoritas = this.seleccionadas;
             JuguemosState.favoritasUbicacion = this.ubicacion;
@@ -463,10 +463,12 @@
             const cantidadReal = Math.min(cantidad, total, this.maxSeleccion);
             
             if (cantidadReal === 0) return [];
+            // 🔥 Si cantidadReal >= total, devolver solo las primeras 12 o menos
             if (cantidadReal >= total) {
-                return Array.from({ length: total }, (_, i) => i);
+                // Si hay más favoritas que casillas, solo mostrar las primeras
+                const maxMostrar = Math.min(cantidadReal, this.maxSeleccion);
+                return Array.from({ length: maxMostrar }, (_, i) => i);
             }
-            
             // 🔥 Distribuir según ubicación
             switch (this.ubicacion) {
                 case 'centro':
@@ -480,11 +482,6 @@
                     return this.obtenerPosicionesAleatorias(grid, cantidadReal);
             }
         }
-
-        // =========================================================
-        // 🎯 ALGORITMOS DE UBICACIÓN
-        // =========================================================
-
         obtenerPosicionesAleatorias(grid, cantidad) {
             const total = this.getTotalCasillas(grid);
             const indices = Array.from({ length: total }, (_, i) => i);

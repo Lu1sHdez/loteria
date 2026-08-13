@@ -334,3 +334,15 @@
     transform: none;
     z-index: 7;
 }
+
+/* =====================================================
+   ESTILOS PARA EL RESUMEN DE GRID
+   ===================================================== */
+
+
+.j-board-cell {
+    background-color: var(--j-marco-color, #FA299C) !important;
+}
+.j-board-grid[data-grid="pocitos3"] .j-board-cell {
+    background-color: var(--j-marco-color, #FA299C) !important;
+}

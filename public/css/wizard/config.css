@@ -163,6 +163,9 @@
 }
 
 .j-mode {
+    display: flex;
+    align-items: center;
+    gap: 8px;  /* Espacio entre icono y texto */
     padding: 10px 18px;
     border: 2px solid #DDD;
     background: #FFF;
@@ -173,6 +176,23 @@
     font-weight: 600;
     font-size: 14px;
     color: #5D5D5D;
+}
+
+.j-mode-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    transition: filter 0.3s;
+}
+
+/* 🔥 Hover - icono se vuelve blanco */
+.j-mode:hover .j-mode-icon {
+    filter: brightness(0) invert(1);
+}
+
+/* 🔥 Activo - icono se vuelve blanco */
+.j-mode.active .j-mode-icon {
+    filter: brightness(0) invert(1);
 }
 
 .j-mode:hover {
@@ -203,13 +223,15 @@
     border-radius: 10px;
     transition: .3s;
     font-family: 'Cairo', sans-serif;
-    font-weight: 600;
+    font-weight: 800;
     font-size: 14px;
     color: #5D5D5D;
 }
 
+
+
 .j-grid span {
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 400;
     color: #5D5D5D;
     display: block;

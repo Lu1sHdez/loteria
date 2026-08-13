@@ -107,21 +107,26 @@
 /* =====================================================
    VISTA PREVIA DE MARCOS
 ===================================================== */
+/* =====================================================
+   VISTA PREVIA DE MARCOS
+===================================================== */
 
+/* SOLO Vista previa marcos */
 .j-marcos-preview-grid {
     display: grid;
     gap: 4px;
     margin: 0 auto;
     padding: 8px;
-    background: #f8f8f8;
+    background: var(--j-fondo-color, #FA299C);
+    border: 3px solid #D9D9D9;
     border-radius: 8px;
-    background: var(--j-fondo-color, #FFFFFF);
     max-width: 250px !important;
     width: 250px !important;
     min-height: 120px !important;
     flex-shrink: 0;
 }
 
+/* SOLO las casillas de Vista previa marcos */
 .j-marcos-preview-grid .cell {
     border-radius: 4px;
     aspect-ratio: 2 / 3;
@@ -129,9 +134,15 @@
     height: auto;
     min-height: 35px;
     transition: background 0.2s ease, border-color 0.2s ease;
+
+    /* Color de los 12 colores */
     border: 3px solid var(--j-marco-color, #FA299C);
-    background: var(--j-fondo-color, #FFFFFF);
+
+    /* Color elegido en Color fondo de tabla */
+    background: var(--j-marco-color, #FA299C);
 }
+
+
 
 /* Mismos layouts de grid que ya usas en los otros previews */
 .j-marcos-preview-grid[data-grid="4x4"] {

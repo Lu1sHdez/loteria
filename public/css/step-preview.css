@@ -520,3 +520,34 @@
         height: 10px;
     }
 }
+
+
+/* =====================================================
+   ESTILOS PARA EL SPAN DEL GRID
+   ===================================================== */
+
+/* Aplicar estilos directamente al span */
+#j-summary-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.2;
+}
+
+/* Título en negrita */
+#j-summary-grid .grid-title {
+    font-weight: 800;
+    font-size: 16px;
+    color: #13BBC5;
+    display: block;
+}
+
+/* Subtítulo en regular */
+#j-summary-grid .grid-subtitle {
+    font-weight: 400;
+    font-size: 12px;
+    color: #13BBC5;
+    display: block;
+}

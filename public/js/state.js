@@ -23,7 +23,7 @@
         total: 0,
 
         cutMarks: true,
-
+        precioBarajas: 0.00,
 
         marcoColor: '#FA299C',
         fondoColor: '#FFFFFF',

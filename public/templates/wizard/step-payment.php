@@ -36,10 +36,6 @@ if (!defined('ABSPATH')) {
 
                 <div class="j-order-summary">
                     <div class="summary-row">
-                        <span>País</span>
-                        <strong id="payment-summary-country">-</strong>
-                    </div>
-                    <div class="summary-row">
                         <span>Tipo</span>
                         <strong id="payment-summary-mode">-</strong>
                     </div>

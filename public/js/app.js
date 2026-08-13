@@ -187,6 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (tablesPerPageInput) {
         const updateTables = () => {
             JuguemosState.quantity = parseInt(tablesPerPageInput.value) || 1;
+            updatePrice();        
             updateOrderSummary();
         };
         tablesPerPageInput.value = JuguemosState.quantity;
@@ -216,7 +217,11 @@ document.addEventListener("DOMContentLoaded", () => {
         pagesInput.addEventListener("input", () => {
             let value = parseInt(pagesInput.value) || 1;
             pagesInput.value = JuguemosState.pages = Math.max(1, value);
+            updatePrice();        // ← NUEVO: Actualizar precio al cambiar páginas
             updateOrderSummary();
+            if (typeof PrintPaper !== "undefined") {
+                setTimeout(() => PrintPaper.refresh(), 150);
+            }
         });
     }
 
@@ -260,17 +265,20 @@ document.addEventListener("DOMContentLoaded", () => {
 const btnIncluir = document.getElementById("j-incluir-barajas");
 const toggleIcon = document.getElementById("j-toggle-icon");
 if (btnIncluir) {
+
     const setActive = (active) => {
         JuguemosState.barajasIncluidas = active;
-        btnIncluir.classList.toggle("active", active);
-        btnIncluir.classList.toggle("inactive", !active);
-        toggleIcon.src =
+
+                const textSpan = btnIncluir.querySelector('.j-toggle-text');
+        if (textSpan) {
+            textSpan.textContent = active ? 'Incluir barajas' : 'No incluir barajas';
+        }
+                toggleIcon.src =
             `/wp-content/uploads/2026/07/incluir_${active ? "on" : "off"}.png`;
         
-        // 🔥 ELIMINAR el texto del status - OCULTAR COMPLETAMENTE
         const statusText = document.getElementById("j-incluir-status");
         if (statusText) {
-            statusText.style.display = 'none';  // Ocultar el elemento
+            statusText.style.display = 'none';
         }
         
         updateOrderSummary();
@@ -558,7 +566,8 @@ if (btnIncluir) {
 
 function updatePrice() {
     if (typeof JuguemosAjax !== 'undefined' && typeof JuguemosState !== 'undefined') {
-        JuguemosAjax.loadPrice(JuguemosState.country, JuguemosState.mode, JuguemosState.quantity);
+        const totalTablas = (JuguemosState.quantity || 1) * (JuguemosState.pages || 1);
+        JuguemosAjax.loadPrice(JuguemosState.country, JuguemosState.mode, totalTablas);
     }
 }
 
@@ -776,10 +785,15 @@ function updateOrderSummary() {
     const country = JuguemosState.country || 'Mexico';
     const mode = JuguemosState.mode || 'sencilla';
     const quantity = JuguemosState.quantity || 0;
+    const pages = JuguemosState.pages || 1;
+    const totalTablas = quantity * pages;
     const modeLabel = mode === 'favoritas' ? 'Favoritas' : mode;
-    const priceText = '$' + Number(total).toFixed(2) + ' ' + currency;
+    const precioBarajas = JuguemosState.precioBarajas || 0.00;
+    const barajasIncluidas = JuguemosState.barajasIncluidas || false;
+    const costoBarajas = barajasIncluidas ? precioBarajas : 0;
+    const totalFinal = total + costoBarajas;
+    const priceText = '$' + Number(totalFinal).toFixed(2) + ' ' + currency;
     
-    // 🔥 Obtener ubicación de favoritas
     const ubicacionLabels = {
         'aleatoria': 'Aleatoria',
         'centro': 'Centro',
@@ -792,22 +806,39 @@ function updateOrderSummary() {
     const elementos = {
         'payment-summary-country': country,
         'payment-summary-mode': modeLabel,
-        'payment-summary-quantity': quantity,
+        'payment-summary-quantity': totalTablas,
         'payment-summary-price': priceText,
         'summary-country': country,
         'summary-mode': modeLabel,
-        'summary-quantity': quantity,
+        'summary-quantity': totalTablas,
         'summary-price': priceText,
-        'j-summary-tables': `${quantity} tablas por hoja`,
+        'j-summary-tables': `${quantity} tablas por hoja × ${pages} páginas = ${totalTablas} tablas`,
         'j-summary-cards': JuguemosState.mode === 'libre' 
         ? (JuguemosState.libreImagesCount === 54 
             ? '54 barajas' 
             : `${JuguemosState.libreImagesCount || 0}/54 barajas`)
         : `${JuguemosState.barajas?.length || 0} barajas`,
-        'j-summary-paper': JuguemosState.paper,
+        'j-summary-paper': PrintPaper.getPaperLabel(),        
         'j-summary-orientation': JuguemosState.orientation === "vertical" ? "Vertical" : "Horizontal",
         'j-summary-pages': `${JuguemosState.pages} páginas`,
-        'j-summary-grid': { "4x4": "4x4 · 16 casillas", "5x5": "5x5 · 25 casillas", "pocitos4": "Pocitos 4", "pocitos3": "Pocitos 3", "cruzadas": "Cruzadas · 8 casillas" }[JuguemosState.grid] || "4x4 · 16 casillas",
+        'j-summary-grid': (function() {
+            const grid = JuguemosState.grid || '4x4';
+            const titles = {
+                '4x4': '4x4',
+                '5x5': '5x5',
+                'pocitos4': 'Pocitos 4',
+                'pocitos3': 'Pocitos 3',
+                'cruzadas': 'Cruzadas'
+            };
+            const subtitles = {
+                '4x4': '16 casillas',
+                '5x5': '25 casillas',
+                'pocitos4': '4 casillas',
+                'pocitos3': '3 casillas',
+                'cruzadas': '8 casillas'
+            };
+            return `<span class="grid-title">${titles[grid] || '4x4'}</span><span class="grid-subtitle">${subtitles[grid] || '16 casillas'}</span>`;
+        })(),        
         'j-summary-mode': modeLabel,
         'j-summary-cutmarks': JuguemosState.cutMarks ? "Líneas de corte" : "Sin líneas de corte",
         'j-summary-libre': JuguemosState.mode === 'libre' ? 
@@ -818,7 +849,13 @@ function updateOrderSummary() {
 
     Object.keys(elementos).forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.textContent = elementos[id];
+        if (el) {
+            if (id === 'j-summary-grid') {
+                el.innerHTML = elementos[id];
+            } else {
+                el.textContent = elementos[id];
+            }
+        }
     });
 }
 function regenerarTodasLasTablas() { llenarCasillasAleatorio(); }
@@ -1154,26 +1191,18 @@ function ejecutarLlenadoAleatorio() {
         
         todasLasTablas.push(casillas);
     }
-
-    // ✅ GUARDAR EN EL ESTADO GLOBAL
     JuguemosState.todasLasTablas = todasLasTablas;
-    
+
     if (todasLasTablas.length > 0) {
         const tablaMostrar = todasLasTablas[0];
         JuguemosState.casillasAsignadas = tablaMostrar;
-        actualizarPreviewCasillas(tablaMostrar);
         
-        console.log('✅ Tablas generadas:', {
-            totalTablas: todasLasTablas.length,
-            primeraTabla: tablaMostrar.map(c => c?.nombre || 'vacío'),
-            favoritas: favoritas.length,
-            modo: JuguemosState.mode
-        });
+        if (JuguemosState.mode !== 'favoritas') {
+            actualizarPreviewCasillas(tablaMostrar);
+        }
     } else {
         console.warn('No se generaron tablas');
     }
-
-
 }
 // =========================================================
 // FUNCIÓN PARA OBTENER POSICIONES DE FAVORITAS

@@ -5,7 +5,7 @@ if (!defined('ABSPATH')) {
 ?>
 
 <!-- ==========================================
-3. Vista previa de impresión
+2. Vista previa de impresión
 ========================================== -->
 
 <div class="j-section">
@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
         <div class="j-panel-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
             <div>
                 <div class="subtitulo-aqua">
-                    3. Vista previa de impresión
+                    2. Vista previa de impresión
                 </div>
 
             </div>

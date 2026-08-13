@@ -17,13 +17,7 @@ if (!defined('ABSPATH')) {
             <span>54</span>
         </span>
     </div>
-
-    <!-- Navegación por grupos -->
-    <div class="j-libre-nav">
-        <button class="j-libre-nav-btn active" data-group="0">Barajas 1-18</button>
-        <button class="j-libre-nav-btn" data-group="1">Barajas 19-36</button>
-        <button class="j-libre-nav-btn" data-group="2">Barajas 37-54</button>
-    </div>
+    <p class="j-texto-normal">Cada imagen debe estar en formato JPEG (.jpg / .jpeg) y tener un peso máximo de 2 MB por baraja. </p>
 
     <!-- Controles -->
     <div class="j-libre-controls">
@@ -33,6 +27,13 @@ if (!defined('ABSPATH')) {
         <button type="button" id="j-libre-clear-all" class="j-btn-primary-delete">
             Borrar todo
         </button>
+    </div>
+
+    <!-- Navegación por grupos -->
+    <div class="j-libre-nav">
+        <button class="j-libre-nav-btn active" data-group="0">Barajas 1-18</button>
+        <button class="j-libre-nav-btn" data-group="1">Barajas 19-36</button>
+        <button class="j-libre-nav-btn" data-group="2">Barajas 37-54</button>
     </div>
 
     <input type="file" id="j-libre-file-input" accept="image/*" multiple style="display:none;">

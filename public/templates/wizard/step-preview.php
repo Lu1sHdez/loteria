@@ -18,7 +18,7 @@
                     <div class="j-print-option">
                         <div class="j-print-option-header">
                             <p class="text-p-negrita">Tamaño de papel</p>
-                            <span class="j-tooltip-icon" data-tooltip="Selecciona el tamaño del papel para la impresión.">i</span>
+                            <span class="j-tooltip-icon" data-tooltip="Selecciona el tamaño del papel para la impresión.">¡</span>
                         </div>
                         <div class="j-select-wrapper">
                             <select id="j-paper-size" class="j-select j-select-papel"></select>
@@ -29,7 +29,7 @@
                     <div class="j-print-option">
                         <div class="j-print-option-header">
                             <p class="text-p-negrita">Orientación</p>
-                            <span class="j-tooltip-icon" data-tooltip="Elige la orientación que deseas para tus tablas de lotería.">i</span>
+                            <span class="j-tooltip-icon" data-tooltip="Elige la orientación que deseas para tus tablas de lotería.">¡</span>
                         </div>
                         <div class="j-orientation-options">
                             <button type="button" class="j-orientation active" data-orientation="vertical">
@@ -47,7 +47,7 @@
                     <div class="j-print-option">
                         <div class="j-print-option-header">
                             <p class="text-p-negrita">Tablas por hoja</p>
-                            <span class="j-tooltip-icon" data-tooltip="Define la cantidad de tablas que querrás por hoja.">i</span>
+                            <span class="j-tooltip-icon" data-tooltip="Define la cantidad de tablas que querrás por hoja.">¡</span>
                         </div>
                         <div class="j-tables-per-page-control">
                             <button type="button" class="j-tables-per-page-btn j-tables-per-page-minus">
@@ -68,7 +68,7 @@
                     <div class="j-print-option">
                         <div class="j-print-option-header">
                             <p class="text-p-negrita">Cantidad de páginas</p>
-                            <span class="j-tooltip-icon" data-tooltip="Define la cantidad de páginas que querrás imprimir.">i</span>
+                            <span class="j-tooltip-icon" data-tooltip="Define la cantidad de páginas que querrás imprimir.">¡</span>
                         </div>
                         <div class="j-tables-per-page-control">
                             <button type="button" class="j-tables-per-page-btn j-pages-minus">
@@ -89,7 +89,7 @@
                     <div class="j-print-option j-print-option-cutmarks">
                         <div class="j-print-option-header">
                             <p class="text-p-negrita">Marcas de corte</p>
-                            <span class="j-tooltip-icon" data-tooltip="Activa para mostrar marcas de corte en la vista previa e impresión.">i</span>
+                            <span class="j-tooltip-icon" data-tooltip="Activa para mostrar marcas de corte en la vista previa e impresión.">¡</span>
                             <label class="j-switch">
                                 <input type="checkbox" id="j-cut-marks-toggle" checked>
                                 <span class="j-switch-slider">

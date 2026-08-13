@@ -69,7 +69,7 @@
 
     <button class="j-grid" data-grid="cruzadas">
         Cruzadas
-        <span>2 diagonales</span>
+        <span >2 diagonales</span>
     </button>
 
 </div>
@@ -77,23 +77,25 @@
 <p class="text-p-negrita">Tipo de tablas</p>
 
 <div class="j-modes">
-
     <button class="j-mode active" data-mode="sencilla">
+        <img class="j-mode-icon" src="/wp-content/uploads/2026/08/sencilla-on.png" alt="Sencilla">
         Sencilla
     </button>
 
     <button class="j-mode" data-mode="dobles" id="j-mode-dobles">
+        <img class="j-mode-icon" src="/wp-content/uploads/2026/08/Dobles-off.png" alt="Dobles">
         Dobles
     </button>
 
     <button class="j-mode" data-mode="favoritas">
+        <img class="j-mode-icon" src="/wp-content/uploads/2026/08/favoritas-off.png" alt="Favoritas">
         Favoritas
     </button>
 
     <button class="j-mode" data-mode="libre" id="j-mode-libre">
+        <img class="j-mode-icon" src="/wp-content/uploads/2026/08/libres-off.png" alt="Personalizadas">
         Personalizadas
     </button>
-
 </div>
 
 <script>
@@ -156,5 +158,67 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Ejecutar inicialmente
     toggleModesByGrid();
+});
+</script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const modeButtons = document.querySelectorAll('.j-mode');
+    
+    // Rutas de los iconos
+    const iconPaths = {
+        'sencilla': {
+            on: '/wp-content/uploads/2026/08/sencilla-on.png',
+            off: '/wp-content/uploads/2026/08/sencilla-off.png'
+        },
+        'dobles': {
+            on: '/wp-content/uploads/2026/08/Dobles-on.png',
+            off: '/wp-content/uploads/2026/08/Dobles-off.png'
+        },
+        'favoritas': {
+            on: '/wp-content/uploads/2026/08/favoritas-on.png',
+            off: '/wp-content/uploads/2026/08/favoritas-off.png'
+        },
+        'libre': {
+            on: '/wp-content/uploads/2026/08/libres-on.png',
+            off: '/wp-content/uploads/2026/08/libres-off.png'
+        }
+    };
+
+    // Función para actualizar iconos
+    function updateIcons(activeMode) {
+        modeButtons.forEach(btn => {
+            const mode = btn.dataset.mode;
+            const icon = btn.querySelector('.j-mode-icon');
+            const isActive = mode === activeMode;
+            
+            if (isActive) {
+                icon.src = iconPaths[mode].on;
+            } else {
+                icon.src = iconPaths[mode].off;
+            }
+        });
+    }
+
+    // Función para activar un modo
+    function setActiveMode(activeButton) {
+        modeButtons.forEach(btn => btn.classList.remove('active'));
+        activeButton.classList.add('active');
+        updateIcons(activeButton.dataset.mode);
+    }
+
+    // Event listeners
+    modeButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            setActiveMode(this);
+        });
+    });
+
+    // Inicializar (Sencilla activa)
+    const initialActive = document.querySelector('.j-mode.active');
+    if (initialActive) {
+        updateIcons(initialActive.dataset.mode);
+    }
 });
 </script>

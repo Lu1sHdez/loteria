@@ -13,7 +13,7 @@ window.PrintPaper = {
     paperSizes: {
         'carta': { width: 215.9, height: 279.4, label: 'Carta' },
         'oficio': { width: 215.9, height: 330.2, label: 'Oficio' },
-        'a4': { width: 210, height: 297, label: 'A4' },
+        'a4': { width: 210, height: 297, label: 'Tabloide' },
         'letter': { width: 215.9, height: 279.4, label: 'Letter' },
         'legal': { width: 215.9, height: 355.6, label: 'Legal' }
     },
@@ -36,6 +36,11 @@ window.PrintPaper = {
             rawWidth: size.width,
             rawHeight: size.height
         };
+    },
+    getPaperLabel() {
+        const paper = JuguemosState.paper || 'carta';
+        const size = this.paperSizes[paper] || this.paperSizes['carta'];
+        return size.label;
     },
 
     getBoardLayout(paper, scale) {
@@ -496,7 +501,7 @@ window.PrintPaper = {
         const isCruzadas = gridType === 'cruzadas';
     
         Object.assign(board.style, {
-            border: `2px solid ${JuguemosState.marcoColor || '#FA299C'}`,
+            border: `2px solid #D9D9D9`,            
             borderRadius: '4px',
             overflow: 'hidden',
             backgroundColor: JuguemosState.fondoColor || '#FFFFFF',
@@ -763,7 +768,7 @@ window.PrintPaper = {
             Object.assign(cell.style, {
                 border: `1px solid ${JuguemosState.marcoColor || '#FA299C'}`,
                 borderRadius: '2px',
-                backgroundColor: JuguemosState.fondoColor || '#FFFFFF',
+                backgroundColor: JuguemosState.marcoColor || '#FA299C',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',

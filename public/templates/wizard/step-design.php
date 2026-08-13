@@ -88,7 +88,7 @@ if (!defined('ABSPATH')) {
             <div class="j-section">
                 <div class="j-panel-item">
                     <div class="subtitulo-aqua">
-                        3. Color y Estilo
+                        3. Colores de Marcos y Tablas
                     </div>
                 </div>
                 <?php include __DIR__ . '/parts/color-style.php'; ?>

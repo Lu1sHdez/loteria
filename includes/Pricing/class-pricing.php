@@ -27,9 +27,6 @@ class Juguemos_Pricing
         if ($cantidad < 1) {
             $cantidad = 1;
         }
-        if ($cantidad > 30) {
-            $cantidad = 30;
-        }
 
         // Obtener precio unitario
         $precio = self::get_unit_price($pais, $modo);
@@ -56,7 +53,6 @@ class Juguemos_Pricing
             'moneda' => $moneda
         ];
     }
-
     /**
      * Obtiene el precio unitario según país y modo
      * Primero intenta desde la base de datos, si no existe usa la tabla por defecto

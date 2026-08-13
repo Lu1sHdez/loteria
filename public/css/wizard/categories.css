@@ -108,10 +108,6 @@
     margin:12px auto;
 }
 
-
-/* =====================================================
-   BOTÓN INCLUIR BARAJAS
-===================================================== */
 .j-toggle-barajas-wrapper {
     display: flex;
     justify-content: center;  
@@ -125,19 +121,23 @@
     margin: 0 auto;
     align-items:center;
     gap:18px;
-    display:inline-flex;
+    display:flex;
     width:auto;
     height:45px;
+    justify-content: left;
     margin-top:20px;
+    width: 280px;
     border:3px solid #FA299C;
     border-radius:999px;
-
     background:#FA299C;
     cursor:pointer;
-
     transition:all .25s ease;
-
     outline:none;
+}
+.j-toggle-barajas:focus,
+.j-toggle-barajas:hover{
+    background: #FA299C;
+    border:3px solid #FA299C;
 }
 
 /* Círculo */
@@ -170,59 +170,6 @@
     font:700 20px 'Cairo',sans-serif;
     color:#FFF;
     transition:color .25s ease;
-}
-
-/* =====================================================
-   HOVER / FOCUS
-===================================================== */
-
-.j-toggle-barajas:hover,
-.j-toggle-barajas:focus,
-.j-toggle-barajas:focus-visible{
-    background:#FFF;
-    border-color:#FA299C;
-    outline:none;
-    box-shadow:none;
-}
-
-.j-toggle-barajas:hover .j-toggle-text,
-.j-toggle-barajas:focus .j-toggle-text,
-.j-toggle-barajas:focus-visible .j-toggle-text{
-    color:#FA299C;
-}
-
-.j-toggle-barajas:hover .j-toggle-circle,
-.j-toggle-barajas:focus .j-toggle-circle,
-.j-toggle-barajas:focus-visible .j-toggle-circle{
-    background:#FFF5FB;
-}
-
-/* =====================================================
-   ACTIVE
-===================================================== */
-
-.j-toggle-barajas:active{
-    transform:scale(.98);
-}
-
-/* =====================================================
-   INACTIVO
-===================================================== */
-
-.j-toggle-barajas.inactive{
-    background:#FFF;
-}
-
-.j-toggle-barajas.inactive .j-toggle-text{
-    color:#FA299C;
-}
-
-.j-toggle-barajas.inactive:hover{
-    background:#FA299C;
-}
-
-.j-toggle-barajas.inactive:hover .j-toggle-text{
-    color:#FFF;
 }
 
 #juguemos-decks .text-p-normal {
