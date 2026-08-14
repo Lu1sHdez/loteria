@@ -597,7 +597,13 @@ function drawGrid() {
     let cells;
     let cols, rows;
     
-    if (grid === 'pocitos4') {
+    if (grid === 'cruzadas') {
+        cells = 16;
+        cols = 4;
+        rows = 4;
+        container.style.gridTemplateColumns = 'repeat(4, 1fr)';
+        container.style.gridTemplateRows = 'repeat(4, 1fr)';
+    } else if (grid === 'pocitos4') {
         cells = 4;
         cols = 2;
         rows = 2;
@@ -609,12 +615,6 @@ function drawGrid() {
         rows = 2;
         container.style.gridTemplateColumns = 'repeat(2, 1fr)';
         container.style.gridTemplateRows = 'repeat(2, 1fr)';
-    } else if (grid === 'cruzadas') {
-        cells = 8;
-        cols = 4;
-        rows = 4;
-        container.style.gridTemplateColumns = 'repeat(4, 1fr)';
-        container.style.gridTemplateRows = 'repeat(4, 1fr)';
     } else {
         cols = grid === '5x5' ? 5 : 4;
         rows = grid === '5x5' ? 5 : 4;
@@ -623,21 +623,47 @@ function drawGrid() {
         container.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
     }
     
-    // 🔥 NUEVO: Usar GridPosiciones para obtener posiciones dobles
     const esModoDobles = JuguemosState.mode === 'dobles';
     let posicionesDobles = [];
     
-    if (esModoDobles && typeof GridPosiciones !== 'undefined') {
-        const ubicacion = JuguemosState.ubicacionDoble || 'aleatoria';
-        posicionesDobles = GridPosiciones.getPositions(ubicacion, grid, 2);
+    if (esModoDobles) {
+        // 🔥 USAR posiciones fijas si existen
+        if (JuguemosState.posicionesDoblesFijas && JuguemosState.posicionesDoblesFijas.length > 0) {
+            posicionesDobles = JuguemosState.posicionesDoblesFijas;
+        } else if (typeof GridPosiciones !== 'undefined') {
+            const ubicacion = JuguemosState.ubicacionDoble || 'aleatoria';
+            posicionesDobles = GridPosiciones.getPositions(ubicacion, grid, 2);
+            JuguemosState.posicionesDoblesFijas = posicionesDobles;
+        }
+        JuguemosState.posicionesDobles = posicionesDobles;
     }
     
     let html = '';
-    for (let i = 0; i < cells; i++) {
-        const esDoble = esModoDobles && posicionesDobles.includes(i);
-        html += `<div class="cell ${esDoble ? 'doble-ubicacion' : ''}">
-            ${esDoble ? '<img src="/wp-content/uploads/2026/08/doblesx2.png" class="j-doble-imagen" alt="×2" loading="lazy">' : ''}
-        </div>`;
+    
+    if (grid === 'cruzadas') {
+        const casillasVisibles = [0, 3, 5, 6, 9, 10, 12, 15];
+        
+        for (let i = 0; i < 16; i++) {
+            const esDoble = esModoDobles && posicionesDobles.includes(i);
+            const esVisible = casillasVisibles.includes(i);
+            const row = Math.floor(i / 4) + 1;
+            const col = (i % 4) + 1;
+            
+            if (esVisible) {
+                html += `<div class="cell visible ${esDoble ? 'doble-ubicacion' : ''}" style="grid-row: ${row}; grid-column: ${col};">
+                    ${esDoble ? '<img src="/wp-content/uploads/2026/08/doblesx2.png" class="j-doble-imagen" alt="×2" loading="lazy">' : ''}
+                </div>`;
+            } else {
+                html += `<div class="cell" style="grid-row: ${row}; grid-column: ${col};"></div>`;
+            }
+        }
+    } else {
+        for (let i = 0; i < cells; i++) {
+            const esDoble = esModoDobles && posicionesDobles.includes(i);
+            html += `<div class="cell ${esDoble ? 'doble-ubicacion' : ''}">
+                ${esDoble ? '<img src="/wp-content/uploads/2026/08/doblesx2.png" class="j-doble-imagen" alt="×2" loading="lazy">' : ''}
+            </div>`;
+        }
     }
     
     container.innerHTML = html;
@@ -660,44 +686,99 @@ function actualizarPreviewCasillas(casillas) {
     const grid = JuguemosState.grid || '4x4';
     container.dataset.grid = grid;
     
-    // Configurar grid según tipo
     if (grid === 'pocitos4') {
         container.style.gridTemplateColumns = 'repeat(2, 1fr)';
         container.style.gridTemplateRows = 'repeat(2, 1fr)';
     } else if (grid === 'pocitos3') {
         container.style.gridTemplateColumns = 'repeat(2, 1fr)';
         container.style.gridTemplateRows = 'repeat(2, 1fr)';
+    } else if (grid === 'cruzadas') {
+        container.style.gridTemplateColumns = 'repeat(4, 1fr)';
+        container.style.gridTemplateRows = 'repeat(4, 1fr)';
     } else {
         container.style.gridTemplateColumns = '';
         container.style.gridTemplateRows = '';
     }
     
-    // OBTENER FAVORITAS
     const favoritas = JuguemosState.favoritas || [];
     const tieneFavoritas = favoritas.length > 0 && JuguemosState.mode === 'favoritas';
     
-    // 🔥 NUEVO: OBTENER POSICIONES DOBLES USANDO GridPosiciones
     const esModoDobles = JuguemosState.mode === 'dobles';
     let posicionesDobles = [];
     
-    if (esModoDobles && typeof GridPosiciones !== 'undefined') {
-        const ubicacion = JuguemosState.ubicacionDoble || 'aleatoria';
-        // Obtener SOLO 2 posiciones para dobles
-        posicionesDobles = GridPosiciones.getPositions(ubicacion, grid, 2);
-        console.log('📍 Posiciones dobles para preview:', posicionesDobles);
+    if (esModoDobles) {
+        // 🔥 USAR posiciones fijas
+        if (JuguemosState.posicionesDoblesFijas && JuguemosState.posicionesDoblesFijas.length > 0) {
+            posicionesDobles = JuguemosState.posicionesDoblesFijas;
+        } else if (typeof GridPosiciones !== 'undefined') {
+            const ubicacion = JuguemosState.ubicacionDoble || 'aleatoria';
+            posicionesDobles = GridPosiciones.getPositions(ubicacion, grid, 2);
+            JuguemosState.posicionesDoblesFijas = posicionesDobles;
+        }
+        JuguemosState.posicionesDobles = posicionesDobles;
     }
     
-    // Si no hay casillas, mostrar vacío
     if (!casillas || casillas.length === 0) {
         const total = getTotalCasillas(grid);
-        container.innerHTML = Array(total).fill('<div class="cell empty"></div>').join('');
+        if (grid === 'cruzadas') {
+            const casillasVisibles = [0, 3, 5, 6, 9, 10, 12, 15];
+            let html = '';
+            for (let i = 0; i < 16; i++) {
+                const esVisible = casillasVisibles.includes(i);
+                const row = Math.floor(i / 4) + 1;
+                const col = (i % 4) + 1;
+                if (esVisible) {
+                    html += `<div class="cell visible" style="grid-row: ${row}; grid-column: ${col};"></div>`;
+                } else {
+                    html += `<div class="cell" style="grid-row: ${row}; grid-column: ${col};"></div>`;
+                }
+            }
+            container.innerHTML = html;
+        } else {
+            container.innerHTML = Array(total).fill('<div class="cell empty"></div>').join('');
+        }
         return;
     }
     
-    // Mostrar las casillas con los badges correspondientes
+    // 🔥 Para Cruzadas, generar 16 celdas
+    if (grid === 'cruzadas') {
+        const casillasVisibles = [0, 3, 5, 6, 9, 10, 12, 15];
+        let html = '';
+        
+        for (let i = 0; i < 16; i++) {
+            const esVisible = casillasVisibles.includes(i);
+            const esDoble = esModoDobles && posicionesDobles.includes(i);
+            const row = Math.floor(i / 4) + 1;
+            const col = (i % 4) + 1;
+            
+            if (esVisible) {
+                const casilla = casillas[i] || null;
+                const esFavorita = tieneFavoritas && casilla && favoritas.some(f => f && parseInt(f.numero) === casilla?.numero);
+                const claseExtra = esFavorita ? ' favorita' : (esDoble ? ' doble' : '');
+                
+                if (casilla) {
+                    html += `
+                        <div class="cell visible${claseExtra}" style="grid-row: ${row}; grid-column: ${col};" title="${casilla.nombre || ''}${esFavorita ? ' ⭐ Favorita' : ''}${esDoble ? ' ×2 Doble' : ''}">
+                            <img src="${casilla.imagen || ''}" alt="${casilla.nombre || ''}" loading="lazy">
+                            ${esFavorita ? '<span class="j-favorita-badge">⭐</span>' : ''}
+                            ${esDoble ? '<span class="j-doble-badge">×2</span>' : ''}
+                        </div>
+                    `;
+                } else {
+                    html += `<div class="cell visible" style="grid-row: ${row}; grid-column: ${col};"></div>`;
+                }
+            } else {
+                html += `<div class="cell" style="grid-row: ${row}; grid-column: ${col};"></div>`;
+            }
+        }
+        container.innerHTML = html;
+        return;
+    }
+    
+    // Grids normales (4x4, 5x5, pocitos)
+    const total = getTotalCasillas(grid);
     container.innerHTML = casillas.map((casilla, index) => {
         const esFavorita = tieneFavoritas && favoritas.some(f => f && parseInt(f.numero) === casilla?.numero);
-        // 🔥 NUEVO: Usar posicionesDobles en lugar de cartasDoblesPrimeraTabla
         const esDoble = esModoDobles && posicionesDobles.includes(index);
         const claseExtra = esFavorita ? ' favorita' : (esDoble ? ' doble' : '');
         
@@ -1056,48 +1137,50 @@ function ejecutarLlenadoAleatorio() {
     }
 
     let configDoblesPorTabla = [];
-    if (JuguemosState.mode === 'dobles') {
-        // 🔥 Obtener posiciones usando GridPosiciones
-        let posicionesDobles = [];
-        if (typeof GridPosiciones !== 'undefined') {
-            const ubicacion = JuguemosState.ubicacionDoble || 'aleatoria';
-            posicionesDobles = GridPosiciones.getPositions(ubicacion, grid, 2);
-        } else {
-            // Fallback: usar DoblesManager si existe
-            if (typeof window.DoblesManager !== 'undefined') {
-                posicionesDobles = window.DoblesManager.obtenerPosicionesPorUbicacion(grid, 2);
-            }
+if (JuguemosState.mode === 'dobles') {
+    // 🔥 Generar posiciones UNA SOLA VEZ (para 4x4, 5x5, cruzadas, etc.)
+    let posicionesDobles = [];
+    if (typeof GridPosiciones !== 'undefined') {
+        const ubicacion = JuguemosState.ubicacionDoble || 'aleatoria';
+        posicionesDobles = GridPosiciones.getPositions(ubicacion, grid, 2);
+    } else {
+        if (typeof window.DoblesManager !== 'undefined') {
+            posicionesDobles = window.DoblesManager.obtenerPosicionesPorUbicacion(grid, 2);
         }
-        
-        JuguemosState.posicionesDobles = posicionesDobles;
-        
-        // Generar cartas dobles para cada tabla
-        for (let t = 0; t < totalTablas; t++) {
-            const barajasMezcladas = [...todasLasBarajas];
-            for (let i = barajasMezcladas.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [barajasMezcladas[i], barajasMezcladas[j]] = [barajasMezcladas[j], barajasMezcladas[i]];
-            }
-            
-            const cartaDoble = barajasMezcladas[0];
-            
-            configDoblesPorTabla.push({
-                carta: cartaDoble,
-                posiciones: posicionesDobles,
-                asignacion: {
-                    [cartaDoble.numero]: posicionesDobles
-                }
-            });
-        }
-        
-        JuguemosState.cartasDobles = configDoblesPorTabla.map(c => c.carta);
-        JuguemosState.asignacionDobles = configDoblesPorTabla.reduce((acc, c, idx) => {
-            acc[idx] = c.asignacion;
-            return acc;
-        }, {});
-        
-        drawGrid();
     }
+    
+    // 🔥 GUARDAR en estado fijo
+    JuguemosState.posicionesDobles = posicionesDobles;
+    JuguemosState.posicionesDoblesFijas = posicionesDobles;
+    console.log('📍 Posiciones dobles fijas para', grid, ':', posicionesDobles);
+    
+    // Generar cartas dobles
+    for (let t = 0; t < totalTablas; t++) {
+        const barajasMezcladas = [...todasLasBarajas];
+        for (let i = barajasMezcladas.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [barajasMezcladas[i], barajasMezcladas[j]] = [barajasMezcladas[j], barajasMezcladas[i]];
+        }
+        
+        const cartaDoble = barajasMezcladas[0];
+        
+        configDoblesPorTabla.push({
+            carta: cartaDoble,
+            posiciones: posicionesDobles,
+            asignacion: {
+                [cartaDoble.numero]: posicionesDobles
+            }
+        });
+    }
+    
+    JuguemosState.cartasDobles = configDoblesPorTabla.map(c => c.carta);
+    JuguemosState.asignacionDobles = configDoblesPorTabla.reduce((acc, c, idx) => {
+        acc[idx] = c.asignacion;
+        return acc;
+    }, {});
+    
+    drawGrid();
+}
 
     //  GENERAR CADA TABLA
     for (let t = 0; t < totalTablas; t++) {
@@ -1417,15 +1500,10 @@ function distribuirFavoritasPorTablas(favoritas, totalTablas, maxPorTabla) {
     return resultado;
 }
 
-// =========================================================
-// PROTECCIÓN
-// =========================================================
     document.addEventListener('dragstart', e => e.preventDefault());
 /*     document.addEventListener('contextmenu', e => e.preventDefault());
  */
-// =========================================================
-// INICIALIZACIÓN FINAL
-// =========================================================
+
 document.addEventListener('DOMContentLoaded', () => {
     setTimeout(sincronizarPais, 100);
     setTimeout(detectarGTranslate, 300);

@@ -171,7 +171,7 @@
 }
 
 .j-casilla-preview-grid .cell {
-    background: var(--j-marco-color, #FA299C);
+    background: #DDDDDD;
     border-radius: 4px;
     aspect-ratio: 2 / 3;
     width: 100%;

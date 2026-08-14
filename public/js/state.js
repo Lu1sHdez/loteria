@@ -35,6 +35,7 @@
         favoritasUbicacion: 'aleatoria',
 
         posicionesDobles: [],
+        posicionesDoblesFijas: [],
         cartasDobles: [],
         asignacionDobles: {},
         ubicacionDoble: 'aleatoria',
