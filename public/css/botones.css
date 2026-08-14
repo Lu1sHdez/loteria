@@ -97,7 +97,7 @@
     background:none;
     border:none;
     padding:0;
-    color:#E53935;
+    color:#FA299C ;
     font-size:14px;
     font-weight:700;
     cursor:pointer;
@@ -106,7 +106,7 @@
 }
 
 .j-delete-category:hover{
-    color:#E53935;
+    color:#FA299C ;
     text-decoration:underline;
     background: none;
 }
@@ -156,7 +156,7 @@
     border:1px solid #D9D9D9;
     border-radius:6px;
 
-    color:#E53935;
+    color:#FA299C ;
     font-size:14px;
     font-weight:700;
 
@@ -166,7 +166,7 @@
 
 .j-admin-delete:hover{
 
-    color:#E53935;
+    color:#FA299C ;
     background: none !important;
     border: none ;
 

@@ -23,7 +23,8 @@
         total: 0,
 
         cutMarks: true,
-        precioBarajas: 0.00,
+        precioBarajasMexico: 50.00,
+        precioBarajasUSA: 15.00,   
 
         marcoColor: '#FA299C',
         fondoColor: '#FFFFFF',

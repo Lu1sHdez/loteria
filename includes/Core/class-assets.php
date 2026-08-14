@@ -126,6 +126,13 @@ class Juguemos_Assets
             JUGUEMOS_VERSION,
             true
         );
+        wp_enqueue_script(
+            'juguemos-grid-posiciones',
+            JUGUEMOS_URL . 'public/js/ubicaciones/grid-posiciones.js',
+            [],
+            JUGUEMOS_VERSION,
+            true
+        );
 
         // Variables para JavaScript
         wp_localize_script(
@@ -165,7 +172,7 @@ class Juguemos_Assets
         wp_enqueue_script(
             'juguemos-dobles',
             JUGUEMOS_URL . 'public/js/dobles.js',
-            ['juguemos-state', 'juguemos-ajax'],
+            ['juguemos-grid-posiciones','juguemos-state', 'juguemos-ajax'],
             JUGUEMOS_VERSION,
             true
         );

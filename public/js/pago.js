@@ -176,7 +176,7 @@
                         <p class="j-texto-normal" style="font-size:14px;color:#666;">Después de enviar el pago, haz clic en "Ya pagué"</p>
                         <div style="display:flex;gap:15px;justify-content:center;margin-top:20px;flex-wrap:wrap;">
                             <button id="j-zelle-confirm" class="j-btn-primary" style="background:#25D366;border-color:#25D366;">
-                                ✅ Ya pagué
+                                Ya pagué
                             </button>
                             <button id="j-zelle-cancel" class="j-btn-back">
                                 Cancelar

@@ -3,24 +3,27 @@
    ===================================================== */
 
 /* =====================================================
-   RADIO BUTTONS DE UBICACIÓN (SOLO UNO SELECCIONABLE)
+   CONTENEDOR PRINCIPAL - 2 COLUMNAS
    ===================================================== */
 
-   .j-ubicacion-radios {
+.j-ubicacion-radios {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
     margin: 12px 0;
     padding: 0;
-    /* 🔥 ELIMINADO: background, border-radius, border */
 }
 
 .j-ubicacion-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
     align-items: center;
 }
+
+/* =====================================================
+   RADIO BUTTONS
+   ===================================================== */
 
 .j-ubicacion-radio {
     display: flex;
@@ -31,19 +34,24 @@
     color: #333;
     transition: all 0.2s;
     user-select: none;
-    padding: 4px 8px;
+    padding: 6px 10px;
     border-radius: 6px;
+    border: 1px solid transparent;
+    min-height: 36px;
 }
 
 .j-ubicacion-radio:hover {
-    background: none;
+    border-color: #e0e0e0;
 }
 
 .j-ubicacion-radio input[type="radio"] {
     display: none;
 }
 
-/* Radio custom - círculo */
+/* =====================================================
+   RADIO CUSTOM - CÍRCULO
+   ===================================================== */
+
 .j-radio-custom {
     width: 18px;
     height: 18px;
@@ -56,7 +64,6 @@
     background: white;
 }
 
-/* Radio seleccionado */
 .j-ubicacion-radio input:checked + .j-radio-custom {
     border-color: #5D5D5D;
     border-width: 2px;
@@ -74,18 +81,35 @@
     background: #FA299C;
 }
 
-.j-ubicacion-label {
-    font-size: 13px;
-    color: #444;
+/* =====================================================
+   ICONOS
+   ===================================================== */
+
+.j-ubicacion-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    flex-shrink: 0;
+    display: block;
 }
 
 /* =====================================================
-   MENSAJE INFORMATIVO - SIN FONDO
+   LABEL
+   ===================================================== */
+
+.j-ubicacion-label {
+    font-size: 13px;
+    color: #444;
+    line-height: 1.2;
+}
+
+/* =====================================================
+   MENSAJE INFORMATIVO
    ===================================================== */
 
 .j-ubicacion-mensaje {
-    margin: 10px 0 15px 0;
-    font-size: 14px;
+    margin: 40px 0 15px 0;
+    font-size: 12px;
     line-height: 1.5;
 }
 
@@ -144,7 +168,6 @@
     line-height: 1.2;
 }
 
-/* Resaltar casilla doble en vista previa de casillas */
 .j-casilla-preview-grid .cell.doble {
     border: 2px solid #FA299C !important;
     box-shadow: 0 0 12px rgba(250, 41, 156, 0.3);
@@ -162,9 +185,23 @@
 
 @media (max-width: 768px) {
     .j-ubicacion-row {
-        flex-direction: column;
-        align-items: flex-start;
+        grid-template-columns: 1fr 1fr;
         gap: 4px;
+    }
+    
+    .j-ubicacion-radio {
+        padding: 4px 8px;
+        font-size: 12px;
+        min-height: 32px;
+    }
+    
+    .j-ubicacion-icon {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .j-ubicacion-label {
+        font-size: 12px;
     }
     
     .j-grid-preview .cell .j-doble-imagen {
@@ -173,51 +210,38 @@
 }
 
 @media (max-width: 480px) {
+    .j-ubicacion-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 4px;
+    }
+    
+    .j-ubicacion-radio {
+        padding: 3px 6px;
+        font-size: 11px;
+        min-height: 28px;
+        gap: 5px;
+    }
+    
+    .j-ubicacion-icon {
+        width: 18px;
+        height: 18px;
+    }
+    
     .j-ubicacion-label {
-        font-size: 12px;
+        font-size: 10px;
+    }
+    
+    .j-radio-custom {
+        width: 14px;
+        height: 14px;
+    }
+    
+    .j-ubicacion-radio input:checked + .j-radio-custom::after {
+        width: 8px;
+        height: 8px;
     }
     
     .j-grid-preview .cell .j-doble-imagen {
         padding: 1px;
-    }
-}
-
-
-/* =====================================================
-   ICONOS EN OPCIONES DE DOBLES
-   ===================================================== */
-
-   .j-ubicacion-radio {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    font-size: 13px;
-    color: #333;
-    transition: all 0.2s;
-    user-select: none;
-    padding: 4px 8px;
-    border-radius: 6px;
-}
-
-.j-ubicacion-icon {
-    width: 20px;
-    height: 20px;
-    object-fit: contain;
-    flex-shrink: 0;
-    display: block;
-}
-
-@media (max-width: 768px) {
-    .j-ubicacion-icon {
-        width: 24px;
-        height: 24px;
-    }
-}
-
-@media (max-width: 480px) {
-    .j-ubicacion-icon {
-        width: 20px;
-        height: 20px;
     }
 }

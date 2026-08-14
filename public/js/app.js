@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (favoritasOption) favoritasOption.style.display = 'none';
             if (libreUpload) libreUpload.style.display = 'none';
             
-            // 🔥 LIMPIAR posiciones dobles si NO es modo dobles
+            //  LIMPIAR posiciones dobles si NO es modo dobles
             if (mode !== 'dobles') {
                 JuguemosState.posicionesDobles = [];
                 JuguemosState.cartasDobles = [];
@@ -119,7 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }, 100);
             } else if (mode === 'favoritas') {
                 if (favoritasOption) favoritasOption.style.display = '';
-                // ✅ SIMPLIFICADO: Solo llamar a actualizarCasillas
+                // SIMPLIFICADO: Solo llamar a actualizarCasillas
                 if (window.FavoritasManagerInstance) {
                     setTimeout(() => {
                         window.FavoritasManagerInstance.actualizarCasillasFavoritas();
@@ -144,14 +144,14 @@ document.addEventListener("DOMContentLoaded", () => {
         limpiarCasillas();
         updateOrderSummary();
         
-        // 🔥 Si el modo NO es dobles, limpiar posiciones dobles
+        //  Si el modo NO es dobles, limpiar posiciones dobles
         if (JuguemosState.mode !== 'dobles') {
             JuguemosState.posicionesDobles = [];
             JuguemosState.cartasDobles = [];
             JuguemosState.asignacionDobles = {};
         }
         
-        // 🔥 REFRESCAR VISTA PREVIA DE DOBLES SOLO SI ESTÁ ACTIVO
+        //  REFRESCAR VISTA PREVIA DE DOBLES SOLO SI ESTÁ ACTIVO
         if (JuguemosState.mode === 'dobles' && typeof window.DoblesManager !== 'undefined') {
             setTimeout(() => {
                 window.DoblesManager.refreshPreview();
@@ -318,7 +318,7 @@ if (btnIncluir) {
                 updateOrderSummary();
             }
             
-            // 🔥 Mantener el botón siempre como "inactive" (sin resaltar)
+            //  Mantener el botón siempre como "inactive" (sin resaltar)
             this.classList.remove('active');
             this.classList.add('inactive');
             this.textContent = 'Selección Aleatoria';
@@ -331,7 +331,7 @@ if (btnIncluir) {
    // ========== SIGUIENTE: VISTA PREVIA ==========
     document.getElementById("j-go-preview")?.addEventListener("click", () => {
     
-    // 🔥 VALIDACIÓN PARA MODO LIBRE
+    //  VALIDACIÓN PARA MODO LIBRE
     if (JuguemosState.mode === 'libre') {
         const count = JuguemosState.libreImagesCount || 0;
         if (count < 54) {
@@ -340,7 +340,7 @@ if (btnIncluir) {
         }
     }
     
-    // 🔥 NUEVO: VALIDACIÓN PARA MODO FAVORITAS
+    //  NUEVO: VALIDACIÓN PARA MODO FAVORITAS
     if (JuguemosState.mode === 'favoritas') {
         const favoritas = JuguemosState.favoritas || [];
         
@@ -361,7 +361,7 @@ if (btnIncluir) {
         }
     }
 
-    // 🔥 NUEVO: VALIDACIÓN PARA MODO DOBLES (opcional)
+    //  NUEVO: VALIDACIÓN PARA MODO DOBLES (opcional)
     if (JuguemosState.mode === 'dobles') {
         const cartasDobles = JuguemosState.cartasDobles || [];
         if (cartasDobles.length === 0) {
@@ -371,19 +371,19 @@ if (btnIncluir) {
         console.log('Cartas dobles generadas:', cartasDobles.length);
     }
 
-    // 🔥 NUEVO: VALIDACIÓN GENERAL - Que haya un diseño seleccionado
+    //  NUEVO: VALIDACIÓN GENERAL - Que haya un diseño seleccionado
     if (!JuguemosState.deck) {
         alert('Selecciona un diseño de lotería primero.');
         return;
     }
 
-    // 🔥 NUEVO: VALIDACIÓN - Que haya barajas cargadas
+    //  NUEVO: VALIDACIÓN - Que haya barajas cargadas
     if (!JuguemosState.barajas || JuguemosState.barajas.length === 0) {
         alert('No se cargaron las barajas. Intenta seleccionar otro diseño.');
         return;
     }
 
-    // ✅ Todo validado, proceder
+    // Todo validado, proceder
     if (typeof llenarCasillasAutomatico === 'function') llenarCasillasAutomatico();
     regenerarTodasLasTablas();
     updateOrderSummary();
@@ -623,17 +623,13 @@ function drawGrid() {
         container.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
     }
     
-    // 🔥 Si es modo dobles, usar las posiciones de DoblesManager
+    // 🔥 NUEVO: Usar GridPosiciones para obtener posiciones dobles
     const esModoDobles = JuguemosState.mode === 'dobles';
     let posicionesDobles = [];
     
-    if (esModoDobles && typeof window.DoblesManager !== 'undefined') {
-        posicionesDobles = window.DoblesManager.getPosicionesDobles() || [];
-    }
-    
-    // Si no hay posiciones dobles, usar las del estado global
-    if (posicionesDobles.length === 0 && esModoDobles) {
-        posicionesDobles = JuguemosState.posicionesDobles || [];
+    if (esModoDobles && typeof GridPosiciones !== 'undefined') {
+        const ubicacion = JuguemosState.ubicacionDoble || 'aleatoria';
+        posicionesDobles = GridPosiciones.getPositions(ubicacion, grid, 2);
     }
     
     let html = '';
@@ -656,6 +652,7 @@ function llenarCasillasAleatorio() {
     if (!JuguemosState.barajas?.length) { alert('No hay barajas disponibles para este diseño.'); return; }
     ejecutarLlenadoAleatorio();
 }
+
 function actualizarPreviewCasillas(casillas) {
     const container = document.getElementById('j-casilla-preview-grid');
     if (!container) return;
@@ -675,32 +672,19 @@ function actualizarPreviewCasillas(casillas) {
         container.style.gridTemplateRows = '';
     }
     
-    // 🔥 OBTENER FAVORITAS
+    // OBTENER FAVORITAS
     const favoritas = JuguemosState.favoritas || [];
     const tieneFavoritas = favoritas.length > 0 && JuguemosState.mode === 'favoritas';
     
-    // 🔥 OBTENER CARTAS DOBLES - SOLO DE LA PRIMERA TABLA
+    // 🔥 NUEVO: OBTENER POSICIONES DOBLES USANDO GridPosiciones
     const esModoDobles = JuguemosState.mode === 'dobles';
+    let posicionesDobles = [];
     
-    // 🔥 🔥 🔥 CORRECCIÓN: Solo usar las cartas dobles de la PRIMERA tabla
-    let cartasDoblesPrimeraTabla = [];
-    if (esModoDobles && JuguemosState.asignacionDobles && JuguemosState.asignacionDobles[0]) {
-        // Obtener las cartas dobles de la primera tabla (índice 0)
-        const asignacionPrimeraTabla = JuguemosState.asignacionDobles[0];
-        if (asignacionPrimeraTabla) {
-            const numerosDobles = Object.keys(asignacionPrimeraTabla).map(Number);
-            cartasDoblesPrimeraTabla = numerosDobles;
-        }
-    }
-    
-    // Si no hay asignación por tabla, usar el método antiguo (fallback)
-    if (cartasDoblesPrimeraTabla.length === 0 && esModoDobles) {
-        const cartasDobles = JuguemosState.cartasDobles || [];
-        // Si cartasDobles tiene más de 1, solo tomar la primera
-        const primeraCarta = cartasDobles.length > 0 ? cartasDobles[0] : null;
-        if (primeraCarta) {
-            cartasDoblesPrimeraTabla = [parseInt(primeraCarta.numero)];
-        }
+    if (esModoDobles && typeof GridPosiciones !== 'undefined') {
+        const ubicacion = JuguemosState.ubicacionDoble || 'aleatoria';
+        // Obtener SOLO 2 posiciones para dobles
+        posicionesDobles = GridPosiciones.getPositions(ubicacion, grid, 2);
+        console.log('📍 Posiciones dobles para preview:', posicionesDobles);
     }
     
     // Si no hay casillas, mostrar vacío
@@ -713,7 +697,8 @@ function actualizarPreviewCasillas(casillas) {
     // Mostrar las casillas con los badges correspondientes
     container.innerHTML = casillas.map((casilla, index) => {
         const esFavorita = tieneFavoritas && favoritas.some(f => f && parseInt(f.numero) === casilla?.numero);
-        const esDoble = esModoDobles && casilla && cartasDoblesPrimeraTabla.includes(parseInt(casilla.numero));
+        // 🔥 NUEVO: Usar posicionesDobles en lugar de cartasDoblesPrimeraTabla
+        const esDoble = esModoDobles && posicionesDobles.includes(index);
         const claseExtra = esFavorita ? ' favorita' : (esDoble ? ' doble' : '');
         
         if (casilla) {
@@ -739,7 +724,7 @@ function limpiarCasillas() {
     const grid = JuguemosState.grid || '4x4';
     container.dataset.grid = grid;
     
-    // 🔥 Si es Pocitos 4, usar 2x2
+    //  Si es Pocitos 4, usar 2x2
     if (grid === 'pocitos4') {
         container.style.gridTemplateColumns = 'repeat(2, 1fr)';
         container.style.gridTemplateRows = 'repeat(2, 1fr)';
@@ -766,7 +751,7 @@ function drawMarcosPreview() {
     const grid = JuguemosState.grid || '4x4';
     container.dataset.grid = grid;
     
-    // 🔥 Si es Pocitos 4, usar 2x2
+    //  Si es Pocitos 4, usar 2x2
     if (grid === 'pocitos4') {
         container.style.gridTemplateColumns = 'repeat(2, 1fr)';
         container.style.gridTemplateRows = 'repeat(2, 1fr)';
@@ -787,21 +772,30 @@ function updateOrderSummary() {
     const quantity = JuguemosState.quantity || 0;
     const pages = JuguemosState.pages || 1;
     const totalTablas = quantity * pages;
-    const modeLabel = mode === 'favoritas' ? 'Favoritas' : mode;
-    const precioBarajas = JuguemosState.precioBarajas || 0.00;
+    const modeLabels = {
+        'sencilla': 'Sencilla',
+        'dobles': 'Dobles',
+        'favoritas': 'Favoritas',
+        'libre': 'Personalizadas'
+    };
+    const modeLabel = modeLabels[mode] || mode;   
+    const isUSA = country === 'USA';
+    const precioBarajas = isUSA 
+        ? (JuguemosState.precioBarajasUSA || 15.00) 
+        : (JuguemosState.precioBarajasMexico || 50.00);
     const barajasIncluidas = JuguemosState.barajasIncluidas || false;
     const costoBarajas = barajasIncluidas ? precioBarajas : 0;
     const totalFinal = total + costoBarajas;
     const priceText = '$' + Number(totalFinal).toFixed(2) + ' ' + currency;
     
     const ubicacionLabels = {
-        'aleatoria': 'Aleatoria',
-        'centro': 'Centro',
-        'esquinas': 'Esquinas',
-        'marco': 'Marco'
+        'aleatoria': 'Aleatoria',   
+        'centro': 'Centro',         
+        'esquinas': 'Esquinas',     
+        'marco': 'Marco'            
     };
     const ubicacion = JuguemosState.favoritasUbicacion || 'aleatoria';
-    const ubicacionLabel = mode === 'favoritas' ? ubicacionLabels[ubicacion] || 'Aleatoria' : '';
+    const ubicacionLabel = mode === 'favoritas' ? ubicacionLabels[ubicacion] || 'Random' : '';
 
     const elementos = {
         'payment-summary-country': country,
@@ -853,7 +847,9 @@ function updateOrderSummary() {
             if (id === 'j-summary-grid') {
                 el.innerHTML = elementos[id];
             } else {
-                el.textContent = elementos[id];
+                if (el.textContent !== elementos[id]) {
+                    el.textContent = elementos[id];
+                }
             }
         }
     });
@@ -927,9 +923,8 @@ new MutationObserver(() => {
 function llenarCasillasAutomatico() {
     if (!JuguemosState.deck) return;
     
-    // 🔥 SINCORONIZAR FAVORITAS DESDE EL MANAGER
+    //  SINCORONIZAR FAVORITAS DESDE EL MANAGER
     if (JuguemosState.mode === 'favoritas' && window.FavoritasManagerInstance) {
-        // ✅ USAR MÉTODOS PÚBLICOS DEL MANAGER
         const favoritasDelManager = window.FavoritasManagerInstance.getFavoritas();
         const ubicacionDelManager = window.FavoritasManagerInstance.getUbicacion();
         
@@ -937,7 +932,7 @@ function llenarCasillasAutomatico() {
         if (favoritasDelManager.length > 0) {
             JuguemosState.favoritas = favoritasDelManager;
             JuguemosState.favoritasUbicacion = ubicacionDelManager;
-            console.log('🔄 Sincronizadas favoritas desde manager:', {
+            console.log('Sincronizadas favoritas desde manager:', {
                 count: favoritasDelManager.length,
                 ubicacion: ubicacionDelManager,
                 nombres: favoritasDelManager.map(f => f.nombre)
@@ -945,7 +940,7 @@ function llenarCasillasAutomatico() {
         }
     }
     
-    // 🔥 Si no es modo dobles, limpiar posiciones dobles
+    //  Si no es modo dobles, limpiar posiciones dobles
     if (JuguemosState.mode !== 'dobles') {
         JuguemosState.posicionesDobles = [];
         JuguemosState.cartasDobles = [];
@@ -979,7 +974,7 @@ function ejecutarLlenadoAleatorio() {
             favoritas = window.FavoritasManagerInstance.getFavoritas();
         }
         
-        // 🔥 LIMITAR: máximo = totalTablas (1 favorita por tabla)
+        //  LIMITAR: máximo = totalTablas (1 favorita por tabla)
         if (favoritas.length > totalTablas) {
             // Mezclar y tomar solo totalTablas
             const mezcladas = [...favoritas];
@@ -996,7 +991,7 @@ function ejecutarLlenadoAleatorio() {
             }
         }
         
-        console.log(`🔒 Pocitos 3: Limitado a ${favoritas.length} favoritas para ${totalTablas} tablas`);
+        console.log(`Pocitos 3: Limitado a ${favoritas.length} favoritas para ${totalTablas} tablas`);
     }
     
     if (!totalCasillas) {
@@ -1015,13 +1010,12 @@ function ejecutarLlenadoAleatorio() {
     const todasLasTablas = [];
     const todasLasBarajas = [...JuguemosState.barajas];
     
-    // 🔥 🔥 🔥 SINCRONIZAR FAVORITAS DESDE EL MANAGER (CRÍTICO)
+    //    SINCRONIZAR FAVORITAS DESDE EL MANAGER (CRÍTICO)
     let favoritas = [];
     let ubicacion = 'aleatoria';
     let tieneFavoritas = false;
     
     if (JuguemosState.mode === 'favoritas') {
-        // ✅ PRIMERO: Intentar desde el manager
         if (window.FavoritasManagerInstance) {
             const favoritasDelManager = window.FavoritasManagerInstance.getFavoritas();
             const ubicacionDelManager = window.FavoritasManagerInstance.getUbicacion();
@@ -1031,11 +1025,11 @@ function ejecutarLlenadoAleatorio() {
                 ubicacion = ubicacionDelManager;
                 tieneFavoritas = true;
                 
-                // ✅ Actualizar el estado global
+                // Actualizar el estado global
                 JuguemosState.favoritas = favoritas;
                 JuguemosState.favoritasUbicacion = ubicacion;
                 
-                console.log('✅ Favoritas sincronizadas desde manager:', {
+                console.log('Favoritas sincronizadas desde manager:', {
                     count: favoritas.length,
                     ubicacion: ubicacion,
                     nombres: favoritas.map(f => f.nombre)
@@ -1043,30 +1037,41 @@ function ejecutarLlenadoAleatorio() {
             }
         }
         
-        // ✅ SEGUNDO: Si no hay del manager, usar el estado global
+        // SEGUNDO: Si no hay del manager, usar el estado global
         if (!tieneFavoritas) {
             const favoritasEstado = JuguemosState.favoritas || [];
             if (favoritasEstado.length > 0) {
                 favoritas = favoritasEstado;
                 ubicacion = JuguemosState.favoritasUbicacion || 'aleatoria';
                 tieneFavoritas = true;
-                console.log('✅ Favoritas desde estado global:', favoritas.length);
+                console.log('Favoritas desde estado global:', favoritas.length);
             }
         }
         
-        // ✅ TERCERO: Si no hay favoritas, mostrar advertencia
+        // TERCERO: Si no hay favoritas, mostrar advertencia
         if (!tieneFavoritas || favoritas.length === 0) {
             console.warn('No hay favoritas seleccionadas en modo Favoritas');
             // No detenemos la ejecución, solo mostramos advertencia
         }
     }
 
-    // 🔥 CONFIGURACIÓN DE DOBLES
     let configDoblesPorTabla = [];
-    if (JuguemosState.mode === 'dobles' && typeof window.DoblesManager !== 'undefined') {
-        const posiciones = window.DoblesManager.obtenerPosicionesPorUbicacion(grid, 2);
-        JuguemosState.posicionesDobles = posiciones;
+    if (JuguemosState.mode === 'dobles') {
+        // 🔥 Obtener posiciones usando GridPosiciones
+        let posicionesDobles = [];
+        if (typeof GridPosiciones !== 'undefined') {
+            const ubicacion = JuguemosState.ubicacionDoble || 'aleatoria';
+            posicionesDobles = GridPosiciones.getPositions(ubicacion, grid, 2);
+        } else {
+            // Fallback: usar DoblesManager si existe
+            if (typeof window.DoblesManager !== 'undefined') {
+                posicionesDobles = window.DoblesManager.obtenerPosicionesPorUbicacion(grid, 2);
+            }
+        }
         
+        JuguemosState.posicionesDobles = posicionesDobles;
+        
+        // Generar cartas dobles para cada tabla
         for (let t = 0; t < totalTablas; t++) {
             const barajasMezcladas = [...todasLasBarajas];
             for (let i = barajasMezcladas.length - 1; i > 0; i--) {
@@ -1078,9 +1083,9 @@ function ejecutarLlenadoAleatorio() {
             
             configDoblesPorTabla.push({
                 carta: cartaDoble,
-                posiciones: posiciones,
+                posiciones: posicionesDobles,
                 asignacion: {
-                    [cartaDoble.numero]: posiciones
+                    [cartaDoble.numero]: posicionesDobles
                 }
             });
         }
@@ -1094,12 +1099,12 @@ function ejecutarLlenadoAleatorio() {
         drawGrid();
     }
 
-    // 🔥 GENERAR CADA TABLA
+    //  GENERAR CADA TABLA
     for (let t = 0; t < totalTablas; t++) {
         const casillas = new Array(totalCasillas).fill(null);
         const copiaBarajas = [...todasLasBarajas];
         
-        // 🔥 COLOCAR FAVORITAS (PRIMERO, para que tengan prioridad)
+        //  COLOCAR FAVORITAS (PRIMERO, para que tengan prioridad)
         if (tieneFavoritas && favoritas.length > 0) {
             // Distribuir favoritas entre tablas
             const favoritasPorTabla = distribuirFavoritasPorTablas(favoritas, totalTablas, totalCasillas);
@@ -1125,7 +1130,7 @@ function ejecutarLlenadoAleatorio() {
             }
         }
         
-        // 🔥 COLOCAR DOBLES (DESPUÉS de favoritas)
+        //  COLOCAR DOBLES (DESPUÉS de favoritas)
         if (configDoblesPorTabla.length > 0 && configDoblesPorTabla[t]) {
             const config = configDoblesPorTabla[t];
             const asignacion = config.asignacion;
@@ -1150,7 +1155,7 @@ function ejecutarLlenadoAleatorio() {
             });
         }
         
-        // 🔥 LLENAR RESTO CON BARAJAS ALEATORIAS
+        //  LLENAR RESTO CON BARAJAS ALEATORIAS
         for (let i = 0; i < totalCasillas; i++) {
             if (!casillas[i]) {
                 let baraja = null;
