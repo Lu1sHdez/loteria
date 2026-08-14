@@ -28,9 +28,27 @@
         }
         
         updatePaymentSummary() {
-            if (typeof updateOrderSummary === 'function') {
-                updateOrderSummary();
-            }
+            // Calcular total final
+            const totalTablas = (JuguemosState.quantity || 1) * (JuguemosState.pages || 1);
+            const subtotal = (JuguemosState.unitPrice || 0) * totalTablas;
+            
+            const isUSA = JuguemosState.country === 'USA';
+            const precioBarajas = isUSA 
+                ? (JuguemosState.precioBarajasUSA || 15.00) 
+                : (JuguemosState.precioBarajasMexico || 50.00);
+            const costoBarajas = JuguemosState.barajasIncluidas ? precioBarajas : 0;
+            
+            const totalFinal = subtotal + costoBarajas;
+            const priceText = '$' + Number(totalFinal).toFixed(2) + ' ' + JuguemosState.currency;
+            
+            // Actualizar UI
+            document.getElementById('payment-summary-mode').textContent = 
+                JuguemosState.mode === 'sencilla' ? 'Sencilla' :
+                JuguemosState.mode === 'dobles' ? 'Dobles' :
+                JuguemosState.mode === 'favoritas' ? 'Favoritas' : 'Personalizadas';
+            
+            document.getElementById('payment-summary-quantity').textContent = totalTablas;
+            document.getElementById('payment-summary-price').textContent = priceText;
         }
         
         selectMethod(method) {
@@ -66,11 +84,20 @@
             btn.hide();
             $('#j-payment-loading').show();
             
-            const amount = JuguemosState.total || 1.00;
+            // 🔥 CALCULAR TOTAL FINAL COMPLETO
+            const totalTablas = (JuguemosState.quantity || 1) * (JuguemosState.pages || 1);
+            const subtotal = (JuguemosState.unitPrice || 0) * totalTablas;
+            
+            const isUSA = JuguemosState.country === 'USA';
+            const precioBarajas = isUSA 
+                ? (JuguemosState.precioBarajasUSA || 15.00) 
+                : (JuguemosState.precioBarajasMexico || 50.00);
+            const costoBarajas = JuguemosState.barajasIncluidas ? precioBarajas : 0;
+            
+            // ✅ TOTAL FINAL = Subtotal tablas + Costo barajas
+            const amount = subtotal + costoBarajas;
             const currency = JuguemosState.currency || 'USD';
-            
-            console.log('Procesando pago:', this.currentMethod, amount, currency);
-            
+
             switch(this.currentMethod) {
                 case 'paypal':
                     this.processPayPal(amount, currency);

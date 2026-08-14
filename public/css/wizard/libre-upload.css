@@ -1,7 +1,4 @@
 /* =====================================================
-   LIBRE - UPLOAD DE IMÁGENES (SIN BORDES)
-===================================================== */
-/* =====================================================
    LIBRE - COMPLETADO (AQUA)
 ===================================================== */
 
@@ -39,6 +36,7 @@
 }
 .j-libre-nav {
     display: flex;
+    justify-content: center;
     gap: 10px;
     margin-bottom: 15px;
     flex-wrap: wrap;
@@ -337,4 +335,19 @@
 
 .j-libre-item-placeholder:active {
     transform: scale(0.95);
+}
+
+
+.j-grid-preview .cell .j-per-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    height: 60%;
+    object-fit: contain;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.3;
+    filter: grayscale(0.3);
 }

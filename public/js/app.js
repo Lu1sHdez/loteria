@@ -642,7 +642,6 @@ function drawGrid() {
     
     // 🔥 Posiciones para FAVORITAS
     if (esModoFavoritas) {
-        // Obtener posiciones de favoritas desde la estructura o fallback
         if (JuguemosState.favoritasEstructura && JuguemosState.favoritasEstructura.length > 0) {
             const primeraTabla = JuguemosState.favoritasEstructura[0] || { posiciones: [] };
             posicionesFavoritas = primeraTabla.posiciones.map(item => item.posicion);
@@ -661,18 +660,22 @@ function drawGrid() {
     if (grid === 'cruzadas') {
         const casillasVisibles = [0, 3, 5, 6, 9, 10, 12, 15];
         
+        // 🔥 MAPA DE POSICIONES 8 → 16
+        const mapaPosiciones = { 0: 0, 1: 3, 2: 5, 3: 6, 4: 9, 5: 10, 6: 12, 7: 15 };
+        const posicionesDobles16 = posicionesDobles.map(p => mapaPosiciones[p] ?? p);
+        
         for (let i = 0; i < 16; i++) {
             const esVisible = casillasVisibles.includes(i);
-            const esDoble = esModoDobles && posicionesDobles.includes(i);
+            const esDoble = esModoDobles && posicionesDobles16.includes(i);
             const esFavorita = esModoFavoritas && posicionesFavoritas.includes(i);
             const row = Math.floor(i / 4) + 1;
             const col = (i % 4) + 1;
             
             let icono = '';
             if (esDoble) {
-                icono = '<img src="/wp-content/uploads/2026/08/doblesx2.png" class="j-doble-imagen" alt="×2" loading="lazy">';
+                icono = '<img src="/wp-content/uploads/2026/08/dobles_icon.png" class="j-doble-imagen" alt="×2" loading="lazy">';
             } else if (esFavorita) {
-                icono = '<img src="/wp-content/uploads/2026/08/corazon-favoritas.png" class="j-favorita-corazon" alt="❤️" loading="lazy">';
+                icono = '<img src="/wp-content/uploads/2026/08/fav_icon.png" class="j-favorita-corazon" alt="" loading="lazy">';
             }
             
             if (esVisible) {
@@ -690,9 +693,9 @@ function drawGrid() {
             
             let icono = '';
             if (esDoble) {
-                icono = '<img src="/wp-content/uploads/2026/08/doblesx2.png" class="j-doble-imagen" alt="×2" loading="lazy">';
+                icono = '<img src=" /wp-content/uploads/2026/08/dobles_icon.png" class="j-doble-imagen" alt="×2" loading="lazy">';
             } else if (esFavorita) {
-                icono = '<img src="/wp-content/uploads/2026/08/corazon-favoritas.png" class="j-favorita-corazon" alt="❤️" loading="lazy">';
+                icono = '<img src="/wp-content/uploads/2026/08/fav_icon.png" class="j-favorita-corazon" alt="" loading="lazy">';
             }
             
             html += `<div class="cell ${esDoble ? 'doble-ubicacion' : ''} ${esFavorita ? 'favorita-ubicacion' : ''}">
@@ -713,7 +716,6 @@ function llenarCasillasAleatorio() {
     if (!JuguemosState.barajas?.length) { alert('No hay barajas disponibles para este diseño.'); return; }
     ejecutarLlenadoAleatorio();
 }
-
 function actualizarPreviewCasillas(casillas) {
     const container = document.getElementById('j-casilla-preview-grid');
     if (!container) return;
@@ -742,7 +744,6 @@ function actualizarPreviewCasillas(casillas) {
     let posicionesDobles = [];
     
     if (esModoDobles) {
-        // 🔥 USAR posiciones fijas
         if (JuguemosState.posicionesDoblesFijas && JuguemosState.posicionesDoblesFijas.length > 0) {
             posicionesDobles = JuguemosState.posicionesDoblesFijas;
         } else if (typeof GridPosiciones !== 'undefined') {
@@ -775,40 +776,47 @@ function actualizarPreviewCasillas(casillas) {
         return;
     }
     
-    // 🔥 Para Cruzadas, generar 16 celdas
-    if (grid === 'cruzadas') {
-        const casillasVisibles = [0, 3, 5, 6, 9, 10, 12, 15];
-        let html = '';
+// 🔥 Para Cruzadas, generar 16 celdas con MAPEO DE POSICIONES
+if (grid === 'cruzadas') {
+    const casillasVisibles = [0, 3, 5, 6, 9, 10, 12, 15];
+    
+    // 🔥 MAPA DE POSICIONES 8 → 16
+    const mapaPosiciones = { 0: 0, 1: 3, 2: 5, 3: 6, 4: 9, 5: 10, 6: 12, 7: 15 };
+    const posicionesDobles16 = posicionesDobles.map(p => mapaPosiciones[p] ?? p);
+    
+    let html = '';
+    
+    for (let i = 0; i < 16; i++) {
+        const esVisible = casillasVisibles.includes(i);
+        const esDoble = esModoDobles && posicionesDobles16.includes(i);
+        const row = Math.floor(i / 4) + 1;
+        const col = (i % 4) + 1;
         
-        for (let i = 0; i < 16; i++) {
-            const esVisible = casillasVisibles.includes(i);
-            const esDoble = esModoDobles && posicionesDobles.includes(i);
-            const row = Math.floor(i / 4) + 1;
-            const col = (i % 4) + 1;
+        if (esVisible) {
+            // 🔥 CORREGIDO: Encontrar el índice correcto en casillas (0-7)
+            const idxVisible = casillasVisibles.indexOf(i);
+            const casilla = (idxVisible !== -1 && casillas[idxVisible]) ? casillas[idxVisible] : null;
+            const esFavorita = tieneFavoritas && casilla && favoritas.some(f => f && parseInt(f.numero) === casilla?.numero);
+            const claseExtra = esFavorita ? ' favorita' : (esDoble ? ' doble' : '');
             
-            if (esVisible) {
-                const casilla = casillas[i] || null;
-                const esFavorita = tieneFavoritas && casilla && favoritas.some(f => f && parseInt(f.numero) === casilla?.numero);
-                const claseExtra = esFavorita ? ' favorita' : (esDoble ? ' doble' : '');
-                
-                if (casilla) {
-                    html += `
-                        <div class="cell visible${claseExtra}" style="grid-row: ${row}; grid-column: ${col};" title="${casilla.nombre || ''}${esFavorita ? ' ⭐ Favorita' : ''}${esDoble ? ' ×2 Doble' : ''}">
-                            <img src="${casilla.imagen || ''}" alt="${casilla.nombre || ''}" loading="lazy">
-                            ${esFavorita ? '<span class="j-favorita-badge">⭐</span>' : ''}
-                            ${esDoble ? '<span class="j-doble-badge">×2</span>' : ''}
-                        </div>
-                    `;
-                } else {
-                    html += `<div class="cell visible" style="grid-row: ${row}; grid-column: ${col};"></div>`;
-                }
+            if (casilla) {
+                html += `
+                    <div class="cell visible${claseExtra}" style="grid-row: ${row}; grid-column: ${col};" title="${casilla.nombre || ''}${esFavorita ? ' ⭐ Favorita' : ''}${esDoble ? ' ×2 Doble' : ''}">
+                        <img src="${casilla.imagen || ''}" alt="${casilla.nombre || ''}" loading="lazy">
+                        ${esFavorita ? '<img src="/wp-content/uploads/2026/08/fav_icon.png" class="j-favorita-badge" alt="⭐">' : ''}
+                        ${esDoble ? '<span class="j-doble-badge">×2</span>' : ''}
+                    </div>
+                `;
             } else {
-                html += `<div class="cell" style="grid-row: ${row}; grid-column: ${col};"></div>`;
+                html += `<div class="cell visible" style="grid-row: ${row}; grid-column: ${col};"></div>`;
             }
+        } else {
+            html += `<div class="cell" style="grid-row: ${row}; grid-column: ${col};"></div>`;
         }
-        container.innerHTML = html;
-        return;
     }
+    container.innerHTML = html;
+    return;
+}
     
     // Grids normales (4x4, 5x5, pocitos)
     const total = getTotalCasillas(grid);
@@ -1189,6 +1197,14 @@ if (JuguemosState.mode === 'dobles') {
     JuguemosState.posicionesDoblesFijas = posicionesDobles;
     console.log('📍 Posiciones dobles fijas para', grid, ':', posicionesDobles);
     
+    // 🔥 MAPA DE POSICIONES 8 → 16 (SOLO PARA CRUZADAS)
+    let posicionesParaAsignar = posicionesDobles;
+    if (grid === 'cruzadas') {
+        const mapaPosiciones = { 0: 0, 1: 3, 2: 5, 3: 6, 4: 9, 5: 10, 6: 12, 7: 15 };
+        posicionesParaAsignar = posicionesDobles.map(p => mapaPosiciones[p] ?? p);
+        console.log('📍 Cruzadas: Mapeo 8→16:', posicionesDobles, '→', posicionesParaAsignar);
+    }
+    
     // Generar cartas dobles
     for (let t = 0; t < totalTablas; t++) {
         const barajasMezcladas = [...todasLasBarajas];
@@ -1201,9 +1217,9 @@ if (JuguemosState.mode === 'dobles') {
         
         configDoblesPorTabla.push({
             carta: cartaDoble,
-            posiciones: posicionesDobles,
+            posiciones: posicionesParaAsignar,
             asignacion: {
-                [cartaDoble.numero]: posicionesDobles
+                [cartaDoble.numero]: posicionesParaAsignar
             }
         });
     }

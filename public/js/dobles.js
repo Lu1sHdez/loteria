@@ -77,7 +77,7 @@
             for (let i = 0; i < total; i++) {
                 const esDoble = posiciones.includes(i);
                 html += `<div class="cell ${esDoble ? 'doble-ubicacion' : ''}">
-                    ${esDoble ? '<img src="/wp-content/uploads/2026/08/doblesx2.png" class="j-doble-imagen" alt="×2" loading="lazy">' : ''}
+                    ${esDoble ? '<img src=" /wp-content/uploads/2026/08/dobles_icon.png" class="j-doble-imagen" alt="×2" loading="lazy">' : ''}
                 </div>`;
             }
             

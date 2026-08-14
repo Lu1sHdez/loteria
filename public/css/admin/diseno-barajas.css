@@ -68,7 +68,7 @@
 }
 
 .j-baraja-nombre:focus {
-    border-color: #FA299C;
+    border-color: #24B8C8;
 }
 .j-baraja-preview img,
 .j-baraja-preview-image{
@@ -96,7 +96,7 @@
     background: #FFFFFF;
     border: 1px solid #D9D9D9;
     border-radius: 8px;
-    color: #E53935;
+    color: #24B8C8;
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
@@ -104,7 +104,38 @@
 }
 
 .j-baraja-delete:hover {
-    background: #E53935;
-    border-color: #E53935;
+    background: #24B8C8;
+    border-color: #24B8C8;
     color: #FFFFFF;
+}
+
+/* =====================================================
+   VISTA PREVIA DE UBICACIÓN - SOLO MODO LIBRE
+===================================================== */
+
+/* Fondo rosa SOLO en modo libre */
+.j-grid-preview .cell.libre-fondo {
+    background: #FA299C !important;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Icono de relleno para modo libre */
+.j-grid-preview .cell .j-per-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    height: 60%;
+    object-fit: contain;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+/* Asegurar que las celdas tengan posición relativa */
+.j-grid-preview .cell {
+    position: relative;
+    overflow: hidden;
 }
