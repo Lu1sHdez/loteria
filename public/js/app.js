@@ -624,10 +624,12 @@ function drawGrid() {
     }
     
     const esModoDobles = JuguemosState.mode === 'dobles';
+    const esModoFavoritas = JuguemosState.mode === 'favoritas';
     let posicionesDobles = [];
+    let posicionesFavoritas = [];
     
+    // 🔥 Posiciones para DOBLES
     if (esModoDobles) {
-        // 🔥 USAR posiciones fijas si existen
         if (JuguemosState.posicionesDoblesFijas && JuguemosState.posicionesDoblesFijas.length > 0) {
             posicionesDobles = JuguemosState.posicionesDoblesFijas;
         } else if (typeof GridPosiciones !== 'undefined') {
@@ -638,20 +640,44 @@ function drawGrid() {
         JuguemosState.posicionesDobles = posicionesDobles;
     }
     
+    // 🔥 Posiciones para FAVORITAS
+    if (esModoFavoritas) {
+        // Obtener posiciones de favoritas desde la estructura o fallback
+        if (JuguemosState.favoritasEstructura && JuguemosState.favoritasEstructura.length > 0) {
+            const primeraTabla = JuguemosState.favoritasEstructura[0] || { posiciones: [] };
+            posicionesFavoritas = primeraTabla.posiciones.map(item => item.posicion);
+        } else if (JuguemosState.favoritas && JuguemosState.favoritas.length > 0) {
+            const cantidad = Math.min(JuguemosState.favoritas.length, 12);
+            const ubicacion = JuguemosState.favoritasUbicacion || 'aleatoria';
+            if (typeof GridPosiciones !== 'undefined') {
+                posicionesFavoritas = GridPosiciones.getPositions(ubicacion, grid, cantidad);
+            }
+        }
+        console.log('📍 drawGrid - Favoritas posiciones:', posicionesFavoritas);
+    }
+    
     let html = '';
     
     if (grid === 'cruzadas') {
         const casillasVisibles = [0, 3, 5, 6, 9, 10, 12, 15];
         
         for (let i = 0; i < 16; i++) {
-            const esDoble = esModoDobles && posicionesDobles.includes(i);
             const esVisible = casillasVisibles.includes(i);
+            const esDoble = esModoDobles && posicionesDobles.includes(i);
+            const esFavorita = esModoFavoritas && posicionesFavoritas.includes(i);
             const row = Math.floor(i / 4) + 1;
             const col = (i % 4) + 1;
             
+            let icono = '';
+            if (esDoble) {
+                icono = '<img src="/wp-content/uploads/2026/08/doblesx2.png" class="j-doble-imagen" alt="×2" loading="lazy">';
+            } else if (esFavorita) {
+                icono = '<img src="/wp-content/uploads/2026/08/corazon-favoritas.png" class="j-favorita-corazon" alt="❤️" loading="lazy">';
+            }
+            
             if (esVisible) {
-                html += `<div class="cell visible ${esDoble ? 'doble-ubicacion' : ''}" style="grid-row: ${row}; grid-column: ${col};">
-                    ${esDoble ? '<img src="/wp-content/uploads/2026/08/doblesx2.png" class="j-doble-imagen" alt="×2" loading="lazy">' : ''}
+                html += `<div class="cell visible ${esDoble ? 'doble-ubicacion' : ''} ${esFavorita ? 'favorita-ubicacion' : ''}" style="grid-row: ${row}; grid-column: ${col};">
+                    ${icono}
                 </div>`;
             } else {
                 html += `<div class="cell" style="grid-row: ${row}; grid-column: ${col};"></div>`;
@@ -660,8 +686,17 @@ function drawGrid() {
     } else {
         for (let i = 0; i < cells; i++) {
             const esDoble = esModoDobles && posicionesDobles.includes(i);
-            html += `<div class="cell ${esDoble ? 'doble-ubicacion' : ''}">
-                ${esDoble ? '<img src="/wp-content/uploads/2026/08/doblesx2.png" class="j-doble-imagen" alt="×2" loading="lazy">' : ''}
+            const esFavorita = esModoFavoritas && posicionesFavoritas.includes(i);
+            
+            let icono = '';
+            if (esDoble) {
+                icono = '<img src="/wp-content/uploads/2026/08/doblesx2.png" class="j-doble-imagen" alt="×2" loading="lazy">';
+            } else if (esFavorita) {
+                icono = '<img src="/wp-content/uploads/2026/08/corazon-favoritas.png" class="j-favorita-corazon" alt="❤️" loading="lazy">';
+            }
+            
+            html += `<div class="cell ${esDoble ? 'doble-ubicacion' : ''} ${esFavorita ? 'favorita-ubicacion' : ''}">
+                ${icono}
             </div>`;
         }
     }
@@ -1187,31 +1222,58 @@ if (JuguemosState.mode === 'dobles') {
         const casillas = new Array(totalCasillas).fill(null);
         const copiaBarajas = [...todasLasBarajas];
         
-        //  COLOCAR FAVORITAS (PRIMERO, para que tengan prioridad)
-        if (tieneFavoritas && favoritas.length > 0) {
-            // Distribuir favoritas entre tablas
-            const favoritasPorTabla = distribuirFavoritasPorTablas(favoritas, totalTablas, totalCasillas);
-            const favoritasTabla = favoritasPorTabla[t] || [];
+       // 🔥 COLOCAR FAVORITAS USANDO LA NUEVA LÓGICA
+if (JuguemosState.mode === 'favoritas' && JuguemosState.favoritasEstructura && JuguemosState.favoritasEstructura.length > 0) {
+    // Usar la estructura generada por FavoritasLogic
+    const estructura = JuguemosState.favoritasEstructura;
+    
+    // Buscar la tabla correspondiente en la estructura
+    const tablaData = estructura[t] || null;
+    
+    if (tablaData && tablaData.posiciones && tablaData.posiciones.length > 0) {
+        console.log(`📊 Tabla ${t + 1}: Usando estructura de FavoritasLogic - ${tablaData.posiciones.length} favoritas`);
+        
+        tablaData.posiciones.forEach(item => {
+            const pos = item.posicion;
+            const favorita = item.favorita;
             
-            if (favoritasTabla.length > 0) {
-                // Obtener posiciones según la ubicación
-                const posicionesFavoritas = obtenerPosicionesFavoritas(grid, favoritasTabla.length, ubicacion);
+            if (pos < totalCasillas && !casillas[pos] && favorita) {
+                casillas[pos] = favorita;
                 
-                console.log(`📊 Tabla ${t + 1}: ${favoritasTabla.length} favoritas en posiciones:`, posicionesFavoritas);
-                
-                favoritasTabla.forEach((favorita, idx) => {
-                    const pos = posicionesFavoritas[idx] !== undefined ? posicionesFavoritas[idx] : idx;
-                    if (pos < totalCasillas && !casillas[pos]) {
-                        casillas[pos] = favorita;
-                        // Remover de la copia de barajas para no repetir
-                        const indexEnCopia = copiaBarajas.findIndex(b => b.numero === favorita.numero);
-                        if (indexEnCopia !== -1) {
-                            copiaBarajas.splice(indexEnCopia, 1);
-                        }
-                    }
-                });
+                // Remover de la copia de barajas para no repetir
+                const indexEnCopia = copiaBarajas.findIndex(b => b.numero === favorita.numero);
+                if (indexEnCopia !== -1) {
+                    copiaBarajas.splice(indexEnCopia, 1);
+                }
             }
-        }
+        });
+    }
+} 
+// FALLBACK: Si no hay estructura, usar la lógica antigua
+else if (tieneFavoritas && favoritas.length > 0) {
+    // Distribuir favoritas entre tablas
+    const favoritasPorTabla = distribuirFavoritasPorTablas(favoritas, totalTablas, totalCasillas);
+    const favoritasTabla = favoritasPorTabla[t] || [];
+    
+    if (favoritasTabla.length > 0) {
+        // Obtener posiciones según la ubicación
+        const posicionesFavoritas = obtenerPosicionesFavoritas(grid, favoritasTabla.length, ubicacion);
+        
+        console.log(`📊 Tabla ${t + 1}: ${favoritasTabla.length} favoritas en posiciones (fallback):`, posicionesFavoritas);
+        
+        favoritasTabla.forEach((favorita, idx) => {
+            const pos = posicionesFavoritas[idx] !== undefined ? posicionesFavoritas[idx] : idx;
+            if (pos < totalCasillas && !casillas[pos]) {
+                casillas[pos] = favorita;
+                // Remover de la copia de barajas para no repetir
+                const indexEnCopia = copiaBarajas.findIndex(b => b.numero === favorita.numero);
+                if (indexEnCopia !== -1) {
+                    copiaBarajas.splice(indexEnCopia, 1);
+                }
+            }
+        });
+    }
+}
         
         //  COLOCAR DOBLES (DESPUÉS de favoritas)
         if (configDoblesPorTabla.length > 0 && configDoblesPorTabla[t]) {

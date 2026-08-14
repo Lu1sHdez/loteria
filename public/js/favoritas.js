@@ -9,7 +9,6 @@
 
     class FavoritasManager {
         constructor() {
-            // Configuración
             this.maxSeleccion = 12;
             this.seleccionadas = [];
             this.categoriaActual = null;
@@ -53,10 +52,6 @@
             this.init();
         }
 
-        // =========================================================
-        // INICIALIZACIÓN
-        // =========================================================
-
         init() {
             if (!this.container) {
                 console.warn('⚠️ FavoritasManager: Contenedor no encontrado');
@@ -71,25 +66,16 @@
             
             this.bindEvents();
             this.renderCategorias(categoriasOrdenadas);
-            
-            // INICIALIZAR: Esperar a que las barajas estén cargadas
             this.cargarGridInicial();
-            
-            //  Suscribirse a cambios en barajas
             this.observarBarajas();
             
             console.log('📋 FavoritasManager iniciado');
         }
 
-        // =========================================================
-        // 🔥 NUEVO: Cargar grid inicial con retry
-        // =========================================================
-
         cargarGridInicial() {
             const barajas = this.getBarajasDelDiseno();
             
             if (barajas.length > 0) {
-                // ✅ Ya hay barajas, renderizar directamente
                 this.renderGrid();
                 this.updateContador();
                 this.updateProgress();
@@ -97,11 +83,9 @@
                 this.initialized = true;
                 console.log('✅ Favoritas: Grid inicial cargado con', barajas.length, 'barajas');
             } else {
-                // ⏳ Esperar a que se carguen las barajas
                 console.log('⏳ Favoritas: Esperando barajas...');
                 this.initialized = false;
                 
-                // Intentar cada 500ms hasta 5 segundos
                 let intentos = 0;
                 const maxIntentos = 10;
                 
@@ -119,7 +103,6 @@
                         console.log('✅ Favoritas: Grid cargado después de', intentos, 'intentos');
                     } else if (intentos >= maxIntentos) {
                         clearInterval(esperarBarajas);
-                        // 🔥 Mostrar mensaje de "Selecciona un diseño"
                         const grid = document.getElementById('j-favoritas-grid');
                         if (grid) {
                             grid.innerHTML = '<p style="color:#999;text-align:center;">Selecciona un diseño primero</p>';
@@ -130,25 +113,14 @@
             }
         }
 
-        // =========================================================
-        // 🔥 NUEVO: Observar cambios en barajas
-        // =========================================================
-
         observarBarajas() {
-            // Guardar referencia al setter original
-            const originalBarajas = Object.getOwnPropertyDescriptor(JuguemosState, 'barajas');
-            
-            // Interceptar cambios en barajas
             Object.defineProperty(JuguemosState, 'barajas', {
                 get: function() {
                     return this._barajas || [];
                 },
                 set: function(value) {
                     this._barajas = value;
-                    
-                    // ✅ Si el modo es favoritas y el manager está activo
                     if (JuguemosState.mode === 'favoritas' && window.FavoritasManagerInstance) {
-                        // Esperar un momento para que el DOM se actualice
                         setTimeout(() => {
                             window.FavoritasManagerInstance.recargarGrid();
                         }, 100);
@@ -157,15 +129,10 @@
                 configurable: true
             });
             
-            // Inicializar con valor actual
             if (!JuguemosState._barajas) {
                 JuguemosState._barajas = JuguemosState.barajas || [];
             }
         }
-
-        // =========================================================
-        // 🔥 NUEVO: Recargar grid cuando cambian las barajas
-        // =========================================================
 
         recargarGrid() {
             const barajas = this.getBarajasDelDiseno();
@@ -179,12 +146,7 @@
             }
         }
 
-        // =========================================================
-        // EVENTOS
-        // =========================================================
-
         bindEvents() {
-            // Botón selección aleatoria
             const btnAleatoria = document.getElementById('j-favoritas-aleatoria');
             if (btnAleatoria) {
                 btnAleatoria.addEventListener('click', () => {
@@ -192,32 +154,20 @@
                 });
             }
         
-            // Botones de ubicación
             document.querySelectorAll('.j-ubicacion-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     document.querySelectorAll('.j-ubicacion-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     this.ubicacion = btn.dataset.ubicacion;
-                    
-                    // ✅ Actualizar estado global
                     JuguemosState.favoritasUbicacion = this.ubicacion;
-                    
-                    // ✅ Primero actualizar vista previa de casillas
                     this.actualizarPreviewCasillas();
                     
-                    // ✅ Luego forzar regeneración de tablas (después de actualizar la vista)
                     if (typeof llenarCasillasAutomatico === 'function') {
-                        setTimeout(() => {
-                            llenarCasillasAutomatico();
-                        }, 100);
+                        setTimeout(() => llenarCasillasAutomatico(), 100);
                     }
                 });
             });
         }
-
-        // =========================================================
-        // RENDERIZADO DE CATEGORÍAS
-        // =========================================================
 
         renderCategorias(categoriasOrdenadas) {
             const container = document.getElementById('j-favoritas-categorias');
@@ -244,7 +194,136 @@
         }
 
         // =========================================================
-        // RENDERIZADO DEL GRID (MEJORADO)
+        // GENERAR DISTRIBUCIÓN (ÚNICA VERSIÓN)
+        // =========================================================
+
+        generarDistribucionInteligente() {
+            const grid = JuguemosState.grid || '4x4';
+            const ubicacion = JuguemosState.favoritasUbicacion || 'aleatoria';
+            const totalTablas = (JuguemosState.quantity || 1) * (JuguemosState.pages || 1);
+            const favoritas = this.seleccionadas || [];
+
+            if (favoritas.length === 0) {
+                JuguemosState.favoritasEstructura = [];
+                JuguemosState.favoritasDistribucion = [];
+                return;
+            }
+
+            const estructura = FavoritasLogic.generarEstructuraCompleta(
+                favoritas,
+                totalTablas,
+                grid,
+                ubicacion
+            );
+
+            JuguemosState.favoritasEstructura = estructura;
+            JuguemosState.favoritasDistribucion = estructura.map(t => t.favoritas);
+            
+            // 🔥 Actualizar Vista previa de ubicación
+            if (typeof drawGrid === 'function') {
+                drawGrid();
+            }
+            
+            return estructura;
+        }
+
+        // =========================================================
+        // VISTA PREVIA DE CASILLAS
+        // =========================================================
+
+        actualizarPreviewCasillas() {
+            console.log('🔄 actualizarPreviewCasillas - Favoritas:', this.seleccionadas.length);
+            console.log('🔄 actualizarPreviewCasillas - Ubicacion:', this.ubicacion);
+            
+            JuguemosState.favoritas = this.seleccionadas;
+            JuguemosState.favoritasUbicacion = this.ubicacion;
+            
+            // PRIMERO: Generar estructura
+            this.generarDistribucionInteligente();
+            
+            // LUEGO: Mostrar vista previa
+            const grid = JuguemosState.grid || '4x4';
+            const totalCasillas = this.getTotalCasillas(grid);
+            const container = document.getElementById('j-casilla-preview-grid');
+            if (!container) return;
+            
+            container.dataset.grid = grid;
+            
+            if (this.seleccionadas.length === 0) {
+                container.innerHTML = Array(totalCasillas)
+                    .fill('<div class="cell empty"></div>')
+                    .join('');
+                return;
+            }
+            
+            const estructura = JuguemosState.favoritasEstructura;
+            if (estructura && estructura.length > 0) {
+                this.mostrarPreviewConEstructura(estructura);
+            } else {
+                // Fallback seguro
+                const posiciones = FavoritasLogic.getPosicionesPorUbicacion(this.ubicacion, grid, this.seleccionadas.length);
+                let html = '';
+                for (let i = 0; i < totalCasillas; i++) {
+                    const esFavorita = posiciones.includes(i);
+                    let baraja = null;
+                    if (esFavorita) {
+                        const idx = posiciones.indexOf(i);
+                        if (idx < this.seleccionadas.length) {
+                            baraja = this.seleccionadas[idx];
+                        }
+                    }
+                    if (baraja) {
+                        html += `
+                            <div class="cell favorita" data-index="${i}" title="${baraja.nombre} ❤️ Favorita">
+                                <img src="${baraja.imagen}" alt="${baraja.nombre}" loading="lazy">
+                            </div>
+                        `;
+                    } else {
+                        html += `<div class="cell empty" data-index="${i}"></div>`;
+                    }
+                }
+                container.innerHTML = html;
+            }
+        }
+
+        mostrarPreviewConEstructura(estructura) {
+            const primeraTabla = estructura[0] || { posiciones: [] };
+            const posiciones = primeraTabla.posiciones || [];
+            
+            const container = document.getElementById('j-casilla-preview-grid');
+            if (!container) return;
+            
+            const grid = JuguemosState.grid || '4x4';
+            const total = FavoritasLogic.getGridConfig(grid).total;
+            
+            const casillas = Array(total).fill(null);
+            posiciones.forEach(item => {
+                if (item.posicion < total) {
+                    casillas[item.posicion] = item.favorita;
+                }
+            });
+            
+            let html = '';
+            for (let i = 0; i < total; i++) {
+                const casilla = casillas[i];
+                const esFavorita = casilla !== null && casilla !== undefined;
+                
+                if (esFavorita) {
+                    html += `
+                        <div class="cell favorita" data-index="${i}">
+                            <img src="${casilla.imagen || ''}" alt="${casilla.nombre || ''}" loading="lazy">
+                        </div>
+                    `;
+                } else {
+                    html += `<div class="cell empty" data-index="${i}"></div>`;
+                }
+            }
+            
+            container.innerHTML = html;
+        }
+
+        // =========================================================
+        // RENDERIZADO DEL GRID DE SELECCIÓN
         // =========================================================
 
         renderGrid() {
@@ -283,7 +362,6 @@
                 const item = document.createElement('div');
                 item.className = `j-favoritas-item${isSelected ? ' selected' : ''}`;
                 
-                // 🔥 AQUÍ ESTÁ EL CAMBIO - El corazón en el centro
                 let html = `
                     <img src="${baraja.imagen}" alt="${baraja.nombre}" loading="lazy">
                     ${isSelected ? '<span class="j-heart-center">❤️</span>' : ''}
@@ -338,7 +416,6 @@
                 this.seleccionadas.push(baraja);
             }
             
-            // ✅ Actualizar todo
             this.renderGrid();
             this.updateContador();
             this.updateProgress();
@@ -360,7 +437,6 @@
             
             this.seleccionadas = mezcladas.slice(0, this.maxSeleccion);
             
-            // ✅ Actualizar todo
             this.renderGrid();
             this.updateContador();
             this.updateProgress();
@@ -396,288 +472,9 @@
                 const percentage = (total / this.maxSeleccion) * 100;
                 range.style.background = `linear-gradient(to right, #FA299C 0%, #FA299C ${percentage}%, #E5E5E5 ${percentage}%, #E5E5E5 100%)`;
             }
-            
             if (number) {
                 number.textContent = total;
             }
-        }
-
-        actualizarPreviewCasillas() {
-            console.log('🔄 actualizarPreviewCasillas - Favoritas:', this.seleccionadas.length);
-            console.log('🔄 actualizarPreviewCasillas - Ubicacion:', this.ubicacion);
-            // Actualizar estado global
-            JuguemosState.favoritas = this.seleccionadas;
-            JuguemosState.favoritasUbicacion = this.ubicacion;
-            
-            const grid = JuguemosState.grid || '4x4';
-            const totalCasillas = this.getTotalCasillas(grid);
-            const container = document.getElementById('j-casilla-preview-grid');
-            if (!container) return;
-            
-            container.dataset.grid = grid;
-            
-            if (this.seleccionadas.length === 0) {
-                container.innerHTML = Array(totalCasillas)
-                    .fill('<div class="cell empty"></div>')
-                    .join('');
-                return;
-            }
-            
-            const posiciones = this.obtenerPosicionesUbicacion(grid, this.seleccionadas.length);
-            
-            let html = '';
-            const favoritasNumeros = this.seleccionadas.map(f => parseInt(f.numero));
-            
-            for (let i = 0; i < totalCasillas; i++) {
-                const esFavorita = posiciones.includes(i);
-                let baraja = null;
-                
-                if (esFavorita) {
-                    const idx = posiciones.indexOf(i);
-                    if (idx < this.seleccionadas.length) {
-                        baraja = this.seleccionadas[idx];
-                    }
-                }
-                
-                if (baraja) {
-                    html += `
-                        <div class="cell favorita" data-index="${i}" title="${baraja.nombre} ❤️ Favorita">
-                            <img src="${baraja.imagen}" alt="${baraja.nombre}" loading="lazy">
-                            <span class="j-favorita-badge">❤️</span>
-                        </div>
-                    `;
-                } else {
-                    html += `<div class="cell empty" data-index="${i}"></div>`;
-                }
-            }
-            
-            container.innerHTML = html;
-        }
-
-        // =========================================================
-        // 🧠 ALGORITMO DE UBICACIÓN DE FAVORITAS
-        // =========================================================
-
-        obtenerPosicionesUbicacion(grid, cantidad) {
-            const total = this.getTotalCasillas(grid);
-            const cantidadReal = Math.min(cantidad, total, this.maxSeleccion);
-            
-            if (cantidadReal === 0) return [];
-            // 🔥 Si cantidadReal >= total, devolver solo las primeras 12 o menos
-            if (cantidadReal >= total) {
-                // Si hay más favoritas que casillas, solo mostrar las primeras
-                const maxMostrar = Math.min(cantidadReal, this.maxSeleccion);
-                return Array.from({ length: maxMostrar }, (_, i) => i);
-            }
-            // 🔥 Distribuir según ubicación
-            switch (this.ubicacion) {
-                case 'centro':
-                    return this.obtenerPosicionesCentro(grid, cantidadReal);
-                case 'esquinas':
-                    return this.obtenerPosicionesEsquinas(grid, cantidadReal);
-                case 'marco':
-                    return this.obtenerPosicionesMarco(grid, cantidadReal);
-                case 'aleatoria':
-                default:
-                    return this.obtenerPosicionesAleatorias(grid, cantidadReal);
-            }
-        }
-        obtenerPosicionesAleatorias(grid, cantidad) {
-            const total = this.getTotalCasillas(grid);
-            const indices = Array.from({ length: total }, (_, i) => i);
-            
-            // Fisher-Yates shuffle
-            for (let i = indices.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [indices[i], indices[j]] = [indices[j], indices[i]];
-            }
-            
-            return indices.slice(0, cantidad);
-        }
-
-        obtenerPosicionesCentro(grid, cantidad) {
-            const cols = this.getColumnasGrid(grid);
-            const rows = this.getFilasGrid(grid);
-            const total = cols * rows;
-            
-            if (cantidad >= total) {
-                return Array.from({ length: total }, (_, i) => i);
-            }
-            
-            // Calcular centro
-            const centroCol = (cols - 1) / 2;
-            const centroRow = (rows - 1) / 2;
-            
-            // Crear lista de posiciones ordenadas por distancia al centro
-            const posiciones = [];
-            const distanciaMap = new Map();
-            
-            for (let r = 0; r < rows; r++) {
-                for (let c = 0; c < cols; c++) {
-                    const idx = r * cols + c;
-                    const dist = Math.sqrt(Math.pow(r - centroRow, 2) + Math.pow(c - centroCol, 2));
-                    distanciaMap.set(idx, dist);
-                    posiciones.push(idx);
-                }
-            }
-            
-            posiciones.sort((a, b) => distanciaMap.get(a) - distanciaMap.get(b));
-            return posiciones.slice(0, cantidad);
-        }
-
-        obtenerPosicionesEsquinas(grid, cantidad) {
-            const cols = this.getColumnasGrid(grid);
-            const rows = this.getFilasGrid(grid);
-            const total = cols * rows;
-            
-            if (cantidad >= total) {
-                return Array.from({ length: total }, (_, i) => i);
-            }
-            
-            const posiciones = [];
-            const usadas = new Set();
-            
-            // Definir esquinas (en orden de prioridad)
-            const esquinas = [
-                0,                          // Superior izquierda
-                cols - 1,                   // Superior derecha
-                (rows - 1) * cols,          // Inferior izquierda
-                (rows - 1) * cols + cols - 1 // Inferior derecha
-            ];
-            
-            // 1. Agregar esquinas
-            for (const pos of esquinas) {
-                if (pos < total && !usadas.has(pos) && posiciones.length < cantidad) {
-                    posiciones.push(pos);
-                    usadas.add(pos);
-                }
-            }
-            
-            // 2. Si necesitamos más, expandir desde las esquinas
-            if (posiciones.length < cantidad) {
-                const vecinosPorEsquina = [];
-                
-                for (const pos of esquinas) {
-                    if (pos >= total) continue;
-                    const row = Math.floor(pos / cols);
-                    const col = pos % cols;
-                    
-                    // Vecinos cercanos a la esquina
-                    const offsets = [
-                        [0, 1], [1, 0], [0, -1], [-1, 0],
-                        [1, 1], [1, -1], [-1, 1], [-1, -1]
-                    ];
-                    
-                    const vecinos = [];
-                    for (const [dr, dc] of offsets) {
-                        const nr = row + dr;
-                        const nc = col + dc;
-                        if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
-                            const idx = nr * cols + nc;
-                            if (!usadas.has(idx)) {
-                                vecinos.push(idx);
-                            }
-                        }
-                    }
-                    vecinosPorEsquina.push(vecinos);
-                }
-                
-                // Intercalar vecinos
-                let agregados = 0;
-                while (agregados < cantidad - posiciones.length) {
-                    for (const vecinos of vecinosPorEsquina) {
-                        if (agregados >= cantidad - posiciones.length) break;
-                        for (const v of vecinos) {
-                            if (!usadas.has(v) && agregados < cantidad - posiciones.length) {
-                                posiciones.push(v);
-                                usadas.add(v);
-                                agregados++;
-                            }
-                        }
-                    }
-                    if (agregados === 0) break;
-                }
-            }
-            
-            return posiciones.slice(0, cantidad);
-        }
-
-        obtenerPosicionesMarco(grid, cantidad) {
-            const cols = this.getColumnasGrid(grid);
-            const rows = this.getFilasGrid(grid);
-            const total = cols * rows;
-            
-            if (cantidad >= total) {
-                return Array.from({ length: total }, (_, i) => i);
-            }
-            
-            const posiciones = [];
-            const usadas = new Set();
-            
-            // 1. Borde superior (de izquierda a derecha)
-            for (let c = 0; c < cols && posiciones.length < cantidad; c++) {
-                const pos = c;
-                if (!usadas.has(pos)) {
-                    posiciones.push(pos);
-                    usadas.add(pos);
-                }
-            }
-            
-            // 2. Borde inferior (de derecha a izquierda)
-            for (let c = cols - 1; c >= 0 && posiciones.length < cantidad; c--) {
-                const pos = (rows - 1) * cols + c;
-                if (!usadas.has(pos)) {
-                    posiciones.push(pos);
-                    usadas.add(pos);
-                }
-            }
-            
-            // 3. Borde izquierdo (excepto esquinas)
-            for (let r = 1; r < rows - 1 && posiciones.length < cantidad; r++) {
-                const pos = r * cols;
-                if (!usadas.has(pos)) {
-                    posiciones.push(pos);
-                    usadas.add(pos);
-                }
-            }
-            
-            // 4. Borde derecho (excepto esquinas)
-            for (let r = rows - 2; r >= 1 && posiciones.length < cantidad; r--) {
-                const pos = r * cols + cols - 1;
-                if (!usadas.has(pos)) {
-                    posiciones.push(pos);
-                    usadas.add(pos);
-                }
-            }
-            
-            // 5. Si aún faltan, llenar con posiciones internas
-            if (posiciones.length < cantidad) {
-                const internas = [];
-                for (let r = 1; r < rows - 1; r++) {
-                    for (let c = 1; c < cols - 1; c++) {
-                        const pos = r * cols + c;
-                        if (!usadas.has(pos)) {
-                            internas.push(pos);
-                        }
-                    }
-                }
-                
-                // Ordenar por cercanía al borde
-                internas.sort((a, b) => {
-                    const ra = Math.floor(a / cols);
-                    const ca = a % cols;
-                    const rb = Math.floor(b / cols);
-                    const cb = b % cols;
-                    const distA = Math.min(ra, rows - 1 - ra, ca, cols - 1 - ca);
-                    const distB = Math.min(rb, rows - 1 - rb, cb, cols - 1 - cb);
-                    return distA - distB;
-                });
-                
-                const restantes = cantidad - posiciones.length;
-                posiciones.push(...internas.slice(0, restantes));
-            }
-            
-            return posiciones.slice(0, cantidad);
         }
 
         // =========================================================
@@ -691,40 +488,19 @@
         }
 
         getTotalCasillas(grid) {
-            const mapa = {
-                '4x4': 16,
-                '5x5': 25,
-                'pocitos4': 4,
-                'pocitos3': 3,
-                'cruzadas': 8
-            };
-            return mapa[grid] || 16;
+            return FavoritasLogic.getGridConfig(grid).total;
         }
 
         getColumnasGrid(grid) {
-            const mapa = {
-                '4x4': 4,
-                '5x5': 5,
-                'pocitos4': 2,
-                'pocitos3': 2,
-                'cruzadas': 4
-            };
-            return mapa[grid] || 4;
+            return FavoritasLogic.getGridConfig(grid).cols;
         }
 
         getFilasGrid(grid) {
-            const mapa = {
-                '4x4': 4,
-                '5x5': 5,
-                'pocitos4': 2,
-                'pocitos3': 2,
-                'cruzadas': 4
-            };
-            return mapa[grid] || 4;
+            return FavoritasLogic.getGridConfig(grid).rows;
         }
 
         // =========================================================
-        // MÉTODOS PÚBLICOS (para app.js)
+        // MÉTODOS PÚBLICOS
         // =========================================================
 
         getFavoritas() {
@@ -739,7 +515,6 @@
             this.actualizarPreviewCasillas();
         }
 
-        // ✅ NUEVO: Método público para recargar
         recargar() {
             this.recargarGrid();
         }
@@ -782,7 +557,6 @@
         }
     };
 
-    // Inicialización automática
     document.addEventListener('DOMContentLoaded', () => {
         if (typeof JuguemosState !== 'undefined') {
             window.FavoritasManagerInstance = window.FavoritasManager.init();

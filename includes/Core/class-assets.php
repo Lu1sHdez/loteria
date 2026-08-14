@@ -134,6 +134,14 @@ class Juguemos_Assets
             true
         );
 
+        wp_enqueue_script(
+            'juguemos-favoritas-logic',
+            JUGUEMOS_URL . 'public/js/favoritas-logic.js',
+            [],
+            JUGUEMOS_VERSION,
+            true
+        );
+        
         // Variables para JavaScript
         wp_localize_script(
             'juguemos-app',
@@ -163,7 +171,7 @@ class Juguemos_Assets
         wp_enqueue_script(
             'juguemos-favoritas',
             JUGUEMOS_URL . 'public/js/favoritas.js',
-            ['juguemos-state', 'juguemos-ajax'],
+            ['juguemos-state', 'juguemos-ajax',  'juguemos-favoritas-logic'],
             JUGUEMOS_VERSION,
             true
         );

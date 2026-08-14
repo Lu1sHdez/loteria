@@ -177,15 +177,21 @@
     align-items: start;
 }
 
+/* 🔥 REEMPLAZAR POR ESTO */
 .j-favoritas-col {
     display: flex;
     flex-direction: column;
     border: 2px solid #D8D8D8;
     border-radius: 8px;
-    padding: 10px 5px;
-    height: 130px;
-    gap: 1px;
+    padding: 8px 10px;
+    height: auto;
+    min-height: 80px;
+    gap: 2px;
     background: #FFFFFF;
+}
+/* 🔥 NUEVA: Hover para los botones */
+.j-ubicacion-btn:hover {
+    background: #f5f5f5;
 }
 
 .j-favoritas-progress .text-p-negrita {
@@ -254,80 +260,84 @@
     text-align: center;
 }
 
+/* 🔥 REEMPLAZAR POR ESTO */
 .j-ubicacion-titulo {
     font-size: 10px;
     font-weight: 600;
-    margin: 0 0 1px 0;
+    margin: 0 0 4px 0;
     color: #1E2249;
 }
 
+/* 🔥 REEMPLAZAR POR ESTO */
 .j-ubicacion-opciones-vertical {
     display: flex;
-    margin-top: 0;
     flex-direction: column;
     gap: 2px;
 }
 
+/* 🔥 REEMPLAZAR POR ESTO */
 .j-ubicacion-btn {
     display: flex;
     align-items: center;
-    gap: 1px;
-    padding: 1px;
+    gap: 6px;
+    padding: 4px 6px;
     background: none;
     cursor: pointer;
     font-weight: 500;
     border: none !important;
-    font-size: 13px;
+    font-size: 12px;
     color: #5D5D5D;
     text-align: left;
     width: 100%;
-    position: relative;
+    border-radius: 4px;
+    transition: background 0.2s;
+    min-height: 28px;
 }
 
-.j-ubicacion-btn .j-ubicacion-radio {
-    width: 20px;
-    height: 20px;
+.j-ubicacion-btn .j-ubicacion-radiof {
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     border: 2px solid #D8D8D8;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    transition: all 0.2s ease;
     background: #FFFFFF;
+}
+
+.j-ubicacion-btn.active .j-ubicacion-radiof {
+    border-color: #5D5D5D;
+    background: #FA299C;
+    box-shadow: inset 0 0 0 3px #FFFFFF;
+}
+
+.j-ubicacion-btn.active .j-ubicacion-radiof::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #FA299C;
+    display: block;
 }
 .j-ubicacion-btn:focus,
 .j-ubicacion-btn:hover {
     background: none;
 }
 
-.j-ubicacion-btn.active .j-ubicacion-radio {
-    border-color:  #5D5D5D;
-    background: #FA299C;
-    box-shadow: inset 0 0 0 3px #FFFFFF;
-}
-
-.j-ubicacion-btn.active .j-ubicacion-radio::after {
-    content: '';
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #FA299C;
-    display: block;
-}
-
+/* 🔥 REEMPLAZAR POR ESTO */
 .j-ubicacion-icon-img {
-    width: 15px;
-    height: 15px;
+    width: 14px;
+    height: 14px;
     object-fit: contain;
     flex-shrink: 0;
 }
-
+/* 🔥 REEMPLAZAR POR ESTO */
 .j-ubicacion-texto {
-    font-size: 13px;
+    font-size: 11px;
     color: #5D5D5D;
+    line-height: 1.2;
 }
-
 .j-favoritas-accion {
     display: flex;
     flex-direction: column;
@@ -489,4 +499,61 @@
 @keyframes pulse-heart {
     0%, 100% { transform: translate(-50%, -50%) scale(1); }
     50% { transform: translate(-50%, -50%) scale(1.1); }
+}
+/* =====================================================
+   CORAZÓN FAVORITAS
+===================================================== */
+
+.j-casilla-preview-grid .cell.favorita {
+    position: relative;
+    border: 3px solid #FA299C !important;
+    box-shadow: 0 0 12px rgba(250, 41, 156, 0.4);
+    border-radius: 4px;
+}
+
+.j-casilla-preview-grid .cell .j-favorita-corazon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    z-index: 5;
+    pointer-events: none;
+    animation: pulse-heart 1.5s ease-in-out infinite;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
+}
+
+@keyframes pulse-heart {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.1); }
+}
+/* =====================================================
+   CORAZÓN FAVORITAS - VISTA PREVIA DE UBICACIÓN
+===================================================== */
+
+.j-grid-preview .cell.favorita-ubicacion {
+    border: 2px solid #FA299C !important;
+    background: #FA299C !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.j-grid-preview .cell .j-favorita-corazon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70%;
+    height: 70%;
+    object-fit: contain;
+    z-index: 5;
+    pointer-events: none;
+    animation: pulse-heart 1.5s ease-in-out infinite;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2));
+}
+
+@keyframes pulse-heart {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.15); }
 }
