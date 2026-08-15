@@ -666,8 +666,13 @@ function drawGrid() {
     let cells;
     let cols, rows;
     
+    // 🔥 DETECTAR MODOS ESPECIALES CON CRUZADAS
+    const esLibreCruzadas = JuguemosState.mode === 'libre' && grid === 'cruzadas';
+    const esFavoritasCruzadas = JuguemosState.mode === 'favoritas' && grid === 'cruzadas';
+    const esCruzadasEspecial = esLibreCruzadas || esFavoritasCruzadas;
+    
     if (grid === 'cruzadas') {
-        cells = 16;
+        cells = esCruzadasEspecial ? 8 : 16;
         cols = 4;
         rows = 4;
         container.style.gridTemplateColumns = 'repeat(4, 1fr)';
@@ -727,35 +732,93 @@ function drawGrid() {
     let html = '';
     
     if (grid === 'cruzadas') {
+        // 🔥 CASILLAS VISIBLES PARA CRUZADAS (0-based)
         const casillasVisibles = [0, 3, 5, 6, 9, 10, 12, 15];
         
         // 🔥 MAPA DE POSICIONES 8 → 16
         const mapaPosiciones = { 0: 0, 1: 3, 2: 5, 3: 6, 4: 9, 5: 10, 6: 12, 7: 15 };
         const posicionesDobles16 = posicionesDobles.map(p => mapaPosiciones[p] ?? p);
         
-        for (let i = 0; i < 16; i++) {
-            const esVisible = casillasVisibles.includes(i);
-            const esDoble = esModoDobles && posicionesDobles16.includes(i);
-            const esFavorita = esModoFavoritas && posicionesFavoritas.includes(i);
-            const row = Math.floor(i / 4) + 1;
-            const col = (i % 4) + 1;
-            
-            let icono = '';
-            if (esDoble) {
-                icono = '<img src="/wp-content/uploads/2026/08/dobles_icon.png" class="j-doble-imagen" alt="×2" loading="lazy">';
-            } else if (esFavorita) {
-                icono = '<img src="/wp-content/uploads/2026/08/fav_icon.png" class="j-favorita-corazon" alt="" loading="lazy">';
+        // 🔥 CASO 1: LIBRE + CRUZADAS → SOLO 8 CASILLAS CON ICONO PER
+        if (esLibreCruzadas) {
+            for (let i = 0; i < 8; i++) {
+                const pos = casillasVisibles[i];
+                const row = Math.floor(pos / 4) + 1;
+                const col = (pos % 4) + 1;
+                
+                html += `
+                    <div class="cell visible libre-cruzada" style="grid-row: ${row}; grid-column: ${col};">
+                        <img src="/wp-content/uploads/2026/08/per_icon.png" class="j-per-icon" alt="Personalizada" loading="lazy">
+                    </div>
+                `;
             }
+        } 
+        // 🔥 CASO 2: FAVORITAS + CRUZADAS → SOLO 8 CASILLAS CON CORAZÓN
+        else if (esFavoritasCruzadas) {
+            const posicionesFavoritas16 = posicionesFavoritas.map(p => mapaPosiciones[p] ?? p);
             
-            if (esVisible) {
-                html += `<div class="cell visible ${esDoble ? 'doble-ubicacion' : ''} ${esFavorita ? 'favorita-ubicacion' : ''}" style="grid-row: ${row}; grid-column: ${col};">
-                    ${icono}
-                </div>`;
-            } else {
-                html += `<div class="cell" style="grid-row: ${row}; grid-column: ${col};"></div>`;
+            for (let i = 0; i < 8; i++) {
+                const pos = casillasVisibles[i];
+                const row = Math.floor(pos / 4) + 1;
+                const col = (pos % 4) + 1;
+                
+                const esFavorita = posicionesFavoritas16.includes(pos);
+                
+                html += `
+                    <div class="cell visible ${esFavorita ? 'favorita-ubicacion' : ''}" style="grid-row: ${row}; grid-column: ${col};">
+                        ${esFavorita ? '<img src="/wp-content/uploads/2026/08/fav_icon.png" class="j-favorita-corazon" alt="" loading="lazy">' : ''}
+                    </div>
+                `;
             }
+        } 
+        // 🔥 CASO 3: CRUZADAS NORMAL (Sencilla o Dobles) → 16 casillas
+// 🔥 CASO 3: SENCILLA + CRUZADAS → 8 CASILLAS CON ICONO SENCILLA
+else if (JuguemosState.mode === 'sencilla') {
+    for (let i = 0; i < 8; i++) {
+        const pos = casillasVisibles[i];
+        const row = Math.floor(pos / 4) + 1;
+        const col = (pos % 4) + 1;
+        
+        html += `
+            <div class="cell visible" style="grid-row: ${row}; grid-column: ${col};">
+                <img src="/wp-content/uploads/2026/08/sencilla-on.png" class="j-sencilla-icon" alt="Sencilla" loading="lazy">
+            </div>
+        `;
+    }
+}
+// 🔥 CASO 4: DOBLES + CRUZADAS → 16 CASILLAS CON ×2
+else if (esModoDobles) {
+    for (let i = 0; i < 16; i++) {
+        const esVisible = casillasVisibles.includes(i);
+        const esDoble = posicionesDobles16.includes(i);
+        const row = Math.floor(i / 4) + 1;
+        const col = (i % 4) + 1;
+        
+        if (esVisible) {
+            html += `<div class="cell visible ${esDoble ? 'doble-ubicacion' : ''}" style="grid-row: ${row}; grid-column: ${col};">
+                ${esDoble ? '<img src="/wp-content/uploads/2026/08/dobles_icon.png" class="j-doble-imagen" alt="×2" loading="lazy">' : ''}
+            </div>`;
+        } else {
+            html += `<div class="cell" style="grid-row: ${row}; grid-column: ${col};"></div>`;
         }
+    }
+}
+// 🔥 CASO 5: CRUZADAS NORMAL (Sencilla sin icono o fallback)
+else {
+    for (let i = 0; i < 16; i++) {
+        const esVisible = casillasVisibles.includes(i);
+        const row = Math.floor(i / 4) + 1;
+        const col = (i % 4) + 1;
+        
+        if (esVisible) {
+            html += `<div class="cell visible" style="grid-row: ${row}; grid-column: ${col};"></div>`;
+        } else {
+            html += `<div class="cell" style="grid-row: ${row}; grid-column: ${col};"></div>`;
+        }
+    }
+}
     } else {
+        // GRIDS NORMALES (4x4, 5x5, pocitos)
         for (let i = 0; i < cells; i++) {
             const esDoble = esModoDobles && posicionesDobles.includes(i);
             const esFavorita = esModoFavoritas && posicionesFavoritas.includes(i);
@@ -785,6 +848,7 @@ function llenarCasillasAleatorio() {
     if (!JuguemosState.barajas?.length) { alert('No hay barajas disponibles para este diseño.'); return; }
     ejecutarLlenadoAleatorio();
 }
+
 function actualizarPreviewCasillas(casillas) {
     const container = document.getElementById('j-casilla-preview-grid');
     if (!container) return;
@@ -792,6 +856,12 @@ function actualizarPreviewCasillas(casillas) {
     const grid = JuguemosState.grid || '4x4';
     container.dataset.grid = grid;
     
+    // 🔥 DETECTAR MODOS ESPECIALES CON CRUZADAS
+    const esLibreCruzadas = JuguemosState.mode === 'libre' && grid === 'cruzadas';
+    const esFavoritasCruzadas = JuguemosState.mode === 'favoritas' && grid === 'cruzadas';
+    const esCruzadasEspecial = esLibreCruzadas || esFavoritasCruzadas;
+    
+    // Configurar grid según tipo
     if (grid === 'pocitos4') {
         container.style.gridTemplateColumns = 'repeat(2, 1fr)';
         container.style.gridTemplateRows = 'repeat(2, 1fr)';
@@ -823,71 +893,157 @@ function actualizarPreviewCasillas(casillas) {
         JuguemosState.posicionesDobles = posicionesDobles;
     }
     
+    // 🔥 CASO ESPECIAL: LIBRE + CRUZADAS (siempre se maneja primero)
+    if (esLibreCruzadas) {
+        const casillasVisibles = [0, 3, 5, 6, 9, 10, 12, 15];
+        const imagenesLibre = JuguemosState.libreImages || [];
+        const totalImagenesSubidas = imagenesLibre.length;
+        
+        let html = '';
+        for (let i = 0; i < 8; i++) {
+            const pos = casillasVisibles[i];
+            const row = Math.floor(pos / 4) + 1;
+            const col = (pos % 4) + 1;
+            
+            // 🔥 Obtener la imagen para esta posición (si existe)
+            const imagen = (i < totalImagenesSubidas) ? imagenesLibre[i] : null;
+            const tieneImagen = imagen && imagen.data && imagen.data.length > 0;
+            
+            if (tieneImagen) {
+                // ✅ IMAGEN REAL SUBIDA
+                html += `
+                    <div class="cell visible" style="grid-row: ${row}; grid-column: ${col};">
+                        <img src="${imagen.data}" alt="Personalizada ${i + 1}" loading="lazy">
+                    </div>
+                `;
+            } else {
+                // ✅ PLACEHOLDER CON BORDE ROSA Y "?"
+                html += `
+                    <div class="cell visible placeholder" style="grid-row: ${row}; grid-column: ${col};">
+                    </div>
+                `;
+            }
+        }
+        container.innerHTML = html;
+        return;
+    }
+    
+    // =========================================================
+    // CASO: Sin casillas (vacío)
+    // =========================================================
     if (!casillas || casillas.length === 0) {
         const total = getTotalCasillas(grid);
+        
         if (grid === 'cruzadas') {
             const casillasVisibles = [0, 3, 5, 6, 9, 10, 12, 15];
-            let html = '';
-            for (let i = 0; i < 16; i++) {
-                const esVisible = casillasVisibles.includes(i);
-                const row = Math.floor(i / 4) + 1;
-                const col = (i % 4) + 1;
-                if (esVisible) {
-                    html += `<div class="cell visible" style="grid-row: ${row}; grid-column: ${col};"></div>`;
-                } else {
-                    html += `<div class="cell" style="grid-row: ${row}; grid-column: ${col};"></div>`;
+            
+            if (esFavoritasCruzadas) {
+                // FAVORITAS + CRUZADAS → 8 casillas vacías
+                let html = '';
+                for (let i = 0; i < 8; i++) {
+                    const pos = casillasVisibles[i];
+                    const row = Math.floor(pos / 4) + 1;
+                    const col = (pos % 4) + 1;
+                    html += `
+                        <div class="cell visible" style="grid-row: ${row}; grid-column: ${col};"></div>
+                    `;
                 }
+                container.innerHTML = html;
+            } else {
+                // CRUZADAS NORMAL → 16 casillas (8 visibles + 8 ocultas)
+                let html = '';
+                for (let i = 0; i < 16; i++) {
+                    const esVisible = casillasVisibles.includes(i);
+                    const row = Math.floor(i / 4) + 1;
+                    const col = (i % 4) + 1;
+                    if (esVisible) {
+                        html += `<div class="cell visible" style="grid-row: ${row}; grid-column: ${col};"></div>`;
+                    } else {
+                        html += `<div class="cell" style="grid-row: ${row}; grid-column: ${col};"></div>`;
+                    }
+                }
+                container.innerHTML = html;
             }
-            container.innerHTML = html;
         } else {
             container.innerHTML = Array(total).fill('<div class="cell empty"></div>').join('');
         }
         return;
     }
     
-// 🔥 Para Cruzadas, generar 16 celdas con MAPEO DE POSICIONES
-if (grid === 'cruzadas') {
-    const casillasVisibles = [0, 3, 5, 6, 9, 10, 12, 15];
-    
-    // 🔥 MAPA DE POSICIONES 8 → 16
-    const mapaPosiciones = { 0: 0, 1: 3, 2: 5, 3: 6, 4: 9, 5: 10, 6: 12, 7: 15 };
-    const posicionesDobles16 = posicionesDobles.map(p => mapaPosiciones[p] ?? p);
-    
-    let html = '';
-    
-    for (let i = 0; i < 16; i++) {
-        const esVisible = casillasVisibles.includes(i);
-        const esDoble = esModoDobles && posicionesDobles16.includes(i);
-        const row = Math.floor(i / 4) + 1;
-        const col = (i % 4) + 1;
-        
-        if (esVisible) {
-            // 🔥 CORREGIDO: Encontrar el índice correcto en casillas (0-7)
-            const idxVisible = casillasVisibles.indexOf(i);
-            const casilla = (idxVisible !== -1 && casillas[idxVisible]) ? casillas[idxVisible] : null;
-            const esFavorita = tieneFavoritas && casilla && favoritas.some(f => f && parseInt(f.numero) === casilla?.numero);
-            const claseExtra = esFavorita ? ' favorita' : (esDoble ? ' doble' : '');
+    // =========================================================
+    // CASO: FAVORITAS + CRUZADAS (con casillas)
+    // =========================================================
+    if (esFavoritasCruzadas) {
+        const casillasVisibles = [0, 3, 5, 6, 9, 10, 12, 15];
+        let html = '';
+        for (let i = 0; i < 8; i++) {
+            const pos = casillasVisibles[i];
+            const row = Math.floor(pos / 4) + 1;
+            const col = (pos % 4) + 1;
+            
+            const casilla = casillas[i] || null;
+            const esFavorita = casilla && favoritas.some(f => f && parseInt(f.numero) === casilla.numero);
             
             if (casilla) {
                 html += `
-                    <div class="cell visible${claseExtra}" style="grid-row: ${row}; grid-column: ${col};" title="${casilla.nombre || ''}${esFavorita ? ' ⭐ Favorita' : ''}${esDoble ? ' ×2 Doble' : ''}">
+                    <div class="cell visible ${esFavorita ? 'favorita' : ''}" style="grid-row: ${row}; grid-column: ${col};">
                         <img src="${casilla.imagen || ''}" alt="${casilla.nombre || ''}" loading="lazy">
-                        ${esFavorita ? '<img src="/wp-content/uploads/2026/08/fav_icon.png" class="j-favorita-badge" alt="⭐">' : ''}
-                        ${esDoble ? '<span class="j-doble-badge">×2</span>' : ''}
+                        ${esFavorita ? '<span class="j-favorita-badge">⭐</span>' : ''}
                     </div>
                 `;
             } else {
-                html += `<div class="cell visible" style="grid-row: ${row}; grid-column: ${col};"></div>`;
+                html += `
+                    <div class="cell visible" style="grid-row: ${row}; grid-column: ${col};"></div>
+                `;
             }
-        } else {
-            html += `<div class="cell" style="grid-row: ${row}; grid-column: ${col};"></div>`;
         }
+        container.innerHTML = html;
+        return;
     }
-    container.innerHTML = html;
-    return;
-}
     
-    // Grids normales (4x4, 5x5, pocitos)
+    // =========================================================
+    // CASO: CRUZADAS NORMAL (Sencilla o Dobles) → 16 casillas
+    // =========================================================
+    if (grid === 'cruzadas') {
+        const casillasVisibles = [0, 3, 5, 6, 9, 10, 12, 15];
+        const mapaPosiciones = { 0: 0, 1: 3, 2: 5, 3: 6, 4: 9, 5: 10, 6: 12, 7: 15 };
+        const posicionesDobles16 = posicionesDobles.map(p => mapaPosiciones[p] ?? p);
+        
+        let html = '';
+        for (let i = 0; i < 16; i++) {
+            const esVisible = casillasVisibles.includes(i);
+            const esDoble = esModoDobles && posicionesDobles16.includes(i);
+            const row = Math.floor(i / 4) + 1;
+            const col = (i % 4) + 1;
+            
+            if (esVisible) {
+                const idxVisible = casillasVisibles.indexOf(i);
+                const casilla = (idxVisible !== -1 && casillas[idxVisible]) ? casillas[idxVisible] : null;
+                const esFavorita = tieneFavoritas && casilla && favoritas.some(f => f && parseInt(f.numero) === casilla?.numero);
+                const claseExtra = esFavorita ? ' favorita' : (esDoble ? ' doble' : '');
+                
+                if (casilla) {
+                    html += `
+                        <div class="cell visible${claseExtra}" style="grid-row: ${row}; grid-column: ${col};" title="${casilla.nombre || ''}${esFavorita ? ' ⭐ Favorita' : ''}${esDoble ? ' ×2 Doble' : ''}">
+                            <img src="${casilla.imagen || ''}" alt="${casilla.nombre || ''}" loading="lazy">
+                            ${esFavorita ? '<img src="/wp-content/uploads/2026/08/fav_icon.png" class="j-favorita-badge" alt="⭐">' : ''}
+                            ${esDoble ? '<span class="j-doble-badge">×2</span>' : ''}
+                        </div>
+                    `;
+                } else {
+                    html += `<div class="cell visible" style="grid-row: ${row}; grid-column: ${col};"></div>`;
+                }
+            } else {
+                html += `<div class="cell" style="grid-row: ${row}; grid-column: ${col};"></div>`;
+            }
+        }
+        container.innerHTML = html;
+        return;
+    }
+    
+    // =========================================================
+    // GRIDS NORMALES (4x4, 5x5, pocitos)
+    // =========================================================
     const total = getTotalCasillas(grid);
     container.innerHTML = casillas.map((casilla, index) => {
         const esFavorita = tieneFavoritas && favoritas.some(f => f && parseInt(f.numero) === casilla?.numero);
@@ -909,7 +1065,6 @@ if (grid === 'cruzadas') {
     
     JuguemosState.casillasAsignadas = casillas;
 }
-
 function limpiarCasillas() {
     const container = document.getElementById('j-casilla-preview-grid');
     if (!container) return;
@@ -944,7 +1099,11 @@ function drawMarcosPreview() {
     const grid = JuguemosState.grid || '4x4';
     container.dataset.grid = grid;
     
-    //  Si es Pocitos 4, usar 2x2
+    // 🔥 DETECTAR MODOS ESPECIALES CON CRUZADAS
+    const esLibreCruzadas = JuguemosState.mode === 'libre' && grid === 'cruzadas';
+    const esFavoritasCruzadas = JuguemosState.mode === 'favoritas' && grid === 'cruzadas';
+    const esCruzadasEspecial = esLibreCruzadas || esFavoritasCruzadas;
+    
     if (grid === 'pocitos4') {
         container.style.gridTemplateColumns = 'repeat(2, 1fr)';
         container.style.gridTemplateRows = 'repeat(2, 1fr)';
@@ -954,6 +1113,29 @@ function drawMarcosPreview() {
     }
     
     const total = getTotalCasillas(grid);
+    
+    // 🔥 SI ES LIBRE + CRUZADAS O FAVORITAS + CRUZADAS → SOLO 8 CASILLAS
+    if (esCruzadasEspecial) {
+        const casillasVisibles = [0, 3, 5, 6, 9, 10, 12, 15];
+        let html = '';
+        for (let i = 0; i < 8; i++) {
+            const pos = casillasVisibles[i];
+            const row = Math.floor(pos / 4) + 1;
+            const col = (pos % 4) + 1;
+            
+            const esFavorita = esFavoritasCruzadas;
+            
+            html += `
+                <div class="cell visible ${esFavorita ? 'favorita' : ''}" style="grid-row: ${row}; grid-column: ${col};">
+                    ${esFavorita ? '<span class="j-favorita-badge">⭐</span>' : ''}
+                    ${esLibreCruzadas ? '<img src="/wp-content/uploads/2026/08/per_icon.png" class="j-per-icon" alt="Personalizada" loading="lazy">' : ''}
+                </div>
+            `;
+        }
+        container.innerHTML = html;
+        return;
+    }
+    
     container.innerHTML = Array(total).fill('<div class="cell"></div>').join('');
 }
 

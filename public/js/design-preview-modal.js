@@ -46,8 +46,6 @@
                     this.closeModal();
                 }
             });
-
-            console.log('📦 DesignPreviewModal: Módulo inicializado');
         }
 
         /**
@@ -216,7 +214,7 @@
             const barajas = JuguemosState?.barajas || [];
 
             // Actualizar título
-            if (title) title.textContent = `${designName} - 54 barajas`;
+            if (title) title.textContent = `${designName}`;
 
             // Actualizar contador
             if (count) count.textContent = `${barajas.length} barajas`;
@@ -233,7 +231,7 @@
 
             // Generar grid de barajas
             let html = '';
-            barajas.forEach((baraja, index) => {
+            barajas.forEach((baraja, index) => {    
                 html += `
                     <div class="j-design-preview-card">
                         <div class="j-design-preview-card-image">
