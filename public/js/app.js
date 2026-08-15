@@ -239,27 +239,96 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ========== COLORES ==========
-    document.querySelectorAll(".j-color-swatch").forEach(swatch => {
-        swatch.addEventListener("click", () => {
-            document.querySelectorAll(".j-color-swatch").forEach(s => s.classList.remove("active"));
-            swatch.classList.add("active");
-            JuguemosState.marcoColor = swatch.dataset.color;
-            aplicarColores();
-        });
-    });
 
-    document.querySelectorAll(".j-fondo-card").forEach(card => {
-        card.addEventListener("click", () => {
-            document.querySelectorAll(".j-fondo-card").forEach(c => c.classList.remove("active"));
-            card.classList.add("active");
-            card.querySelector('input[type="radio"]').checked = true;
-            JuguemosState.fondoColor = card.dataset.color;
-            aplicarColores();
-        });
+// 1. Color de Marco (12 colores)
+document.querySelectorAll(".j-color-swatch").forEach(swatch => {
+    swatch.addEventListener("click", function() {
+        document.querySelectorAll(".j-color-swatch").forEach(s => s.classList.remove("active"));
+        this.classList.add("active");
+        JuguemosState.marcoColor = this.dataset.color;
+        
+        // Actualizar indicador
+        const display = document.getElementById('j-marco-color-display');
+        const preview = document.getElementById('j-marco-color-preview');
+        if (display) display.textContent = this.dataset.color;
+        if (preview) preview.style.background = this.dataset.color;
+        
+        aplicarColores();
+        if (typeof updateOrderSummary === 'function') updateOrderSummary();
     });
+});
+
+// 2. Color Fondo de Tabla (12 colores)
+document.querySelectorAll(".j-fondo-swatch").forEach(swatch => {
+    swatch.addEventListener("click", function() {
+        document.querySelectorAll(".j-fondo-swatch").forEach(s => s.classList.remove("active"));
+        this.classList.add("active");
+        JuguemosState.fondoColor = this.dataset.color;
+        
+        // Actualizar indicador
+        const display = document.getElementById('j-fondo-color-display');
+        const preview = document.getElementById('j-fondo-color-preview');
+        if (display) display.textContent = this.dataset.color;
+        if (preview) preview.style.background = this.dataset.color;
+        
+        aplicarColores();
+        if (typeof updateOrderSummary === 'function') updateOrderSummary();
+    });
+});
+
+// 3. Función para aplicar colores
+function aplicarColores() {
+    document.documentElement.style.setProperty('--j-marco-color', JuguemosState.marcoColor || '#FA299C');
+    document.documentElement.style.setProperty('--j-fondo-color', JuguemosState.fondoColor || '#FA299C');
+}
+
+// 4. Inicializar colores al cargar
+function inicializarColores() {
+    // Marco
+    const marcoActivo = document.querySelector('.j-color-swatch.active');
+    if (marcoActivo) {
+        JuguemosState.marcoColor = marcoActivo.dataset.color;
+        const display = document.getElementById('j-marco-color-display');
+        const preview = document.getElementById('j-marco-color-preview');
+        if (display) display.textContent = marcoActivo.dataset.color;
+        if (preview) preview.style.background = marcoActivo.dataset.color;
+    } else {
+        const primerMarco = document.querySelector('.j-color-swatch');
+        if (primerMarco) {
+            primerMarco.classList.add('active');
+            JuguemosState.marcoColor = primerMarco.dataset.color;
+            const display = document.getElementById('j-marco-color-display');
+            const preview = document.getElementById('j-marco-color-preview');
+            if (display) display.textContent = primerMarco.dataset.color;
+            if (preview) preview.style.background = primerMarco.dataset.color;
+        }
+    }
+
+    // Fondo
+    const fondoActivo = document.querySelector('.j-fondo-swatch.active');
+    if (fondoActivo) {
+        JuguemosState.fondoColor = fondoActivo.dataset.color;
+        const display = document.getElementById('j-fondo-color-display');
+        const preview = document.getElementById('j-fondo-color-preview');
+        if (display) display.textContent = fondoActivo.dataset.color;
+        if (preview) preview.style.background = fondoActivo.dataset.color;
+    } else {
+        const primerFondo = document.querySelector('.j-fondo-swatch');
+        if (primerFondo) {
+            primerFondo.classList.add('active');
+            JuguemosState.fondoColor = primerFondo.dataset.color;
+            const display = document.getElementById('j-fondo-color-display');
+            const preview = document.getElementById('j-fondo-color-preview');
+            if (display) display.textContent = primerFondo.dataset.color;
+            if (preview) preview.style.background = primerFondo.dataset.color;
+        }
+    }
 
     aplicarColores();
-    updateOrderSummary();
+}
+
+inicializarColores();
+
 
 // ========== TOGGLE INCLUIR BARAJAS ==========
 const btnIncluir = document.getElementById("j-incluir-barajas");

@@ -5,113 +5,131 @@
 .j-color-style {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 20px;
 }
 
-.j-fondo-title {
-    margin-top: 15px;
-}
 
-/* ---- Swatches de color de marco ---- */
+/* =====================================================
+   SWATCHES - Color de Marco (12 colores)
+===================================================== */
 
 .j-marco-colores {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
+    margin-bottom: 20px;
 }
 
 .j-color-swatch {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     border: 3px solid transparent;
     cursor: pointer;
     padding: 0;
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    flex-shrink: 0;
 }
 
 .j-color-swatch:hover {
-    transform: scale(1.1);
+    transform: scale(1.15);
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.15);
 }
 
 .j-color-swatch.active {
     border-color: #FFFFFF;
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 0 0 3px #1E2249;
+    transform: scale(1.1);
 }
 
-/* ---- Opciones de fondo de tabla ---- */
+/* =====================================================
+   SWATCHES - Color Fondo de Tabla (12 colores)
+===================================================== */
 
-.j-fondo-opciones {
+.j-fondo-colores {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
-}
-
-.j-fondo-card {
-    position: relative;
-    display: flex;
-    align-items: center;
     gap: 12px;
-    padding: 14px 16px;
-    border: 2px solid #EAEAEA;
-    border-radius: 12px;
-    cursor: pointer;
-    min-width: 160px;
-    transition: border-color 0.25s ease;
-    font-family: 'Cairo', sans-serif;
 }
 
-.j-fondo-card input[type="radio"] {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-}
-
-.j-fondo-card .j-fondo-swatch {
-    width: 30px;
-    height: 30px;
+.j-fondo-swatch {
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    border: 2px solid #EAEAEA;
+    border: 3px solid #EAEAEA;
+    cursor: pointer;
+    padding: 0;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     flex-shrink: 0;
 }
 
-.j-fondo-card .j-fondo-info {
+.j-fondo-swatch:hover {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.15);
+}
+
+.j-fondo-swatch.active {
+    border-color: #FFFFFF;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 0 0 3px #1E2249;
+    transform: scale(1.1);
+}
+
+/* =====================================================
+   INDICADORES DE COLOR SELECCIONADO
+===================================================== */
+
+.j-color-indicators {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 12px 16px;
+    background: #F8F8F8;
+    border-radius: 10px;
+    border: 1px solid #E5E5E5;
+    margin-top: 5px;
 }
 
-.j-fondo-card .j-fondo-name {
+.j-color-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 13px;
+}
+
+.j-color-label {
+    font-weight: 600;
+    color: #5D5D5D;
+}
+
+.j-color-value {
     font-weight: 700;
-    font-size: 14px;
     color: #1E2249;
-}
-
-.j-fondo-card .j-fondo-hex {
     font-size: 12px;
-    color: #999999;
+    background: #FFFFFF;
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid #E5E5E5;
+    min-width: 60px;
+    text-align: center;
 }
 
-.j-fondo-card.active {
-    border-color: #FA299C;
+.j-color-preview {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid #FFFFFF;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+    transition: background 0.3s ease;
 }
-
-.j-fondo-card.active .j-fondo-swatch {
-    border-color: #FA299C;
-}
-
-
-
-
 
 /* =====================================================
    VISTA PREVIA DE MARCOS
 ===================================================== */
-/* =====================================================
-   VISTA PREVIA DE MARCOS
-===================================================== */
 
-/* SOLO Vista previa marcos */
 .j-marcos-preview-grid {
     display: grid;
     gap: 4px;
@@ -126,7 +144,6 @@
     flex-shrink: 0;
 }
 
-/* SOLO las casillas de Vista previa marcos */
 .j-marcos-preview-grid .cell {
     border-radius: 4px;
     aspect-ratio: 2 / 3;
@@ -134,17 +151,11 @@
     height: auto;
     min-height: 35px;
     transition: background 0.2s ease, border-color 0.2s ease;
-
-    /* Color de los 12 colores */
     border: 3px solid var(--j-marco-color, #FA299C);
-
-    /* Color elegido en Color fondo de tabla */
     background: var(--j-marco-color, #FA299C);
 }
 
-
-
-/* Mismos layouts de grid que ya usas en los otros previews */
+/* Mismos layouts de grid */
 .j-marcos-preview-grid[data-grid="4x4"] {
     grid-template-columns: repeat(4, 1fr);
 }
@@ -154,7 +165,6 @@
     min-height: 140px !important;
 }
 
-/* 🔥 Pocitos 4 - 2x2 */
 .j-marcos-preview-grid[data-grid="pocitos4"] {
     grid-template-columns: repeat(2, 1fr);
     gap: 2px;
@@ -184,3 +194,58 @@
 .j-marcos-preview-grid[data-grid="cruzadas"] .cell:nth-child(6) { grid-column: 3; grid-row: 2; }
 .j-marcos-preview-grid[data-grid="cruzadas"] .cell:nth-child(7) { grid-column: 2; grid-row: 3; }
 .j-marcos-preview-grid[data-grid="cruzadas"] .cell:nth-child(8) { grid-column: 1; grid-row: 4; }
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 768px) {
+    .j-color-swatch,
+    .j-fondo-swatch {
+        width: 30px;
+        height: 30px;
+    }
+
+    .j-color-indicators {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px 14px;
+    }
+
+    .j-color-indicator {
+        font-size: 12px;
+    }
+
+    .j-color-value {
+        font-size: 11px;
+        min-width: 50px;
+    }
+
+    .j-color-preview {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .j-color-swatch,
+    .j-fondo-swatch {
+        width: 28px;
+        height: 28px;
+    }
+
+    .j-marco-colores,
+    .j-fondo-colores {
+        gap: 8px;
+    }
+
+    .j-color-indicators {
+        padding: 8px 12px;
+        gap: 8px;
+    }
+
+    .j-color-indicator {
+        font-size: 11px;
+        flex-wrap: wrap;
+    }
+}
