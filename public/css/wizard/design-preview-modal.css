@@ -1,0 +1,382 @@
+/* =====================================================
+   BOTÓN "VER DISEÑO COMPLETO"
+===================================================== */
+
+.j-view-full-icon {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+    flex-shrink: 0;
+    display: block;
+}
+
+.j-view-full-design-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 48px;
+    padding: 0 26px;
+    background: #1FAFB4;
+    border: 2px solid #1FAFB4;
+    border-radius: 8px;
+    color: #FFFFFF;
+    font-family: 'Cairo', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    width: 100%;
+    max-width: 220px;
+    margin-top: 10px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.j-view-full-design-btn:hover {
+    background: #1FAFB4;
+    color: #FFFFFF;
+    border-color: #1FAFB4;
+    transform: translateY(-2px);
+}
+
+.j-view-full-design-btn:active {
+    transform: translateY(0);
+}
+
+/* =====================================================
+   OVERLAY DEL MODAL
+===================================================== */
+
+.j-design-preview-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 999999;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(4px);
+    padding: 20px;
+}
+
+.j-design-preview-overlay.active {
+    display: flex;
+    animation: jDesignFadeIn 0.3s ease;
+}
+
+@keyframes jDesignFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* =====================================================
+   MODAL
+===================================================== */
+
+.j-design-preview-modal {
+    background: #FFFFFF;
+    border-radius: 16px;
+    max-width: 900px;
+    width: 100%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+}
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.j-design-preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 24px;
+    border-bottom: 2px solid #F0F0F0;
+    flex-shrink: 0;
+    background: #FFFFFF;
+}
+
+.j-design-preview-header h3 {
+    margin: 0;
+    font-family: 'Cairo', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1E2249;
+}
+
+.j-design-preview-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    font-weight: 300;
+    color: #999;
+    cursor: pointer;
+    padding: 0 8px;
+    line-height: 1;
+    transition: color 0.2s ease;
+}
+
+.j-design-preview-close:hover {
+    color: #FA299C;
+    font-weight: 700px;
+    background: none;
+}
+
+/* =====================================================
+   BODY (GRID DE BARAJAS)
+===================================================== */
+
+.j-design-preview-body {
+    padding: 20px 24px;
+    overflow-y: auto;
+    flex: 1;
+    background: #FAFAFA;
+}
+
+.j-design-preview-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.j-design-preview-body::-webkit-scrollbar-track {
+    background: #F0F0F0;
+    border-radius: 3px;
+}
+
+.j-design-preview-body::-webkit-scrollbar-thumb {
+    background: #1FAFB4;
+    border-radius: 3px;
+}
+
+.j-design-preview-body::-webkit-scrollbar-thumb:hover {
+    background: #179B95;
+}
+
+/* =====================================================
+   GRID DE BARAJAS
+===================================================== */
+
+.j-design-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+}
+
+/* =====================================================
+   TARJETA DE BARAJA
+===================================================== */
+
+.j-design-preview-card {
+    background: #FFFFFF;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid #E8E8E8;
+    transition: all 0.25s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.j-design-preview-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: #1FAFB4;
+}
+
+.j-design-preview-card-image {
+    aspect-ratio: 2 / 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #F8F8F8;
+    padding: 8px;
+    overflow: hidden;
+}
+
+.j-design-preview-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.j-design-preview-card:hover .j-design-preview-card-image img {
+    transform: scale(1.05);
+}
+
+.j-design-preview-card-info {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 10px 10px;
+    gap: 2px;
+}
+
+.j-design-preview-card-number {
+    font-family: 'Cairo', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    color: #1FAFB4;
+}
+
+.j-design-preview-card-name {
+    font-family: 'Cairo', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+.j-design-preview-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 24px;
+    border-top: 2px solid #F0F0F0;
+    flex-shrink: 0;
+    background: #FFFFFF;
+}
+
+.j-design-preview-footer .j-design-preview-count {
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+    color: #888;
+    font-weight: 600;
+}
+
+.j-design-preview-footer .j-btn-back {
+    min-width: 100px;
+    justify-content: center;
+}
+
+/* =====================================================
+   LOADING Y EMPTY STATE
+===================================================== */
+
+.j-design-preview-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    grid-column: 1 / -1;
+}
+
+.j-design-preview-loading .j-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #E5E5E5;
+    border-top: 4px solid #1FAFB4;
+    border-radius: 50%;
+    animation: jDesignSpin 0.8s linear infinite;
+    margin-bottom: 15px;
+}
+
+@keyframes jDesignSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.j-design-preview-loading p {
+    font-family: 'Cairo', sans-serif;
+    color: #888;
+    font-size: 14px;
+    margin: 0;
+}
+
+.j-design-preview-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+    font-family: 'Cairo', sans-serif;
+    font-size: 16px;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 768px) {
+    .j-design-preview-modal {
+        max-width: 100%;
+        max-height: 95vh;
+        border-radius: 12px;
+    }
+
+    .j-design-preview-header {
+        padding: 14px 18px;
+    }
+
+    .j-design-preview-header h3 {
+        font-size: 17px;
+    }
+
+    .j-design-preview-body {
+        padding: 14px 16px;
+    }
+
+    .j-design-preview-grid {
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        gap: 10px;
+    }
+
+    .j-design-preview-card-info {
+        padding: 6px 8px 8px;
+    }
+
+    .j-design-preview-card-name {
+        font-size: 10px;
+    }
+
+    .j-design-preview-footer {
+        padding: 12px 16px;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .j-design-preview-footer .j-btn-back {
+        min-width: 80px;
+        font-size: 13px;
+        height: 36px;
+    }
+}
+
+@media (max-width: 480px) {
+    .j-design-preview-grid {
+        grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+        gap: 8px;
+    }
+
+    .j-design-preview-card-image {
+        padding: 4px;
+    }
+
+    .j-design-preview-card-number {
+        font-size: 9px;
+    }
+
+    .j-design-preview-card-name {
+        font-size: 9px;
+    }
+
+    .j-design-preview-header h3 {
+        font-size: 15px;
+    }
+}

@@ -168,6 +168,15 @@ class Juguemos_Assets
             JUGUEMOS_VERSION,
             true
         );
+
+        wp_enqueue_script(
+            'juguemos-design-preview-modal',
+            JUGUEMOS_URL . 'public/js/design-preview-modal.js',
+            ['juguemos-state', 'juguemos-ajax'],
+            JUGUEMOS_VERSION,
+            true
+        );
+    
         wp_enqueue_script(
             'juguemos-favoritas',
             JUGUEMOS_URL . 'public/js/favoritas.js',
