@@ -61,8 +61,8 @@ if (!defined('ABSPATH')) {
 
                 <div class="j-payment-methods">
                     <button class="j-payment-method active" data-method="paypal">
-                        <img src="/wp-content/uploads/2026/07/paypal.png" alt="PayPal" class="j-payment-icon">
-                        <span>PayPal</span>
+                        <img src="/wp-content/uploads/2026/08/paypal-scaled.png" alt="PayPal" class="j-payment-icon">
+                       
                     </button>
 
                     <?php 
@@ -70,8 +70,8 @@ if (!defined('ABSPATH')) {
                         if ($stripe_creds['is_configured']): 
                         ?>
                         <button class="j-payment-method" data-method="stripe">
-                            <img src="/wp-content/uploads/2026/07/stripe.png" alt="Stripe" class="j-payment-icon">
-                            <span>Tarjeta de Crédito</span>
+                            <img src="/wp-content/uploads/2026/08/strupe.webp" alt="Stripe" class="j-payment-icon">
+                            
                         </button>
                         <?php endif;
                     ?>

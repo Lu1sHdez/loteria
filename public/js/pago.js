@@ -218,7 +218,7 @@ startStripeVerification(order_id, session_id) {
     const maxAttempts = 30;
     const self = this;
     
-    // ✅ Mostrar mensaje de espera
+    //  Mostrar mensaje de espera
     this.showWaitingMessage('Stripe');
     
     const checkPayment = setInterval(function() {
