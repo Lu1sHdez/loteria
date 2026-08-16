@@ -76,15 +76,6 @@ if (!defined('ABSPATH')) {
                         <?php endif;
                     ?>
 
-                    <button class="j-payment-method" data-method="apple-pay" disabled>
-                        <img src="/wp-content/uploads/2026/07/apple-pay.png" alt="Apple Pay" class="j-payment-icon">
-                        <span>Apple Pay</span>
-                    </button>
-                    
-                    <button class="j-payment-method" data-method="zelle" disabled>
-                        <img src="/wp-content/uploads/2026/07/zelle.png" alt="Zelle" class="j-payment-icon">
-                        <span>Zelle</span>
-                    </button>
                 </div>
 
                 <div class="j-payment-actions">

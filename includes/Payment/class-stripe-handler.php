@@ -39,7 +39,7 @@ class Juguemos_Stripe_Handler {
             return ['error' => 'El monto mínimo es $0.50 USD o su equivalente'];
         }
         
-        // URLs de retorno
+        // ✅ REDIRIGE DIRECTAMENTE A /JUGUEMOS (COMO PAYPAL)
         $success_url = home_url('/juguemos?payment=stripe_success&session_id={CHECKOUT_SESSION_ID}&order_id=' . $order_id);
         $cancel_url = home_url('/juguemos?payment=stripe_cancel');
         
@@ -79,7 +79,7 @@ class Juguemos_Stripe_Handler {
             return ['error' => 'Error de conexión con Stripe'];
         }
         
-        $body = json_decode(wp_remote_retrieve_body($response), true);
+        $body = json_decode(wp_remote_retrieve_body($response), true);  
         
         if (isset($body['id'])) {
             return [
