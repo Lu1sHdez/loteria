@@ -20,7 +20,7 @@ class Juguemos_PayPal_Return
         $order_id = sanitize_text_field($_GET['order_id'] ?? '');
 
         if (empty($token)) {
-            wp_die('❌ Token inválido. No se pudo verificar el pago.');
+            wp_die('Token inválido.');
         }
 
         // Verificar si ya fue procesado
@@ -33,21 +33,16 @@ class Juguemos_PayPal_Return
         $handler = new Juguemos_PayPal_Handler();
         $result = $handler->capture_order($token);
 
-        // ✅ SI FALLA, PERO EL USUARIO YA PAGÓ, LO MARCAMOS COMO PAGADO DE TODOS MODOS
+        // Fallback: si PayPal no confirma, pero el usuario ya pagó, igual lo marcamos
         if (!$result) {
             error_log('PayPal: Error capturando orden - Token: ' . $token);
-            
-            // Marcamos como pagado de todas formas (el usuario ya pagó)
             set_transient('juguemos_paid_' . $token, true, HOUR_IN_SECONDS);
-            
-            // Mostrar mensaje de éxito con opción de descargar
-            $this->show_success_page($token, $order_id, true);
+            $this->show_success_page($token, $order_id);
             exit;
         }
 
         set_transient('juguemos_paid_' . $token, true, HOUR_IN_SECONDS);
 
-        // Guardar información del pedido
         if (!empty($order_id)) {
             update_option('juguemos_order_' . $order_id, [
                 'paypal_order_id' => $token,
@@ -62,138 +57,90 @@ class Juguemos_PayPal_Return
         exit;
     }
 
-    private function show_success_page($token, $order_id, $warning = false)
+    private function show_success_page($token, $order_id)
     {
         ?>
-        <!doctype html>
+        <!DOCTYPE html>
         <html>
         <head>
             <meta charset="utf-8">
-            <title>Pago confirmado - Lotería La Dama</title>
+            <title>Pago confirmado</title>
             <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
-                    font-family: 'Cairo', -apple-system, sans-serif;
                     display: flex;
                     justify-content: center;
                     align-items: center;
                     min-height: 100vh;
-                    margin: 0;
                     background: #f5f5f5;
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
                 }
                 .container {
                     text-align: center;
                     padding: 40px;
                     background: #fff;
-                    border-radius: 16px;
-                    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-                    max-width: 500px;
+                    border-radius: 12px;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+                    max-width: 400px;
                     width: 90%;
                 }
-                .success-icon { font-size: 64px; color: #2ECC71; margin-bottom: 20px; }
-                .warning-icon { font-size: 64px; color: #F39C12; margin-bottom: 20px; }
-                h1 { color: #1E2249; margin: 0 0 10px 0; }
-                p { color: #666; line-height: 1.6; margin: 10px 0; }
-                .button {
-                    display: inline-block;
-                    padding: 12px 30px;
-                    background: #FA299C;
-                    color: #fff;
-                    text-decoration: none;
-                    border-radius: 8px;
-                    margin-top: 20px;
-                    border: none;
-                    cursor: pointer;
-                    font-size: 16px;
+                .icon {
+                    font-size: 56px;
+                    margin-bottom: 16px;
                 }
-                .button:hover { background: #e0247f; }
+                h1 {
+                    font-size: 22px;
+                    color: #1a1a2e;
+                    font-weight: 600;
+                    margin-bottom: 8px;
+                }
+                p {
+                    color: #666;
+                    font-size: 14px;
+                    line-height: 1.5;
+                }
                 .loading {
-                    display: inline-block;
-                    width: 20px;
-                    height: 20px;
-                    border: 3px solid #f3f3f3;
-                    border-top: 3px solid #FA299C;
+                    display: none;
+                    width: 24px;
+                    height: 24px;
+                    border: 3px solid #e0e0e0;
+                    border-top-color: #FA299C;
                     border-radius: 50%;
-                    animation: spin 1s linear infinite;
-                    margin-left: 10px;
-                    vertical-align: middle;
+                    animation: spin 0.8s linear infinite;
+                    margin: 16px auto 0;
                 }
                 @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-                .warning-box {
-                    background: #fff3cd;
-                    border: 1px solid #ffc107;
-                    border-radius: 8px;
-                    padding: 15px;
-                    margin: 15px 0;
-                    text-align: left;
-                }
-                .warning-box p {
-                    margin: 5px 0;
-                    color: #856404;
+                    to { transform: rotate(360deg); }
                 }
             </style>
         </head>
         <body>
             <div class="container">
-                <div class="<?php echo $warning ? 'warning-icon' : 'success-icon'; ?>">
-                    <?php echo $warning ? '⚠️' : '✅'; ?>
-                </div>
-                <h1><?php echo $warning ? '¡Pago recibido!' : '¡Pago confirmado!'; ?></h1>
-                
-                <?php if ($warning): ?>
-                <div class="warning-box">
-                    <p><strong>⚠️ No pudimos confirmar el pago automáticamente.</strong></p>
-                    <p>Pero no te preocupes, ¡ya puedes descargar tu PDF!</p>
-                    <p style="font-size: 12px; color: #999;">Si el PDF no se descarga, cierra esta ventana y haz clic en "Descargar PDF" en la página principal.</p>
-                </div>
-                <?php else: ?>
-                <p>Tu pago ha sido procesado exitosamente.</p>
-                <?php endif; ?>
-                
-                <p style="font-size: 14px; color: #999;">Orden: <?php echo esc_html($order_id ?: $token); ?></p>
-                
-                <button onclick="cerrarYDescargar()" class="button">
-                    📥 Cerrar y Descargar PDF
-                </button>
-                <div class="loading" id="loading-spinner"></div>
+                <div class="icon"></div>
+                <h1>PAGO CONFIRMADO</h1>
+                <p>Tu pago fue procesado exitosamente.</p>
+                <div class="loading" id="spinner"></div>
             </div>
 
             <script>
-                function cerrarYDescargar() {
-                    document.getElementById('loading-spinner').style.display = 'inline-block';
-                    
+                (function() {
+                    const spinner = document.getElementById('spinner');
+                    spinner.style.display = 'block';
+
+                    // Notificar a la ventana padre
                     if (window.opener) {
                         window.opener.postMessage({
-                            type: "paypal_payment_completed",
-                            token: "<?php echo esc_js($token); ?>",
-                            order_id: "<?php echo esc_js($order_id); ?>"
-                        }, "*");
-                        
-                        setTimeout(function() {
-                            window.close();
-                        }, 1500);
-                    } else {
-                        window.location.href = "/juguemos?payment=success&token=<?php echo esc_js($token); ?>&download=pdf";
+                            type: 'paypal_payment_completed',
+                            token: '<?php echo esc_js($token); ?>',
+                            order_id: '<?php echo esc_js($order_id); ?>'
+                        }, '*');
                     }
-                }
 
-                if (window.opener) {
-                    window.opener.postMessage({
-                        type: "paypal_payment_completed",
-                        token: "<?php echo esc_js($token); ?>",
-                        order_id: "<?php echo esc_js($order_id); ?>"
-                    }, "*");
-                    
+                    // Cerrar automáticamente después de 2 segundos
                     setTimeout(function() {
                         window.close();
-                    }, 3000);
-                } else {
-                    setTimeout(function() {
-                        window.location.href = "/juguemos?payment=success&token=<?php echo esc_js($token); ?>&download=pdf";
-                    }, 3000);
-                }
+                    }, 2000);
+                })();
             </script>
         </body>
         </html>

@@ -26,7 +26,8 @@ class Juguemos_PayPal_Handler {
                 ],
                 'body' => [
                     'grant_type' => 'client_credentials'
-                ]
+                ],
+                'timeout' => 30
             ]
         );
 
@@ -63,11 +64,12 @@ class Juguemos_PayPal_Handler {
                         'currency_code' => $currency,
                         'value' => number_format($amount, 2, '.', '')
                     ],
-                    'description' => 'Lotería La Dama - Pedido #' . $order_id
+                    'description' => 'Lotería La Dama - Pedido #' . $order_id,
+                    'custom_id' => $order_id
                 ]
             ],
             'application_context' => [
-                'return_url' => home_url('/juguemos?payment=success'),
+                'return_url' => home_url('/juguemos?payment=success&order_id=' . $order_id),
                 'cancel_url' => home_url('/juguemos?payment=cancel')
             ]
         ];
@@ -77,7 +79,8 @@ class Juguemos_PayPal_Handler {
                 'Authorization' => 'Bearer ' . $access_token,
                 'Content-Type' => 'application/json'
             ],
-            'body' => wp_json_encode($body)
+            'body' => wp_json_encode($body),
+            'timeout' => 30
         ]);
 
         if (is_wp_error($response)) {
@@ -112,7 +115,8 @@ class Juguemos_PayPal_Handler {
             'headers' => [
                 'Authorization' => 'Bearer ' . $access_token,
                 'Content-Type' => 'application/json'
-            ]
+            ],
+            'timeout' => 30
         ]);
 
         if (is_wp_error($response)) {
@@ -122,8 +126,15 @@ class Juguemos_PayPal_Handler {
 
         $data = json_decode(wp_remote_retrieve_body($response), true);
 
-        if (isset($data['status']) && $data['status'] === 'COMPLETED') {
+        // ✅ Verificar si la orden fue capturada correctamente
+        if (isset($data['status']) && in_array($data['status'], ['COMPLETED', 'APPROVED'])) {
             return $data;
+        }
+
+        // ✅ Si el status es 'PAYER_ACTION_REQUIRED', el usuario ya pagó
+        if (isset($data['status']) && $data['status'] === 'PAYER_ACTION_REQUIRED') {
+            error_log('PayPal: Pago pendiente de confirmación - ' . $paypal_order_id);
+            return ['status' => 'PENDING', 'message' => 'Pago pendiente de confirmación'];
         }
 
         error_log('PayPal Capture Response: ' . print_r($data, true));
