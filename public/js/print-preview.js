@@ -25,11 +25,12 @@ window.PrintPaper = {
         const paper = JuguemosState.paper || 'carta';
         const orientation = JuguemosState.orientation || 'vertical';
         const size = this.paperSizes[paper] || this.paperSizes['carta'];
-
+    
         return {
             type: paper,
             label: size.label,
             country: JuguemosState.country || 'Mexico',
+            // 🔥 Si es horizontal, intercambiar ancho y alto
             width: orientation === 'horizontal' ? size.height : size.width,
             height: orientation === 'horizontal' ? size.width : size.height,
             orientation: orientation,
@@ -47,32 +48,67 @@ window.PrintPaper = {
         const totalBoards = Number(JuguemosState.quantity) || 1;
         const margin = 15;
         const gap = 8;
-
+    
         const sheetWidth = paper.width * scale;
         const sheetHeight = paper.height * scale;
-
+    
         const availableWidth = sheetWidth - (margin * 2);
         const availableHeight = sheetHeight - (margin * 2);
-
+    
         let cols, rows;
-        if (totalBoards <= 2) {
-            cols = totalBoards;
-            rows = 1;
-        } else if (totalBoards <= 4) {
-            cols = 2;
-            rows = Math.ceil(totalBoards / 2);
-        } else if (totalBoards <= 6) {
-            cols = 3;
-            rows = Math.ceil(totalBoards / 3);
+        
+        // 🔥 OBTENER ORIENTACIÓN
+        const orientation = paper.orientation || 'vertical';
+        const isHorizontal = orientation === 'horizontal';
+        
+        // 🔥 DISTRIBUCIÓN INTELIGENTE SEGÚN ORIENTACIÓN Y CANTIDAD
+        if (isHorizontal) {
+            // HORIZONTAL: Optimizar para que quepan más tablas por fila
+            if (totalBoards <= 2) {
+                cols = totalBoards;
+                rows = 1;
+            } else if (totalBoards <= 4) {
+                cols = Math.min(totalBoards, 4);
+                rows = Math.ceil(totalBoards / cols);
+            } else if (totalBoards <= 6) {
+                cols = 3;
+                rows = Math.ceil(totalBoards / cols);
+            } else if (totalBoards <= 8) {
+                cols = 4;
+                rows = Math.ceil(totalBoards / cols);
+            } else if (totalBoards <= 10) {
+                cols = 5;
+                rows = Math.ceil(totalBoards / cols);
+            } else if (totalBoards <= 12) {
+                cols = 6;
+                rows = Math.ceil(totalBoards / cols);
+            } else {
+                // Para más de 12, calcular automáticamente
+                cols = Math.min(Math.ceil(Math.sqrt(totalBoards * 1.5)), 6);
+                rows = Math.ceil(totalBoards / cols);
+            }
         } else {
-            cols = Math.ceil(Math.sqrt(totalBoards));
-            rows = Math.ceil(totalBoards / cols);
+            // VERTICAL: Comportamiento original
+            if (totalBoards <= 2) {
+                cols = totalBoards;
+                rows = 1;
+            } else if (totalBoards <= 4) {
+                cols = 2;
+                rows = Math.ceil(totalBoards / 2);
+            } else if (totalBoards <= 6) {
+                cols = 3;
+                rows = Math.ceil(totalBoards / 3);
+            } else {
+                cols = Math.ceil(Math.sqrt(totalBoards));
+                rows = Math.ceil(totalBoards / cols);
+            }
         }
-
-        const boardRatio = JuguemosState.grid === 'pocitos3' ? 4 / 3 : 2 / 3;        
+    
+        const boardRatio = JuguemosState.grid === 'pocitos3' ? 4 / 3 : 2 / 3;
+        
         let boardWidth = (availableWidth - (cols - 1) * gap) / cols;
         let boardHeight = (availableHeight - (rows - 1) * gap) / rows;
-
+    
         const maxWidthByHeight = boardHeight * boardRatio;
         if (boardWidth > maxWidthByHeight) {
             boardWidth = maxWidthByHeight;
@@ -84,16 +120,16 @@ window.PrintPaper = {
                 boardWidth = boardHeight * boardRatio;
             }
         }
-
+    
         boardWidth = Math.round(boardWidth);
         boardHeight = Math.round(boardHeight);
-
+    
         const gridWidth = cols * boardWidth + (cols - 1) * gap;
         const gridHeight = rows * boardHeight + (rows - 1) * gap;
-
+    
         const offsetX = Math.round(margin + (availableWidth - gridWidth) / 2);
         const offsetY = Math.round(margin + (availableHeight - gridHeight) / 2);
-
+    
         return {
             totalBoards, cols, rows,
             boardWidth, boardHeight,
@@ -391,6 +427,13 @@ window.PrintPaper = {
         const maxScale = 2.5;
         scale = Math.max(minScale, Math.min(scale, maxScale));
         
+        // 🔥 Si es horizontal, ajustar escala para que quepa mejor
+        if (paper.orientation === 'horizontal') {
+            // Permitir un poco más de escala horizontal
+            scale = Math.min(scaleX * 0.95, scaleY * 0.9);
+            scale = Math.max(minScale, Math.min(scale, maxScale));
+        }
+        
         if (paper.orientation === 'vertical') {
             scale = Math.min(scaleX, scale * 1.1);
         }
@@ -425,19 +468,24 @@ window.PrintPaper = {
             }
         }
     },
-
     createSheet(paper, scale, pageIndex) {
         const sheet = document.createElement('div');
         sheet.className = 'j-sheet';
         sheet.dataset.page = pageIndex + 1;
         sheet.style.position = 'relative';
-
+    
         const layout = this.getBoardLayout(paper, scale);
-
+    
         sheet.style.width = layout.sheetWidth + 'px';
         sheet.style.height = layout.sheetHeight + 'px';
         sheet.dataset.orientation = paper.orientation;
-
+    
+        // 🔥 Si es horizontal, asegurar que el grid se expanda correctamente
+        if (paper.orientation === 'horizontal') {
+            sheet.style.maxWidth = '100%';
+            sheet.style.overflow = 'hidden';
+        }
+    
         const content = document.createElement('div');
         content.className = 'j-sheet-content';
         Object.assign(content.style, {
@@ -448,21 +496,34 @@ window.PrintPaper = {
             display: 'block',
             boxSizing: 'border-box'
         });
-
+    
         const boardContainer = document.createElement('div');
         boardContainer.className = 'j-boards-grid';
+        
+        // 🔥 Ajustar grid para horizontal
+        const gridTemplate = `repeat(${layout.cols}, ${layout.boardWidth}px)`;
+        const gridTemplateRows = `repeat(${layout.rows}, ${layout.boardHeight}px)`;
+        
         Object.assign(boardContainer.style, {
             display: 'grid',
-            gridTemplateColumns: `repeat(${layout.cols}, ${layout.boardWidth}px)`,
-            gridTemplateRows: `repeat(${layout.rows}, ${layout.boardHeight}px)`,
+            gridTemplateColumns: gridTemplate,
+            gridTemplateRows: gridTemplateRows,
             gap: layout.gap + 'px',
             position: 'absolute',
             left: layout.offsetX + 'px',
             top: layout.offsetY + 'px',
             width: layout.gridWidth + 'px',
-            height: layout.gridHeight + 'px'
+            height: layout.gridHeight + 'px',
+            justifyContent: 'center',
+            alignItems: 'center'
         });
-
+    
+        // 🔥 Si es horizontal y hay muchas tablas, ajustar el grid
+        if (paper.orientation === 'horizontal' && layout.totalBoards > 6) {
+            boardContainer.style.justifyContent = 'center';
+            boardContainer.style.alignItems = 'center';
+        }
+    
         for (let i = 0; i < layout.totalBoards; i++) {
             const board = this.createBoard(
                 this.gridConfig[JuguemosState.grid || '4x4'] || this.gridConfig['4x4'],
@@ -475,14 +536,14 @@ window.PrintPaper = {
             board.style.flexShrink = '0';
             boardContainer.appendChild(board);
         }
-
+    
         content.appendChild(boardContainer);
         sheet.appendChild(content);
-
+    
         if (JuguemosState.cutMarks) {
             this.addCutMarks(sheet, paper, scale, layout);
         }
-
+    
         return sheet;
     },
 

@@ -22,7 +22,7 @@
                     numeros: [3, 4, 6, 12, 13, 14, 25, 26, 32, 34, 38, 42]
                 },
                 'amor': {
-                    nombre: '❤️ Amor y emociones',
+                    nombre: ' Amor y emociones',
                     numeros: [27, 41]
                 },
                 'naturaleza': {
@@ -71,6 +71,7 @@
             
             console.log('📋 FavoritasManager iniciado');
         }
+        
 
         cargarGridInicial() {
             const barajas = this.getBarajasDelDiseno();
@@ -202,24 +203,49 @@
             const ubicacion = JuguemosState.favoritasUbicacion || 'aleatoria';
             const totalTablas = (JuguemosState.quantity || 1) * (JuguemosState.pages || 1);
             const favoritas = this.seleccionadas || [];
-
+        
             if (favoritas.length === 0) {
                 JuguemosState.favoritasEstructura = [];
                 JuguemosState.favoritasDistribucion = [];
                 return;
             }
-
+        
+            // 🔥 PARA POCITOS 3 - Forzar posición 1 (superior derecha)
+            if (grid === 'pocitos3') {
+                // Crear estructura con la favorita en la posición 1
+                const estructura = [];
+                for (let t = 0; t < totalTablas; t++) {
+                    const favoritaTabla = t === 0 && favoritas.length > 0 ? [favoritas[0]] : [];
+                    const posiciones = favoritaTabla.length > 0 ? [{ posicion: 1, favorita: favoritas[0] }] : [];
+                    
+                    estructura.push({
+                        tablaIndex: t,
+                        favoritas: favoritaTabla,
+                        posiciones: posiciones,
+                        cantidad: favoritaTabla.length
+                    });
+                }
+                
+                JuguemosState.favoritasEstructura = estructura;
+                JuguemosState.favoritasDistribucion = estructura.map(t => t.favoritas);
+                
+                if (typeof drawGrid === 'function') {
+                    drawGrid();
+                }
+                return estructura;
+            }
+        
+            // 🔥 OTROS GRIDS - Comportamiento normal
             const estructura = FavoritasLogic.generarEstructuraCompleta(
                 favoritas,
                 totalTablas,
                 grid,
                 ubicacion
             );
-
+        
             JuguemosState.favoritasEstructura = estructura;
             JuguemosState.favoritasDistribucion = estructura.map(t => t.favoritas);
             
-            // 🔥 Actualizar Vista previa de ubicación
             if (typeof drawGrid === 'function') {
                 drawGrid();
             }
@@ -249,6 +275,42 @@
             
             container.dataset.grid = grid;
             
+            // Configuración especial para Pocitos 3
+            if (grid === 'pocitos3') {
+                container.style.gridTemplateColumns = 'repeat(2, 1fr)';
+                container.style.gridTemplateRows = 'repeat(2, 1fr)';
+            } else {
+                container.style.gridTemplateColumns = '';
+                container.style.gridTemplateRows = '';
+            }
+            
+            // 🔥 SI ES POCITOS 3 - SIEMPRE CASILLA 2 (superior derecha)
+            if (grid === 'pocitos3') {
+                // POSICIÓN 0 = izquierda
+                // POSICIÓN 1 = superior derecha ← SIEMPRE AQUÍ
+                // POSICIÓN 2 = inferior derecha
+                
+                let html = '';
+                for (let i = 0; i < totalCasillas; i++) {
+                    // SOLO la posición 1 (superior derecha) puede tener favorita
+                    const esFavorita = (i === 1) && this.seleccionadas.length > 0;
+                    const casilla = esFavorita ? this.seleccionadas[0] : null;
+                    
+                    if (esFavorita && casilla) {
+                        html += `
+                            <div class="cell favorita" data-index="${i}" title="${casilla.nombre}  Favorita">
+                                <img src="${casilla.imagen}" alt="${casilla.nombre}" loading="lazy">
+                            </div>
+                        `;
+                    } else {
+                        html += `<div class="cell empty" data-index="${i}"></div>`;
+                    }
+                }
+                container.innerHTML = html;
+                return;
+            }
+            
+            // 🔥 OTROS GRIDS - Comportamiento normal
             if (this.seleccionadas.length === 0) {
                 container.innerHTML = Array(totalCasillas)
                     .fill('<div class="cell empty"></div>')
@@ -274,7 +336,7 @@
                     }
                     if (baraja) {
                         html += `
-                            <div class="cell favorita" data-index="${i}" title="${baraja.nombre} ❤️ Favorita">
+                            <div class="cell favorita" data-index="${i}" title="${baraja.nombre}  Favorita">
                                 <img src="${baraja.imagen}" alt="${baraja.nombre}" loading="lazy">
                             </div>
                         `;
@@ -287,14 +349,37 @@
         }
 
         mostrarPreviewConEstructura(estructura) {
-            const primeraTabla = estructura[0] || { posiciones: [] };
-            const posiciones = primeraTabla.posiciones || [];
-            
             const container = document.getElementById('j-casilla-preview-grid');
             if (!container) return;
             
             const grid = JuguemosState.grid || '4x4';
             const total = FavoritasLogic.getGridConfig(grid).total;
+            
+            // 🔥 PARA POCITOS 3 - SIEMPRE CASILLA 2 (superior derecha)
+            if (grid === 'pocitos3') {
+                let html = '';
+                for (let i = 0; i < total; i++) {
+                    // SOLO la posición 1 (superior derecha) puede tener favorita
+                    const esFavorita = (i === 1) && this.seleccionadas.length > 0;
+                    const casilla = esFavorita ? this.seleccionadas[0] : null;
+                    
+                    if (esFavorita && casilla) {
+                        html += `
+                            <div class="cell favorita" data-index="${i}">
+                                <img src="${casilla.imagen || ''}" alt="${casilla.nombre || ''}" loading="lazy">
+                            </div>
+                        `;
+                    } else {
+                        html += `<div class="cell empty" data-index="${i}"></div>`;
+                    }
+                }
+                container.innerHTML = html;
+                return;
+            }
+            
+            // 🔥 OTROS GRIDS - Comportamiento normal
+            const primeraTabla = estructura[0] || { posiciones: [] };
+            const posiciones = primeraTabla.posiciones || [];
             
             const casillas = Array(total).fill(null);
             posiciones.forEach(item => {
@@ -364,13 +449,13 @@
                 
                 let html = `
                     <img src="${baraja.imagen}" alt="${baraja.nombre}" loading="lazy">
-                    ${isSelected ? '<span class="j-heart-center">❤️</span>' : ''}
+                    ${isSelected ? '<span class="j-heart-center"></span>' : ''}
                     <span class="j-favoritas-nombre">${baraja.nombre}</span>
                     <span class="j-check-circle">✓</span>
                 `;
                 
                 if (isPopular) {
-                    html += `<span class="j-popular-badge"><span class="heart">❤️</span> Popular</span>`;
+                    html += `<span class="j-popular-badge"><span class="heart"></span> Popular</span>`;
                 }
                 
                 item.innerHTML = html;
@@ -395,17 +480,38 @@
         // =========================================================
 
         toggleSeleccion(baraja) {
-            if (JuguemosState.grid === 'pocitos3') {
-                const totalTablas = (JuguemosState.quantity || 1) * (JuguemosState.pages || 1);
-                if (this.seleccionadas.length >= totalTablas) {
-                    alert(`Pocitos 3 solo permite ${totalTablas} favorita(s) (1 por tabla).`);
-                    return;
-                }
-            }
-
             const numero = parseInt(baraja.numero);
             const index = this.seleccionadas.findIndex(s => parseInt(s.numero) === numero);
             
+            // 🔥 SI ES POCITOS 3 - Comportamiento especial (1 favorita a la vez)
+            if (JuguemosState.grid === 'pocitos3') {
+                // Si ya está seleccionada, la desmarcamos
+                if (index !== -1) {
+                    this.seleccionadas.splice(index, 1);
+                } else {
+                    // Si hay otra favorita seleccionada, la reemplazamos
+                    if (this.seleccionadas.length === 1) {
+                        // Remover la actual y agregar la nueva
+                        this.seleccionadas = [];
+                    }
+                    this.seleccionadas.push(baraja);
+                }
+                
+                // Actualizar UI
+                this.renderGrid();
+                this.updateContador();
+                this.updateProgress();
+                this.actualizarPreviewCasillas();
+                
+                if (typeof llenarCasillasAutomatico === 'function') {
+                    setTimeout(() => {
+                        llenarCasillasAutomatico();
+                    }, 100);
+                }
+                return;
+            }
+            
+            // 🔥 COMPORTAMIENTO NORMAL PARA OTROS GRIDS
             if (index !== -1) {
                 this.seleccionadas.splice(index, 1);
             } else {
@@ -416,10 +522,17 @@
                 this.seleccionadas.push(baraja);
             }
             
+            // Actualizar UI
             this.renderGrid();
             this.updateContador();
             this.updateProgress();
             this.actualizarPreviewCasillas();
+            
+            if (typeof llenarCasillasAutomatico === 'function') {
+                setTimeout(() => {
+                    llenarCasillasAutomatico();
+                }, 100);
+            }
         }
 
         seleccionAleatoria() {
@@ -429,18 +542,30 @@
                 return;
             }
             
+            // 🔥 PARA POCITOS 3 - Solo 1 favorita
+            let limite = this.maxSeleccion;
+            if (JuguemosState.grid === 'pocitos3') {
+                limite = 1;
+            }
+            
             const mezcladas = [...barajas];
             for (let i = mezcladas.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [mezcladas[i], mezcladas[j]] = [mezcladas[j], mezcladas[i]];
             }
             
-            this.seleccionadas = mezcladas.slice(0, this.maxSeleccion);
+            this.seleccionadas = mezcladas.slice(0, limite);
             
             this.renderGrid();
             this.updateContador();
             this.updateProgress();
             this.actualizarPreviewCasillas();
+            
+            if (typeof llenarCasillasAutomatico === 'function') {
+                setTimeout(() => {
+                    llenarCasillasAutomatico();
+                }, 100);
+            }
         }
 
         // =========================================================

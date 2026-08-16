@@ -4,7 +4,7 @@
     class JuguemosPayment {
         constructor() {
             this.isDownloading = false;
-            this.currentMethod = 'paypal'; // Método por defecto
+            this.currentMethod = 'paypal';
             this.init();
         }
         
@@ -28,7 +28,6 @@
         }
         
         updatePaymentSummary() {
-            // Calcular total final
             const totalTablas = (JuguemosState.quantity || 1) * (JuguemosState.pages || 1);
             const subtotal = (JuguemosState.unitPrice || 0) * totalTablas;
             
@@ -41,7 +40,6 @@
             const totalFinal = subtotal + costoBarajas;
             const priceText = '$' + Number(totalFinal).toFixed(2) + ' ' + JuguemosState.currency;
             
-            // Actualizar UI
             document.getElementById('payment-summary-mode').textContent = 
                 JuguemosState.mode === 'sencilla' ? 'Sencilla' :
                 JuguemosState.mode === 'dobles' ? 'Dobles' :
@@ -84,7 +82,6 @@
             btn.hide();
             $('#j-payment-loading').show();
             
-            // 🔥 CALCULAR TOTAL FINAL COMPLETO
             const totalTablas = (JuguemosState.quantity || 1) * (JuguemosState.pages || 1);
             const subtotal = (JuguemosState.unitPrice || 0) * totalTablas;
             
@@ -94,7 +91,6 @@
                 : (JuguemosState.precioBarajasMexico || 50.00);
             const costoBarajas = JuguemosState.barajasIncluidas ? precioBarajas : 0;
             
-            // ✅ TOTAL FINAL = Subtotal tablas + Costo barajas
             const amount = subtotal + costoBarajas;
             const currency = JuguemosState.currency || 'USD';
 
@@ -114,27 +110,50 @@
             }
         }
         
-        // ==================== PAYPAL ====================
+        // ==================== PAYPAL (CORREGIDO) ====================
         processPayPal(amount, currency) {
             const order_id = sessionStorage.getItem('juguemos_order_id') || Date.now().toString();
             sessionStorage.setItem('juguemos_order_id', order_id);
             
+            // ✅ AGREGAR NONCE
+            const nonce = window.Juguemos?.nonce || '';
+            
+            console.log('PayPal: Enviando petición con nonce:', nonce);
+            
             fetch('/wp-content/plugins/juguemos/public/templates/payment/paypal-simple.php', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-WP-Nonce': nonce
+                },
                 body: JSON.stringify({
                     amount: amount,
                     currency: currency,
                     description: 'Lotería La Dama - Pedido',
-                    order_id: order_id
+                    order_id: order_id,
+                    nonce: nonce  // ✅ AGREGADO
                 })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('HTTP error: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('PayPal Response:', data);
+                
                 if (data.approve_url) {
+                    // Guardar el token real de PayPal
+                    if (data.token) {
+                        sessionStorage.setItem('juguemos_paypal_token', data.token);
+                    }
+                    
                     window.open(data.approve_url, '_blank', 'width=800,height=600');
                     this.showWaitingMessage('PayPal');
-                    this.startPaymentVerification(order_id);
+                    
+                    // Verificar con el token de PayPal (no con order_id)
+                    this.startPaymentVerification(data.token || order_id);
                 } else {
                     alert('Error: ' + (data.error || 'No se pudo crear la orden'));
                     this.restoreButton($('#j-process-payment'));
@@ -142,6 +161,7 @@
             })
             .catch(error => {
                 console.error('PayPal Error:', error);
+                alert('Error de conexión: ' + error.message);
                 this.handlePaymentError();
             });
         }
@@ -165,7 +185,6 @@
                 console.log('Stripe response:', data);
                 
                 if (data.success && data.url) {
-                    // Redirigir a Stripe Checkout
                     window.location.href = data.url;
                 } else {
                     alert('Error: ' + (data.error || 'No se pudo iniciar el pago con Stripe'));
@@ -181,12 +200,9 @@
         
         // ==================== ZELLE ====================
         processZelle(amount) {
-            const phone = "<?php echo get_option('juguemos_zelle_phone', '+1-832-350-3646'); ?>";
+            const phone = '+1-832-350-3646';
             const order_id = sessionStorage.getItem('juguemos_order_id') || Date.now().toString();
             
-            const message = `Hola, quiero pagar mi pedido de Lotería La Dama.\n\nTotal: $${amount.toFixed(2)}\nReferencia: ${order_id}\n\n✅ Ya envié el pago por Zelle al número ${phone}.`;
-            
-            // Mostrar instrucciones Zelle
             $('#j-process-payment').hide();
             $('#j-payment-loading').hide();
             $('.j-payment-methods').hide();
@@ -202,12 +218,8 @@
                         <p class="j-texto-normal"><strong>Total:</strong> $${amount.toFixed(2)} ${JuguemosState.currency || 'USD'}</p>
                         <p class="j-texto-normal" style="font-size:14px;color:#666;">Después de enviar el pago, haz clic en "Ya pagué"</p>
                         <div style="display:flex;gap:15px;justify-content:center;margin-top:20px;flex-wrap:wrap;">
-                            <button id="j-zelle-confirm" class="j-btn-primary" style="background:#25D366;border-color:#25D366;">
-                                Ya pagué
-                            </button>
-                            <button id="j-zelle-cancel" class="j-btn-back">
-                                Cancelar
-                            </button>
+                            <button id="j-zelle-confirm" class="j-btn-primary" style="background:#25D366;border-color:#25D366;">Ya pagué</button>
+                            <button id="j-zelle-cancel" class="j-btn-back">Cancelar</button>
                         </div>
                     </div>
                 `);
@@ -216,7 +228,6 @@
                     sessionStorage.setItem('juguemos_payment_verified', 'true');
                     sessionStorage.setItem('juguemos_payment_token', order_id);
                     
-                    // Marcar en el servidor
                     $.ajax({
                         url: Juguemos.ajax_url,
                         method: 'POST',
@@ -291,10 +302,10 @@
                 </div>
             `);
     
-    $(document).on('click', '#j-check-payment-status', () => {
-        this.checkPaymentManually();
-    });
-}
+            $(document).on('click', '#j-check-payment-status', () => {
+                this.checkPaymentManually();
+            });
+        }
         }
         
         checkPaymentManually() {
@@ -375,7 +386,6 @@
                     return;
                 }
                 
-                // Verificar con el servidor
                 $.ajax({
                     url: Juguemos.ajax_url,
                     method: 'POST',
@@ -397,27 +407,18 @@
                 if (attempts >= maxAttempts) {
                     clearInterval(checkPayment);
                     
-                    // Reemplazar mensaje de espera con opciones de reintento
                     $('#j-waiting-message').html(
                         '<div style="text-align:center;padding:20px;">' +
                             '<h3 style="color:#FA299C;margin:0 0 10px 0;">El tiempo de espera ha terminado</h3>' +
-                            '<p class="j-texto-normal" style="color:#666;font-size:14px;text-align:center;">' +
-                                'El pago no se pudo confirmar automáticamente.' +
-                            '</p>' +
-                            '<p style="font-size:12px;color:#999;margin:5px 0 15px 0;text-align:center;">' +
-                                'Puedes intentar nuevamente o seleccionar otro método de pago.' +
-                            '</p>' +
+                            '<p class="j-texto-normal" style="color:#666;font-size:14px;text-align:center;">El pago no se pudo confirmar automáticamente.</p>' +
+                            '<p style="font-size:12px;color:#999;margin:5px 0 15px 0;text-align:center;">Puedes intentar nuevamente o seleccionar otro método de pago.</p>' +
                             '<div style="display:flex;flex-direction:column;gap:10px;max-width:300px;margin:0 auto;">' +
-                                '<button id="j-retry-payment" class="j-btn-primary" style="background:#FA299C;border-color:#FA299C;width:100%;text-align:center;">' +
-                                    'Reintentar pago' +
-                                '</button>' +
-                                '<button id="j-back-to-payment-methods" class="j-btn-back" style="width:100%;text-align:center;justify-content:center;">' +
-                                    'Volver a m&eacute;todos de pago' +
-                                '</button>' +
+                                '<button id="j-retry-payment" class="j-btn-primary" style="background:#FA299C;border-color:#FA299C;width:100%;text-align:center;">Reintentar pago</button>' +
+                                '<button id="j-back-to-payment-methods" class="j-btn-back" style="width:100%;text-align:center;justify-content:center;">Volver a métodos de pago</button>' +
                             '</div>' +
                         '</div>'
                     );
-                    // Evento para reintentar
+                    
                     $(document).off('click', '#j-retry-payment').on('click', '#j-retry-payment', function() {
                         sessionStorage.removeItem('juguemos_payment_verified');
                         sessionStorage.removeItem('juguemos_payment_token');
@@ -430,7 +431,6 @@
                         $('#j-payment-loading').hide();
                     });
                     
-                    // Evento para volver a métodos de pago
                     $(document).off('click', '#j-back-to-payment-methods').on('click', '#j-back-to-payment-methods', function() {
                         $('#j-waiting-message').remove();
                         $('.j-payment-methods').show();

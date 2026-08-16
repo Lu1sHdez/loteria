@@ -499,7 +499,7 @@
 
 .j-grid-preview .cell.favorita-ubicacion {
     border: 2px solid #FA299C !important;
-    background: #FA299C !important;
+    background: #FA299C;
     position: relative;
     overflow: hidden;
 }
@@ -515,4 +515,159 @@
     z-index: 5;
     pointer-events: none;
     filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2));
+}
+
+
+/* =====================================================
+   DISTRIBUIR FAVORITAS - SIMPLIFICADO
+===================================================== */
+
+.j-ubicacion-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.j-ubicacion-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 6px;
+    border-radius: 6px;
+    background: #FAFAFA;
+}
+
+.j-ubicacion-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #333;
+}
+
+.j-ubicacion-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #FA299C;
+    cursor: pointer;
+}
+
+.j-ubicacion-icon {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+}
+
+.j-counter-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.j-counter-btn {
+    width: 26px;
+    height: 26px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+
+.j-counter-btn:hover {
+    background: #FA299C;
+    border-color: #FA299C;
+    color: white;
+}
+
+.j-counter-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.j-counter-num {
+    min-width: 20px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 15px;
+    color: #1E2249;
+}
+
+/* =====================================================
+   RESUMEN
+===================================================== */
+
+.j-ubicacion-resumen {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 2px solid #eee;
+}
+
+.j-resumen-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    padding: 2px 0;
+}
+
+.j-resumen-row strong {
+    color: #FA299C;
+}
+
+#j-resumen-status {
+    font-size: 18px;
+    margin-left: 6px;
+}
+
+.j-btn-confirmar {
+    width: 100%;
+    height: 38px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 6px;
+    background: #FA299C;
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.j-btn-confirmar:hover:not(:disabled) {
+    background: #d91a7a;
+    transform: translateY(-1px);
+}
+
+.j-btn-confirmar:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.j-resumen-mensaje {
+    margin-top: 8px;
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    display: none;
+}
+
+.j-resumen-mensaje.success {
+    display: block;
+    background: #d5f5e3;
+    color: #1a7a42;
+}
+
+.j-resumen-mensaje.error {
+    display: block;
+    background: #fadbd8;
+    color: #922b21;
 }
