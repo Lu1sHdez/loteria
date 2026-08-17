@@ -40,14 +40,11 @@
                 radio.addEventListener('change', () => {
                     if (radio.checked) {
                         this.ubicacion = radio.dataset.ubicacion;
-
                         JuguemosState.ubicacionDoble = this.ubicacion;
                         
                         this.actualizarPreviewUbicacion();
-                        
                         this.actualizarEstadoGlobal();
                         
-                        // Forzar regeneración de tablas
                         if (typeof llenarCasillasAutomatico === 'function') {
                             setTimeout(() => {
                                 llenarCasillasAutomatico();
@@ -57,33 +54,6 @@
                 });
             });
         }
-
-        /**
-         * Actualiza la vista previa de ubicación con los ×2
-         * SIEMPRE SOLO 2 CASILLAS
-         */
-        actualizarPreviewUbicacion() {
-            const grid = JuguemosState.grid || '4x4';
-            const total = this.getTotalCasillas(grid);
-            const container = document.getElementById('j-grid-preview');
-            
-            if (!container) return;
-            
-            // 🔥 SIEMPRE 2 posiciones para dobles
-            const posiciones = this.obtenerPosicionesPorUbicacion(grid, 2);
-            
-            // Crear celdas con imagen ×2
-            let html = '';
-            for (let i = 0; i < total; i++) {
-                const esDoble = posiciones.includes(i);
-                html += `<div class="cell ${esDoble ? 'doble-ubicacion' : ''}">
-                    ${esDoble ? '<img src=" /wp-content/uploads/2026/08/dobles_icon.png" class="j-doble-imagen" alt="×2" loading="lazy">' : ''}
-                </div>`;
-            }
-            
-            container.innerHTML = html;
-        }
-
         /**
          * Obtiene posiciones según la ubicación seleccionada
          * SIEMPRE RETORNA SOLO 2 POSICIONES
@@ -205,15 +175,12 @@
          */
         actualizarEstadoGlobal() {
             if (typeof JuguemosState === 'undefined') return;
-            
+        
             const grid = JuguemosState.grid || '4x4';
             const barajas = JuguemosState.barajas || [];
-            
             if (barajas.length === 0) return;
-            
+        
             this.generarDobles(grid, barajas);
-            
-            this.actualizarPreviewUbicacion();
         }
 
         /**
@@ -549,7 +516,9 @@
          * Refresca la vista previa
          */
         refreshPreview() {
-            this.actualizarEstadoGlobal();
+            if (typeof llenarCasillasAutomatico === 'function') {
+                llenarCasillasAutomatico();
+            }
         }
     }
 

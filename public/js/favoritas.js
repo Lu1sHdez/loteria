@@ -194,10 +194,6 @@
             });
         }
 
-        // =========================================================
-        // GENERAR DISTRIBUCIÓN (ÚNICA VERSIÓN)
-        // =========================================================
-
         generarDistribucionInteligente() {
             const grid = JuguemosState.grid || '4x4';
             const ubicacion = JuguemosState.favoritasUbicacion || 'aleatoria';
@@ -210,9 +206,8 @@
                 return;
             }
         
-            // 🔥 PARA POCITOS 3 - Forzar posición 1 (superior derecha)
+            // PARA POCITOS 3 - Forzar posición 1 (superior derecha)
             if (grid === 'pocitos3') {
-                // Crear estructura con la favorita en la posición 1
                 const estructura = [];
                 for (let t = 0; t < totalTablas; t++) {
                     const favoritaTabla = t === 0 && favoritas.length > 0 ? [favoritas[0]] : [];
@@ -229,13 +224,15 @@
                 JuguemosState.favoritasEstructura = estructura;
                 JuguemosState.favoritasDistribucion = estructura.map(t => t.favoritas);
                 
-                if (typeof drawGrid === 'function') {
-                    drawGrid();
+                // Ahora solo actualiza la vista previa de casillas
+                if (typeof actualizarPreviewCasillas === 'function') {
+                    actualizarPreviewCasillas(estructura[0]?.posiciones.map(p => p.favorita) || []);
                 }
+                
                 return estructura;
             }
         
-            // 🔥 OTROS GRIDS - Comportamiento normal
+            // OTROS GRIDS - Comportamiento normal
             const estructura = FavoritasLogic.generarEstructuraCompleta(
                 favoritas,
                 totalTablas,
@@ -246,8 +243,10 @@
             JuguemosState.favoritasEstructura = estructura;
             JuguemosState.favoritasDistribucion = estructura.map(t => t.favoritas);
             
-            if (typeof drawGrid === 'function') {
-                drawGrid();
+            // Ahora solo actualiza la vista previa de casillas
+            if (estructura.length > 0 && typeof actualizarPreviewCasillas === 'function') {
+                const primeraTabla = estructura[0]?.posiciones?.map(p => p.favorita) || [];
+                actualizarPreviewCasillas(primeraTabla);
             }
             
             return estructura;

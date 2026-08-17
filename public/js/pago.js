@@ -211,8 +211,6 @@ processStripe(amount, currency) {
         this.restoreButton($('#j-process-payment'));
     });
 }
-
-        // ==================== VERIFICACIÓN DE STRIPE ====================
 startStripeVerification(order_id, session_id) {
     let attempts = 0;
     const maxAttempts = 30;

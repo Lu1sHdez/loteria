@@ -177,7 +177,6 @@
     align-items: start;
 }
 
-/* 🔥 REEMPLAZAR POR ESTO */
 .j-favoritas-col {
     display: flex;
     flex-direction: column;
@@ -189,7 +188,7 @@
     gap: 2px;
     background: #FFFFFF;
 }
-/* 🔥 NUEVA: Hover para los botones */
+
 .j-ubicacion-btn:hover {
     background: #f5f5f5;
 }
@@ -260,7 +259,6 @@
     text-align: center;
 }
 
-/* 🔥 REEMPLAZAR POR ESTO */
 .j-ubicacion-titulo {
     font-size: 10px;
     font-weight: 600;
@@ -268,14 +266,12 @@
     color: #1E2249;
 }
 
-/* 🔥 REEMPLAZAR POR ESTO */
 .j-ubicacion-opciones-vertical {
     display: flex;
     flex-direction: column;
     gap: 2px;
 }
 
-/* 🔥 REEMPLAZAR POR ESTO */
 .j-ubicacion-btn {
     display: flex;
     align-items: center;
@@ -320,24 +316,25 @@
     background: #FA299C;
     display: block;
 }
+
 .j-ubicacion-btn:focus,
 .j-ubicacion-btn:hover {
     background: none;
 }
 
-/* 🔥 REEMPLAZAR POR ESTO */
 .j-ubicacion-icon-img {
     width: 14px;
     height: 14px;
     object-fit: contain;
     flex-shrink: 0;
 }
-/* 🔥 REEMPLAZAR POR ESTO */
+
 .j-ubicacion-texto {
     font-size: 11px;
     color: #5D5D5D;
     line-height: 1.2;
 }
+
 .j-favoritas-accion {
     display: flex;
     flex-direction: column;
@@ -427,8 +424,6 @@
     border-radius: 4px;
 }
 
-
-
 .j-favoritas-mensaje {
     width: 100%;
     text-align: center;
@@ -440,12 +435,9 @@
     width: 100%;
 }
 
-
 .j-favoritas-item.selected img {
     opacity: 0.6;
 }
-
-
 
 .j-heart-center {
     position: absolute;
@@ -457,7 +449,7 @@
     z-index: 10;
     text-shadow: 0 2px 12px rgba(250, 41, 156, 0.5);
     pointer-events: none;
-    opacity: 0; /* 🔥 Invisible por defecto */
+    opacity: 0;
     transition: opacity 0.3s ease;
 }
 
@@ -469,9 +461,8 @@
     opacity: 0.6;
 }
 
-
 /* =====================================================
-   CORAZÓN FAVORITAS
+   CORAZÓN FAVORITAS - VISTA PREVIA DE CASILLAS
 ===================================================== */
 
 .j-casilla-preview-grid .cell.favorita {
@@ -492,31 +483,6 @@
     pointer-events: none;
     filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
 }
-
-/* =====================================================
-   CORAZÓN FAVORITAS - VISTA PREVIA DE UBICACIÓN
-===================================================== */
-
-.j-grid-preview .cell.favorita-ubicacion {
-    border: 2px solid #FA299C !important;
-    background: #FA299C;
-    position: relative;
-    overflow: hidden;
-}
-
-.j-grid-preview .cell .j-favorita-corazon {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 70%;
-    height: 70%;
-    object-fit: contain;
-    z-index: 5;
-    pointer-events: none;
-    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2));
-}
-
 
 /* =====================================================
    DISTRIBUIR FAVORITAS - SIMPLIFICADO
