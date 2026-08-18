@@ -61,18 +61,77 @@
     min-height: 50px;
 }
 
+/* =====================================================
+   🔥 CRUZADAS - 16 celdas (8 visibles + 8 invisibles)
+   ===================================================== */
 
 .j-casilla-preview-grid[data-grid="cruzadas"] {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
 }
 
-.j-casilla-preview-grid[data-grid="cruzadas"] .cell:nth-child(1) { grid-column: 1; grid-row: 1; }
-.j-casilla-preview-grid[data-grid="cruzadas"] .cell:nth-child(2) { grid-column: 3; grid-row: 1; }
-.j-casilla-preview-grid[data-grid="cruzadas"] .cell:nth-child(3) { grid-column: 2; grid-row: 2; }
-.j-casilla-preview-grid[data-grid="cruzadas"] .cell:nth-child(4) { grid-column: 1; grid-row: 3; }
-.j-casilla-preview-grid[data-grid="cruzadas"] .cell:nth-child(5) { grid-column: 3; grid-row: 3; }
+/* Celdas VISIBLES (8) - con fondo gris */
+.j-casilla-preview-grid[data-grid="cruzadas"] .cell.visible {
+    background: #DDDDDD;
+    border-radius: 4px;
+}
 
-/* Animación */
+/* Celdas INVISIBLES (8) - sin fondo, sin borde */
+.j-casilla-preview-grid[data-grid="cruzadas"] .cell.invisible {
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+}
+
+/* Celdas FAVORITAS en cruzadas - fondo rosa */
+.j-casilla-preview-grid[data-grid="cruzadas"] .cell.favorita {
+    background: #FA299C !important;
+    border: 3px solid #FA299C !important;
+    border-radius: 4px;
+}
+
+/* =====================================================
+   POCITOS 3
+===================================================== */
+
+.j-casilla-preview-grid[data-grid="pocitos3"] {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 2px;
+    max-width: 100%;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    box-sizing: border-box;
+}
+
+.j-casilla-preview-grid[data-grid="pocitos3"] .cell {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    aspect-ratio: auto;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.j-casilla-preview-grid[data-grid="pocitos3"] .cell:nth-child(1) {
+    grid-column: 1;
+    grid-row: 1 / 3;
+}
+
+.j-casilla-preview-grid[data-grid="pocitos3"] .cell:nth-child(2) {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.j-casilla-preview-grid[data-grid="pocitos3"] .cell:nth-child(3) {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+/* =====================================================
+   ANIMACIÓN
+===================================================== */
+
 .j-casilla-preview-grid .cell {
     animation: fadeIn 0.3s ease;
 }

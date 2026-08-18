@@ -58,9 +58,9 @@
                 return;
             }
             
-            const categoriasOrdenadas = Object.keys(this.categorias).sort((a, b) => {
+            var categoriasOrdenadas = Object.keys(this.categorias).sort(function(a, b) {
                 return this.categorias[a].nombre.localeCompare(this.categorias[b].nombre);
-            });
+            }.bind(this));
             
             this.categoriaActual = categoriasOrdenadas[0] || Object.keys(this.categorias)[0];
             
@@ -71,10 +71,9 @@
             
             console.log('📋 FavoritasManager iniciado');
         }
-        
 
         cargarGridInicial() {
-            const barajas = this.getBarajasDelDiseno();
+            var barajas = this.getBarajasDelDiseno();
             
             if (barajas.length > 0) {
                 this.renderGrid();
@@ -82,17 +81,15 @@
                 this.updateProgress();
                 this.actualizarPreviewCasillas();
                 this.initialized = true;
-                console.log('✅ Favoritas: Grid inicial cargado con', barajas.length, 'barajas');
             } else {
-                console.log('⏳ Favoritas: Esperando barajas...');
                 this.initialized = false;
                 
-                let intentos = 0;
-                const maxIntentos = 10;
+                var intentos = 0;
+                var maxIntentos = 10;
                 
-                const esperarBarajas = setInterval(() => {
+                var esperarBarajas = setInterval(function() {
                     intentos++;
-                    const barajasAhora = this.getBarajasDelDiseno();
+                    var barajasAhora = this.getBarajasDelDiseno();
                     
                     if (barajasAhora.length > 0) {
                         clearInterval(esperarBarajas);
@@ -104,13 +101,13 @@
                         console.log('✅ Favoritas: Grid cargado después de', intentos, 'intentos');
                     } else if (intentos >= maxIntentos) {
                         clearInterval(esperarBarajas);
-                        const grid = document.getElementById('j-favoritas-grid');
+                        var grid = document.getElementById('j-favoritas-grid');
                         if (grid) {
                             grid.innerHTML = '<p style="color:#999;text-align:center;">Selecciona un diseño primero</p>';
                         }
                         console.log('⏳ Favoritas: No hay diseño seleccionado aún');
                     }
-                }, 500);
+                }.bind(this), 500);
             }
         }
 
@@ -122,7 +119,7 @@
                 set: function(value) {
                     this._barajas = value;
                     if (JuguemosState.mode === 'favoritas' && window.FavoritasManagerInstance) {
-                        setTimeout(() => {
+                        setTimeout(function() {
                             window.FavoritasManagerInstance.recargarGrid();
                         }, 100);
                     }
@@ -136,7 +133,7 @@
         }
 
         recargarGrid() {
-            const barajas = this.getBarajasDelDiseno();
+            var barajas = this.getBarajasDelDiseno();
             if (barajas.length > 0) {
                 this.renderGrid();
                 this.updateContador();
@@ -148,57 +145,57 @@
         }
 
         bindEvents() {
-            const btnAleatoria = document.getElementById('j-favoritas-aleatoria');
+            var btnAleatoria = document.getElementById('j-favoritas-aleatoria');
             if (btnAleatoria) {
-                btnAleatoria.addEventListener('click', () => {
+                btnAleatoria.addEventListener('click', function() {
                     this.seleccionAleatoria();
-                });
+                }.bind(this));
             }
         
-            document.querySelectorAll('.j-ubicacion-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.j-ubicacion-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.j-ubicacion-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.j-ubicacion-btn').forEach(function(b) { b.classList.remove('active'); });
                     btn.classList.add('active');
                     this.ubicacion = btn.dataset.ubicacion;
                     JuguemosState.favoritasUbicacion = this.ubicacion;
                     this.actualizarPreviewCasillas();
                     
                     if (typeof llenarCasillasAutomatico === 'function') {
-                        setTimeout(() => llenarCasillasAutomatico(), 100);
+                        setTimeout(function() { llenarCasillasAutomatico(); }, 100);
                     }
-                });
-            });
+                }.bind(this));
+            }.bind(this));
         }
 
         renderCategorias(categoriasOrdenadas) {
-            const container = document.getElementById('j-favoritas-categorias');
+            var container = document.getElementById('j-favoritas-categorias');
             if (!container) return;
             
             container.innerHTML = '';
             
-            categoriasOrdenadas.forEach(key => {
-                const cat = this.categorias[key];
+            categoriasOrdenadas.forEach(function(key) {
+                var cat = this.categorias[key];
                 if (!cat) return;
                 
-                const btn = document.createElement('button');
-                btn.className = `j-favoritas-categoria-btn${key === this.categoriaActual ? ' active' : ''}`;
+                var btn = document.createElement('button');
+                btn.className = 'j-favoritas-categoria-btn' + (key === this.categoriaActual ? ' active' : '');
                 btn.dataset.categoria = key;
                 btn.textContent = cat.nombre;
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.j-favoritas-categoria-btn').forEach(b => b.classList.remove('active'));
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.j-favoritas-categoria-btn').forEach(function(b) { b.classList.remove('active'); });
                     btn.classList.add('active');
                     this.categoriaActual = key;
                     this.renderGrid();
-                });
+                }.bind(this));
                 container.appendChild(btn);
-            });
+            }.bind(this));
         }
 
         generarDistribucionInteligente() {
-            const grid = JuguemosState.grid || '4x4';
-            const ubicacion = JuguemosState.favoritasUbicacion || 'aleatoria';
-            const totalTablas = (JuguemosState.quantity || 1) * (JuguemosState.pages || 1);
-            const favoritas = this.seleccionadas || [];
+            var grid = JuguemosState.grid || '4x4';
+            var ubicacion = JuguemosState.favoritasUbicacion || 'aleatoria';
+            var totalTablas = (JuguemosState.quantity || 1) * (JuguemosState.pages || 1);
+            var favoritas = this.seleccionadas || [];
         
             if (favoritas.length === 0) {
                 JuguemosState.favoritasEstructura = [];
@@ -206,12 +203,11 @@
                 return;
             }
         
-            // PARA POCITOS 3 - Forzar posición 1 (superior derecha)
             if (grid === 'pocitos3') {
-                const estructura = [];
-                for (let t = 0; t < totalTablas; t++) {
-                    const favoritaTabla = t === 0 && favoritas.length > 0 ? [favoritas[0]] : [];
-                    const posiciones = favoritaTabla.length > 0 ? [{ posicion: 1, favorita: favoritas[0] }] : [];
+                var estructura = [];
+                for (var t = 0; t < totalTablas; t++) {
+                    var favoritaTabla = t === 0 && favoritas.length > 0 ? [favoritas[0]] : [];
+                    var posiciones = favoritaTabla.length > 0 ? [{ posicion: 1, favorita: favoritas[0] }] : [];
                     
                     estructura.push({
                         tablaIndex: t,
@@ -222,18 +218,17 @@
                 }
                 
                 JuguemosState.favoritasEstructura = estructura;
-                JuguemosState.favoritasDistribucion = estructura.map(t => t.favoritas);
+                JuguemosState.favoritasDistribucion = estructura.map(function(t) { return t.favoritas; });
                 
-                // Ahora solo actualiza la vista previa de casillas
                 if (typeof actualizarPreviewCasillas === 'function') {
-                    actualizarPreviewCasillas(estructura[0]?.posiciones.map(p => p.favorita) || []);
+                    var primeras = estructura[0]?.posiciones.map(function(p) { return p.favorita; }) || [];
+                    actualizarPreviewCasillas(primeras);
                 }
                 
                 return estructura;
             }
         
-            // OTROS GRIDS - Comportamiento normal
-            const estructura = FavoritasLogic.generarEstructuraCompleta(
+            var estructura = FavoritasLogic.generarEstructuraCompleta(
                 favoritas,
                 totalTablas,
                 grid,
@@ -241,126 +236,173 @@
             );
         
             JuguemosState.favoritasEstructura = estructura;
-            JuguemosState.favoritasDistribucion = estructura.map(t => t.favoritas);
+            JuguemosState.favoritasDistribucion = estructura.map(function(t) { return t.favoritas; });
             
-            // Ahora solo actualiza la vista previa de casillas
             if (estructura.length > 0 && typeof actualizarPreviewCasillas === 'function') {
-                const primeraTabla = estructura[0]?.posiciones?.map(p => p.favorita) || [];
-                actualizarPreviewCasillas(primeraTabla);
+                var primeras = estructura[0]?.posiciones?.map(function(p) { return p.favorita; }) || [];
+                actualizarPreviewCasillas(primeras);
             }
             
             return estructura;
         }
 
+    
         // =========================================================
-        // VISTA PREVIA DE CASILLAS
-        // =========================================================
+// VISTA PREVIA DE CASILLAS
+// =========================================================
 
-        actualizarPreviewCasillas() {
-            console.log('🔄 actualizarPreviewCasillas - Favoritas:', this.seleccionadas.length);
-            console.log('🔄 actualizarPreviewCasillas - Ubicacion:', this.ubicacion);
-            
-            JuguemosState.favoritas = this.seleccionadas;
-            JuguemosState.favoritasUbicacion = this.ubicacion;
-            
-            // PRIMERO: Generar estructura
-            this.generarDistribucionInteligente();
-            
-            // LUEGO: Mostrar vista previa
-            const grid = JuguemosState.grid || '4x4';
-            const totalCasillas = this.getTotalCasillas(grid);
-            const container = document.getElementById('j-casilla-preview-grid');
-            if (!container) return;
-            
-            container.dataset.grid = grid;
-            
-            // Configuración especial para Pocitos 3
-            if (grid === 'pocitos3') {
-                container.style.gridTemplateColumns = 'repeat(2, 1fr)';
-                container.style.gridTemplateRows = 'repeat(2, 1fr)';
-            } else {
-                container.style.gridTemplateColumns = '';
-                container.style.gridTemplateRows = '';
-            }
-            
-            // 🔥 SI ES POCITOS 3 - SIEMPRE CASILLA 2 (superior derecha)
-            if (grid === 'pocitos3') {
-                // POSICIÓN 0 = izquierda
-                // POSICIÓN 1 = superior derecha ← SIEMPRE AQUÍ
-                // POSICIÓN 2 = inferior derecha
-                
-                let html = '';
-                for (let i = 0; i < totalCasillas; i++) {
-                    // SOLO la posición 1 (superior derecha) puede tener favorita
-                    const esFavorita = (i === 1) && this.seleccionadas.length > 0;
-                    const casilla = esFavorita ? this.seleccionadas[0] : null;
-                    
-                    if (esFavorita && casilla) {
-                        html += `
-                            <div class="cell favorita" data-index="${i}" title="${casilla.nombre}  Favorita">
-                                <img src="${casilla.imagen}" alt="${casilla.nombre}" loading="lazy">
-                            </div>
-                        `;
-                    } else {
-                        html += `<div class="cell empty" data-index="${i}"></div>`;
-                    }
+/**
+ * 🔥 NUEVO: Método principal que decide qué renderizar según el grid
+ */
+actualizarPreviewCasillas() {
+    console.log('🔄 actualizarPreviewCasillas - Favoritas:', this.seleccionadas.length);
+    console.log('🔄 actualizarPreviewCasillas - Grid:', JuguemosState.grid);
+    
+    JuguemosState.favoritas = this.seleccionadas;
+    JuguemosState.favoritasUbicacion = this.ubicacion;
+    
+    this.generarDistribucionInteligente();
+    
+    var grid = JuguemosState.grid || '4x4';
+    
+    // 🔥 Si es Cruzadas, usar la función específica
+    if (grid === 'cruzadas') {
+        this.actualizarPreviewCruzadas();
+        return;
+    }
+    
+    // 🔥 Para otros grids (4x4, 5x5, pocitos4)
+    var container = document.getElementById('j-casilla-preview-grid');
+    if (!container) return;
+    
+    var total = this.getTotalCasillas(grid);
+    container.dataset.grid = grid;
+    
+    // Configurar grid según tipo
+    if (grid === 'pocitos4') {
+        container.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        container.style.gridTemplateRows = 'repeat(2, 1fr)';
+    } else {
+        container.style.gridTemplateColumns = '';
+        container.style.gridTemplateRows = '';
+    }
+    
+    // Si no hay favoritas, mostrar vacío
+    if (this.seleccionadas.length === 0) {
+        container.innerHTML = Array(total)
+            .fill('<div class="cell empty"></div>')
+            .join('');
+        return;
+    }
+    
+    // Usar la estructura generada
+    var estructura = JuguemosState.favoritasEstructura;
+    if (estructura && estructura.length > 0) {
+        this.mostrarPreviewConEstructura(estructura);
+    } else {
+        // Fallback: mostrar favoritas en posiciones aleatorias
+        var posiciones = FavoritasLogic.getPosicionesPorUbicacion(
+            this.ubicacion, 
+            grid, 
+            this.seleccionadas.length
+        );
+        
+        var html = '';
+        for (var i = 0; i < total; i++) {
+            var esFavorita = posiciones.includes(i);
+            var baraja = null;
+            if (esFavorita) {
+                var idx = posiciones.indexOf(i);
+                if (idx < this.seleccionadas.length) {
+                    baraja = this.seleccionadas[idx];
                 }
-                container.innerHTML = html;
-                return;
             }
-            
-            // 🔥 OTROS GRIDS - Comportamiento normal
-            if (this.seleccionadas.length === 0) {
-                container.innerHTML = Array(totalCasillas)
-                    .fill('<div class="cell empty"></div>')
-                    .join('');
-                return;
-            }
-            
-            const estructura = JuguemosState.favoritasEstructura;
-            if (estructura && estructura.length > 0) {
-                this.mostrarPreviewConEstructura(estructura);
+            if (baraja) {
+                html += `
+                    <div class="cell favorita" data-index="${i}" title="${baraja.nombre}  Favorita">
+                        <img src="${baraja.imagen}" alt="${baraja.nombre}" loading="lazy">
+                    </div>
+                `;
             } else {
-                // Fallback seguro
-                const posiciones = FavoritasLogic.getPosicionesPorUbicacion(this.ubicacion, grid, this.seleccionadas.length);
-                let html = '';
-                for (let i = 0; i < totalCasillas; i++) {
-                    const esFavorita = posiciones.includes(i);
-                    let baraja = null;
-                    if (esFavorita) {
-                        const idx = posiciones.indexOf(i);
-                        if (idx < this.seleccionadas.length) {
-                            baraja = this.seleccionadas[idx];
-                        }
-                    }
-                    if (baraja) {
-                        html += `
-                            <div class="cell favorita" data-index="${i}" title="${baraja.nombre}  Favorita">
-                                <img src="${baraja.imagen}" alt="${baraja.nombre}" loading="lazy">
-                            </div>
-                        `;
-                    } else {
-                        html += `<div class="cell empty" data-index="${i}"></div>`;
-                    }
-                }
-                container.innerHTML = html;
+                html += '<div class="cell empty" data-index="' + i + '"></div>';
             }
         }
+        container.innerHTML = html;
+    }
+}
 
+/**
+ * VISTA PREVIA DE CASILLAS - CRUZADAS (8 celdas visibles)
+ */
+actualizarPreviewCruzadas() {
+    console.log('🔄 actualizarPreviewCruzadas - Favoritas:', this.seleccionadas.length);
+    
+    JuguemosState.favoritas = this.seleccionadas;
+    
+    var container = document.getElementById('j-casilla-preview-grid');
+    if (!container) return;
+    
+    container.dataset.grid = 'cruzadas';
+    container.style.gridTemplateColumns = 'repeat(4, 1fr)';
+    container.style.gridTemplateRows = 'repeat(4, 1fr)';
+    
+    var casillasVisibles = [0, 3, 5, 6, 9, 10, 12, 15];
+    var html = '';
+    
+    for (var i = 0; i < 16; i++) {
+        var row = Math.floor(i / 4) + 1;
+        var col = (i % 4) + 1;
+        var esVisible = casillasVisibles.includes(i);
+        
+        if (esVisible) {
+            var casilla = null;
+            var esFavorita = false;
+            
+            for (var f = 0; f < this.seleccionadas.length; f++) {
+                var fav = this.seleccionadas[f];
+                if (fav && parseInt(fav.numero) === i + 1) {
+                    casilla = fav;
+                    esFavorita = true;
+                    break;
+                }
+            }
+            
+            if (casilla) {
+                html += `
+                    <div class="cell visible ${esFavorita ? 'favorita' : ''}" 
+                         style="grid-row: ${row}; grid-column: ${col};">
+                        <img src="${casilla.imagen || ''}" alt="${casilla.nombre || ''}" loading="lazy">
+                        ${esFavorita ? '<span class="j-favorita-badge"></span>' : ''}
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="cell visible" style="grid-row: ${row}; grid-column: ${col};">
+                    </div>
+                `;
+            }
+        } else {
+            html += `
+                <div class="cell invisible" style="grid-row: ${row}; grid-column: ${col};"></div>
+            `;
+        }
+    }
+    
+    container.innerHTML = html;
+}
+        
         mostrarPreviewConEstructura(estructura) {
-            const container = document.getElementById('j-casilla-preview-grid');
+            var container = document.getElementById('j-casilla-preview-grid');
             if (!container) return;
             
-            const grid = JuguemosState.grid || '4x4';
-            const total = FavoritasLogic.getGridConfig(grid).total;
+            var grid = JuguemosState.grid || '4x4';
+            var total = FavoritasLogic.getGridConfig(grid).total;
             
-            // 🔥 PARA POCITOS 3 - SIEMPRE CASILLA 2 (superior derecha)
             if (grid === 'pocitos3') {
-                let html = '';
-                for (let i = 0; i < total; i++) {
-                    // SOLO la posición 1 (superior derecha) puede tener favorita
-                    const esFavorita = (i === 1) && this.seleccionadas.length > 0;
-                    const casilla = esFavorita ? this.seleccionadas[0] : null;
+                var html = '';
+                for (var i = 0; i < total; i++) {
+                    var esFavorita = (i === 1) && this.seleccionadas.length > 0;
+                    var casilla = esFavorita ? this.seleccionadas[0] : null;
                     
                     if (esFavorita && casilla) {
                         html += `
@@ -369,28 +411,32 @@
                             </div>
                         `;
                     } else {
-                        html += `<div class="cell empty" data-index="${i}"></div>`;
+                        html += '<div class="cell empty" data-index="' + i + '"></div>';
                     }
                 }
                 container.innerHTML = html;
                 return;
             }
             
-            // 🔥 OTROS GRIDS - Comportamiento normal
-            const primeraTabla = estructura[0] || { posiciones: [] };
-            const posiciones = primeraTabla.posiciones || [];
+            if (grid === 'cruzadas') {
+                this.actualizarPreviewCruzadas();
+                return;
+            }
             
-            const casillas = Array(total).fill(null);
-            posiciones.forEach(item => {
+            var primeraTabla = estructura[0] || { posiciones: [] };
+            var posiciones = primeraTabla.posiciones || [];
+            
+            var casillas = Array(total).fill(null);
+            posiciones.forEach(function(item) {
                 if (item.posicion < total) {
                     casillas[item.posicion] = item.favorita;
                 }
             });
             
-            let html = '';
-            for (let i = 0; i < total; i++) {
-                const casilla = casillas[i];
-                const esFavorita = casilla !== null && casilla !== undefined;
+            var html = '';
+            for (var i = 0; i < total; i++) {
+                var casilla = casillas[i];
+                var esFavorita = casilla !== null && casilla !== undefined;
                 
                 if (esFavorita) {
                     html += `
@@ -399,7 +445,7 @@
                         </div>
                     `;
                 } else {
-                    html += `<div class="cell empty" data-index="${i}"></div>`;
+                    html += '<div class="cell empty" data-index="' + i + '"></div>';
                 }
             }
             
@@ -411,18 +457,18 @@
         // =========================================================
 
         renderGrid() {
-            const grid = document.getElementById('j-favoritas-grid');
+            var grid = document.getElementById('j-favoritas-grid');
             if (!grid) return;
             
             grid.innerHTML = '';
             
-            const cat = this.categorias[this.categoriaActual];
+            var cat = this.categorias[this.categoriaActual];
             if (!cat || !cat.numeros || cat.numeros.length === 0) {
                 grid.innerHTML = '<p style="color:#999;text-align:center;">No hay barajas en esta categoría</p>';
                 return;
             }
             
-            const barajasDisponibles = this.getBarajasDelDiseno();
+            var barajasDisponibles = this.getBarajasDelDiseno();
             
             if (barajasDisponibles.length === 0) {
                 grid.innerHTML = `
@@ -434,19 +480,19 @@
                 return;
             }
             
-            let encontradas = 0;
-            cat.numeros.forEach(numero => {
-                const baraja = barajasDisponibles.find(b => parseInt(b.numero) === numero);
+            var encontradas = 0;
+            cat.numeros.forEach(function(numero) {
+                var baraja = barajasDisponibles.find(function(b) { return parseInt(b.numero) === numero; });
                 if (!baraja) return;
                 
                 encontradas++;
-                const isSelected = this.seleccionadas.some(s => parseInt(s.numero) === numero);
-                const isPopular = this.populares.includes(numero);
+                var isSelected = this.seleccionadas.some(function(s) { return parseInt(s.numero) === numero; });
+                var isPopular = this.populares.includes(numero);
                 
-                const item = document.createElement('div');
-                item.className = `j-favoritas-item${isSelected ? ' selected' : ''}`;
+                var item = document.createElement('div');
+                item.className = 'j-favoritas-item' + (isSelected ? ' selected' : '');
                 
-                let html = `
+                var html = `
                     <img src="${baraja.imagen}" alt="${baraja.nombre}" loading="lazy">
                     ${isSelected ? '<span class="j-heart-center"></span>' : ''}
                     <span class="j-favoritas-nombre">${baraja.nombre}</span>
@@ -454,17 +500,18 @@
                 `;
                 
                 if (isPopular) {
-                    html += `<span class="j-popular-badge"><span class="heart"></span> Popular</span>`;
+                    html += '<span class="j-popular-badge"><span class="heart"></span> Popular</span>';
                 }
                 
                 item.innerHTML = html;
                 
-                item.addEventListener('click', () => {
+                item.addEventListener('click', function() {
                     this.toggleSeleccion(baraja);
-                });
+                }.bind(this));
                 
                 grid.appendChild(item);
-            });
+            }.bind(this));
+            
             if (encontradas === 0) {
                 grid.innerHTML = `
                     <p class="j-favoritas-grid-wrapper">
@@ -479,78 +526,74 @@
         // =========================================================
 
         toggleSeleccion(baraja) {
-            const numero = parseInt(baraja.numero);
-            const index = this.seleccionadas.findIndex(s => parseInt(s.numero) === numero);
+            var numero = parseInt(baraja.numero);
+            var index = this.seleccionadas.findIndex(function(s) { return parseInt(s.numero) === numero; });
             
-            // 🔥 SI ES POCITOS 3 - Comportamiento especial (1 favorita a la vez)
             if (JuguemosState.grid === 'pocitos3') {
-                // Si ya está seleccionada, la desmarcamos
                 if (index !== -1) {
                     this.seleccionadas.splice(index, 1);
                 } else {
-                    // Si hay otra favorita seleccionada, la reemplazamos
                     if (this.seleccionadas.length === 1) {
-                        // Remover la actual y agregar la nueva
                         this.seleccionadas = [];
                     }
                     this.seleccionadas.push(baraja);
                 }
                 
-                // Actualizar UI
                 this.renderGrid();
                 this.updateContador();
                 this.updateProgress();
                 this.actualizarPreviewCasillas();
                 
                 if (typeof llenarCasillasAutomatico === 'function') {
-                    setTimeout(() => {
-                        llenarCasillasAutomatico();
-                    }, 100);
+                    setTimeout(function() { llenarCasillasAutomatico(); }, 100);
                 }
                 return;
             }
             
-            // 🔥 COMPORTAMIENTO NORMAL PARA OTROS GRIDS
             if (index !== -1) {
                 this.seleccionadas.splice(index, 1);
             } else {
                 if (this.seleccionadas.length >= this.maxSeleccion) {
-                    alert(`Solo puedes seleccionar ${this.maxSeleccion} favoritas.`);
+                    alert('Solo puedes seleccionar ' + this.maxSeleccion + ' favoritas.');
                     return;
                 }
                 this.seleccionadas.push(baraja);
             }
             
-            // Actualizar UI
             this.renderGrid();
             this.updateContador();
             this.updateProgress();
-            this.actualizarPreviewCasillas();
+            
+            // 🔥 Si es Cruzadas, usar la función específica
+            if (JuguemosState.grid === 'cruzadas') {
+                this.actualizarPreviewCruzadas();
+            } else {
+                this.actualizarPreviewCasillas();
+            }
             
             if (typeof llenarCasillasAutomatico === 'function') {
-                setTimeout(() => {
-                    llenarCasillasAutomatico();
-                }, 100);
+                setTimeout(function() { llenarCasillasAutomatico(); }, 100);
             }
         }
 
         seleccionAleatoria() {
-            const barajas = this.getBarajasDelDiseno();
+            var barajas = this.getBarajasDelDiseno();
             if (barajas.length === 0) {
                 alert('Primero selecciona un diseño.');
                 return;
             }
             
-            // 🔥 PARA POCITOS 3 - Solo 1 favorita
-            let limite = this.maxSeleccion;
+            var limite = this.maxSeleccion;
             if (JuguemosState.grid === 'pocitos3') {
                 limite = 1;
             }
             
-            const mezcladas = [...barajas];
-            for (let i = mezcladas.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [mezcladas[i], mezcladas[j]] = [mezcladas[j], mezcladas[i]];
+            var mezcladas = [...barajas];
+            for (var i = mezcladas.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = mezcladas[i];
+                mezcladas[i] = mezcladas[j];
+                mezcladas[j] = temp;
             }
             
             this.seleccionadas = mezcladas.slice(0, limite);
@@ -561,22 +604,16 @@
             this.actualizarPreviewCasillas();
             
             if (typeof llenarCasillasAutomatico === 'function') {
-                setTimeout(() => {
-                    llenarCasillasAutomatico();
-                }, 100);
+                setTimeout(function() { llenarCasillasAutomatico(); }, 100);
             }
         }
 
-        // =========================================================
-        // ACTUALIZACIÓN DE UI
-        // =========================================================
-
         updateContador() {
-            const total = this.seleccionadas.length;
+            var total = this.seleccionadas.length;
             
-            const counter = document.getElementById('j-favoritas-seleccionadas');
-            const count = document.getElementById('j-favoritas-count');
-            const circle = document.getElementById('j-favoritas-counter-circle');
+            var counter = document.getElementById('j-favoritas-seleccionadas');
+            var count = document.getElementById('j-favoritas-count');
+            var circle = document.getElementById('j-favoritas-counter-circle');
             
             if (counter) counter.textContent = total;
             if (count) count.textContent = total;
@@ -586,24 +623,20 @@
         }
 
         updateProgress() {
-            const total = this.seleccionadas.length;
+            var total = this.seleccionadas.length;
             
-            const range = document.getElementById('j-favoritas-progress-range');
-            const number = document.getElementById('j-favoritas-progress-number');
+            var range = document.getElementById('j-favoritas-progress-range');
+            var number = document.getElementById('j-favoritas-progress-number');
             
             if (range) {
                 range.value = total;
-                const percentage = (total / this.maxSeleccion) * 100;
-                range.style.background = `linear-gradient(to right, #FA299C 0%, #FA299C ${percentage}%, #E5E5E5 ${percentage}%, #E5E5E5 100%)`;
+                var percentage = (total / this.maxSeleccion) * 100;
+                range.style.background = 'linear-gradient(to right, #FA299C 0%, #FA299C ' + percentage + '%, #E5E5E5 ' + percentage + '%, #E5E5E5 100%)';
             }
             if (number) {
                 number.textContent = total;
             }
         }
-
-        // =========================================================
-        // FUNCIONES AUXILIARES
-        // =========================================================
 
         getBarajasDelDiseno() {
             return (JuguemosState.barajas && JuguemosState.barajas.length > 0) 
@@ -622,10 +655,6 @@
         getFilasGrid(grid) {
             return FavoritasLogic.getGridConfig(grid).rows;
         }
-
-        // =========================================================
-        // MÉTODOS PÚBLICOS
-        // =========================================================
 
         getFavoritas() {
             return this.seleccionadas;
@@ -648,7 +677,7 @@
     // EXPOSICIÓN GLOBAL
     // =========================================================
 
-    let instance = null;
+    var instance = null;
 
     function getInstance() {
         if (!instance) {
@@ -681,11 +710,11 @@
         }
     };
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', function() {
         if (typeof JuguemosState !== 'undefined') {
             window.FavoritasManagerInstance = window.FavoritasManager.init();
         } else {
-            const checkState = setInterval(() => {
+            var checkState = setInterval(function() {
                 if (typeof JuguemosState !== 'undefined') {
                     clearInterval(checkState);
                     window.FavoritasManagerInstance = window.FavoritasManager.init();

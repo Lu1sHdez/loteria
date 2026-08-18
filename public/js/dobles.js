@@ -1,6 +1,6 @@
 /**
  * =====================================================
- * DOBLES - Módulo independiente
+ * DOBLES - Módulo independiente (CORREGIDO)
  * =====================================================
  */
 
@@ -9,7 +9,7 @@
 
     class DoblesManager {
         constructor() {
-            this.ubicacion = 'aleatoria'; // Solo una ubicación
+            this.ubicacion = 'aleatoria';
             this.posicionesDobles = [];
             this.cartasDobles = [];
             this.asignacionDobles = {};
@@ -30,9 +30,6 @@
             console.log('📋 DoblesManager iniciado');
         }
 
-        /**
-         * Vincula los eventos de los radio buttons
-         */
         bindEvents() {
             const radios = this.container.querySelectorAll('.j-ubicacion-radio-input');
             
@@ -42,9 +39,11 @@
                         this.ubicacion = radio.dataset.ubicacion;
                         JuguemosState.ubicacionDoble = this.ubicacion;
                         
-                        this.actualizarPreviewUbicacion();
+                        // 🔥 REGENERAR POSICIONES INMEDIATAMENTE
+                        this.actualizarPosiciones();
                         this.actualizarEstadoGlobal();
                         
+                        // 🔥 FORZAR ACTUALIZACIÓN DE LA VISTA PREVIA
                         if (typeof llenarCasillasAutomatico === 'function') {
                             setTimeout(() => {
                                 llenarCasillasAutomatico();
@@ -54,54 +53,93 @@
                 });
             });
         }
+
+        /**
+         * 🔥 NUEVO: Actualizar posiciones sin regenerar todo
+         */
+        actualizarPosiciones() {
+            const grid = JuguemosState.grid || '4x4';
+            const barajas = JuguemosState.barajas || [];
+            
+            if (barajas.length === 0) return;
+            
+            // Generar posiciones según la ubicación seleccionada
+            const posiciones = this.obtenerPosicionesPorUbicacion(grid, 2);
+            this.posicionesDobles = posiciones;
+            
+            // Seleccionar UNA carta al azar para duplicar
+            const barajasMezcladas = [...barajas];
+            for (let i = barajasMezcladas.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [barajasMezcladas[i], barajasMezcladas[j]] = [barajasMezcladas[j], barajasMezcladas[i]];
+            }
+            
+            this.cartasDobles = [barajasMezcladas[0]];
+            
+            // Asignar la carta a las posiciones
+            this.asignacionDobles = {};
+            const carta = this.cartasDobles[0];
+            if (carta && posiciones.length === 2) {
+                this.asignacionDobles[carta.numero] = posiciones;
+            }
+            
+            // Guardar en estado global
+            JuguemosState.cartasDobles = this.cartasDobles;
+            JuguemosState.posicionesDobles = this.posicionesDobles;
+            JuguemosState.asignacionDobles = this.asignacionDobles;
+            
+            console.log('📍 Posiciones dobles actualizadas:', {
+                ubicacion: this.ubicacion,
+                posiciones: this.posicionesDobles,
+                carta: this.cartasDobles[0]?.nombre || 'Ninguna'
+            });
+        }
+
         /**
          * Obtiene posiciones según la ubicación seleccionada
-         * SIEMPRE RETORNA SOLO 2 POSICIONES
+         * SIEMPRE RETORNA 2 POSICIONES
          */
         obtenerPosicionesPorUbicacion(grid, cantidad) {
-            // 🔥 Forzar a que siempre sean 2 posiciones
             const total = this.getTotalCasillas(grid);
             const cols = this.getColumnasGrid(grid);
             const rows = this.getFilasGrid(grid);
             
-            // Si el grid tiene menos de 2 casillas, ajustar
             if (total < 2) {
                 return [0];
             }
             
             let posiciones = [];
-            const usadas = new Set();
             
-            // 🔥 Siempre pedir 2 posiciones
+            // 🔥 SIEMPRE 2 posiciones
             const cantidadReal = Math.min(2, total);
             
             switch(this.ubicacion) {
                 case 'aleatoria':
-                    posiciones = this.obtenerAleatorio(grid, cantidadReal, usadas);
+                    posiciones = this.obtenerAleatorio(grid, cantidadReal);
                     break;
                 case 'centro':
-                    posiciones = this.obtenerCentro(grid, cantidadReal, usadas);
+                    posiciones = this.obtenerCentro(grid, cantidadReal);
                     break;
                 case 'contra-esquina-der-izq':
-                    posiciones = this.obtenerContraEsquinaDerIzq(grid, cantidadReal, usadas);
+                    posiciones = this.obtenerContraEsquinaDerIzq(grid, cantidadReal);
                     break;
                 case 'contra-esquina-izq-der':
-                    posiciones = this.obtenerContraEsquinaIzqDer(grid, cantidadReal, usadas);
+                    posiciones = this.obtenerContraEsquinaIzqDer(grid, cantidadReal);
                     break;
                 case 'centro-diagonal-der-izq':
-                    posiciones = this.obtenerCentroDiagonalDerIzq(grid, cantidadReal, usadas);
+                    posiciones = this.obtenerCentroDiagonalDerIzq(grid, cantidadReal);
                     break;
                 case 'centro-diagonal-izq-der':
-                    posiciones = this.obtenerCentroDiagonalIzqDer(grid, cantidadReal, usadas);
+                    posiciones = this.obtenerCentroDiagonalIzqDer(grid, cantidadReal);
                     break;
                 case 'centro-horizontal':
-                    posiciones = this.obtenerCentroHorizontal(grid, cantidadReal, usadas);
+                    posiciones = this.obtenerCentroHorizontal(grid, cantidadReal);
                     break;
                 case 'centro-vertical':
-                    posiciones = this.obtenerCentroVertical(grid, cantidadReal, usadas);
+                    posiciones = this.obtenerCentroVertical(grid, cantidadReal);
                     break;
                 default:
-                    posiciones = this.obtenerAleatorio(grid, cantidadReal, usadas);
+                    posiciones = this.obtenerAleatorio(grid, cantidadReal);
             }
             
             // Asegurar que siempre tengamos 2 posiciones
@@ -114,16 +152,225 @@
                 }
             }
             
+            // 🔥 Guardar en estado para depuración
+            console.log(`📍 Ubicación "${this.ubicacion}" en grid ${grid}:`, posiciones);
+            
             return posiciones.slice(0, 2);
         }
 
+        // =========================================================
+        // 🔥 UBICACIONES CORREGIDAS PARA 4x4 Y 5x5
+        // =========================================================
+
+        obtenerAleatorio(grid, cantidad) {
+            const total = this.getTotalCasillas(grid);
+            const indices = Array.from({ length: total }, (_, i) => i);
+            for (let i = indices.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [indices[i], indices[j]] = [indices[j], indices[i]];
+            }
+            return indices.slice(0, cantidad);
+        }
+
         /**
-         * Genera las cartas dobles (SIEMPRE 1 CARTA REPETIDA 2 VECES)
+         * CENTRO - Para 4x4: posiciones 5 y 6
+         * Para 5x5: posiciones 12 y 7 (centro y uno cercano)
+         */
+        obtenerCentro(grid, cantidad) {
+            const total = this.getTotalCasillas(grid);
+            const cols = this.getColumnasGrid(grid);
+            
+            if (grid === '4x4') {
+                // 🔥 4x4: centro = posiciones 5 y 6
+                return [5, 6];
+            } else if (grid === '5x5') {
+                // 🔥 5x5: centro = posiciones 12 y 7 (centro y centro-superior)
+                return [12, 7];
+            } else if (grid === 'cruzadas') {
+                // 🔥 Cruzadas: centro = posiciones 1 y 2
+                return [1, 2];
+            } else if (grid === 'pocitos4') {
+                return [0, 1];
+            } else if (grid === 'pocitos3') {
+                return [1, 2];
+            }
+            
+            // Fallback
+            const centro = Math.floor(total / 2);
+            return [centro - 1, centro];
+        }
+
+        /**
+         * CONTRA ESQUINA DERECHA A IZQUIERDA
+         * 4x4: posiciones 0 y 15
+         * 5x5: posiciones 0 y 24
+         */
+        obtenerContraEsquinaDerIzq(grid, cantidad) {
+            const total = this.getTotalCasillas(grid);
+            
+            if (grid === '4x4') {
+                return [0, 15];
+            } else if (grid === '5x5') {
+                return [0, 24];
+            } else if (grid === 'cruzadas') {
+                return [0, 7];
+            } else if (grid === 'pocitos4') {
+                return [0, 3];
+            } else if (grid === 'pocitos3') {
+                return [0, 2];
+            }
+            
+            return [0, total - 1];
+        }
+
+        /**
+         * CONTRA ESQUINA IZQUIERDA A DERECHA
+         * 4x4: posiciones 3 y 12
+         * 5x5: posiciones 4 y 20
+         */
+        obtenerContraEsquinaIzqDer(grid, cantidad) {
+            const cols = this.getColumnasGrid(grid);
+            const rows = this.getFilasGrid(grid);
+            
+            if (grid === '4x4') {
+                return [3, 12];
+            } else if (grid === '5x5') {
+                return [4, 20];
+            } else if (grid === 'cruzadas') {
+                return [3, 4];
+            } else if (grid === 'pocitos4') {
+                return [1, 2];
+            } else if (grid === 'pocitos3') {
+                return [1, 2];
+            }
+            
+            // Fallback: esquina superior derecha e inferior izquierda
+            return [cols - 1, (rows - 1) * cols];
+        }
+
+        /**
+         * CENTRO HORIZONTAL
+         * 4x4: posiciones 9 y 10 (fila central inferior)
+         * 5x5: posiciones 12 y 13 (centro exacto + derecha)
+         */
+        obtenerCentroHorizontal(grid, cantidad) {
+            const cols = this.getColumnasGrid(grid);
+            const rows = this.getFilasGrid(grid);
+            
+            if (grid === '4x4') {
+                // 🔥 4x4: fila central inferior (índices 8-11), tomar 9 y 10
+                return [9, 10];
+            } else if (grid === '5x5') {
+                // 🔥 5x5: fila central (índices 10-14), tomar 12 y 13
+                return [12, 13];
+            } else if (grid === 'cruzadas') {
+                // 🔥 Cruzadas: centro horizontal = posiciones 1 y 2
+                return [1, 2];
+            } else if (grid === 'pocitos4') {
+                return [0, 1];
+            } else if (grid === 'pocitos3') {
+                return [1, 2];
+            }
+            
+            // Fallback
+            const centroRow = Math.floor(rows / 2);
+            const start = centroRow * cols;
+            const centroCol = Math.floor(cols / 2);
+            return [start + centroCol - 1, start + centroCol];
+        }
+
+        /**
+         * CENTRO VERTICAL
+         * 4x4: posiciones 6 y 10 (columna central derecha)
+         * 5x5: posiciones 12 y 17 (centro exacto + abajo)
+         */
+        obtenerCentroVertical(grid, cantidad) {
+            const cols = this.getColumnasGrid(grid);
+            const rows = this.getFilasGrid(grid);
+            
+            if (grid === '4x4') {
+                // 🔥 4x4: columna central derecha (índices 2,6,10,14), tomar 6 y 10
+                return [6, 10];
+            } else if (grid === '5x5') {
+                // 🔥 5x5: columna central (índices 2,7,12,17,22), tomar 12 y 17
+                return [12, 17];
+            } else if (grid === 'cruzadas') {
+                // 🔥 Cruzadas: centro vertical = posiciones 1 y 2
+                return [1, 2];
+            } else if (grid === 'pocitos4') {
+                return [0, 2];
+            } else if (grid === 'pocitos3') {
+                return [1, 2];
+            }
+            
+            // Fallback
+            const centroCol = Math.floor(cols / 2);
+            const centroRow = Math.floor(rows / 2);
+            return [centroRow * cols + centroCol, (centroRow + 1) * cols + centroCol];
+        }
+
+        /**
+         * CENTRO DIAGONAL DERECHA A IZQUIERDA
+         * 4x4: posiciones 5 y 10
+         * 5x5: posiciones 7 y 17
+         */
+        obtenerCentroDiagonalDerIzq(grid, cantidad) {
+            const cols = this.getColumnasGrid(grid);
+            
+            if (grid === '4x4') {
+                // 🔥 4x4: diagonal derecha→izquierda (0,5,10,15), tomar 5 y 10
+                return [5, 10];
+            } else if (grid === '5x5') {
+                // 🔥 5x5: diagonal derecha→izquierda (4,8,12,16,20), tomar 8 y 16
+                return [8, 16];
+            } else if (grid === 'cruzadas') {
+                return [1, 2];
+            } else if (grid === 'pocitos4') {
+                return [1, 2];
+            } else if (grid === 'pocitos3') {
+                return [1, 2];
+            }
+            
+            // Fallback
+            const centroCol = Math.floor(cols / 2);
+            const centroRow = Math.floor(rows / 2);
+            return [centroRow * cols + (centroCol - 1), (centroRow + 1) * cols + centroCol];
+        }
+
+        /**
+         * CENTRO DIAGONAL IZQUIERDA A DERECHA
+         * 4x4: posiciones 6 y 9
+         * 5x5: posiciones 7 y 17
+         */
+        obtenerCentroDiagonalIzqDer(grid, cantidad) {
+            const cols = this.getColumnasGrid(grid);
+            
+            if (grid === '4x4') {
+                // 🔥 4x4: diagonal izquierda→derecha (3,6,9,12), tomar 6 y 9
+                return [6, 9];
+            } else if (grid === '5x5') {
+                // 🔥 5x5: diagonal izquierda→derecha (0,6,12,18,24), tomar 6 y 18
+                return [6, 18];
+            } else if (grid === 'cruzadas') {
+                return [1, 2];
+            } else if (grid === 'pocitos4') {
+                return [1, 2];
+            } else if (grid === 'pocitos3') {
+                return [1, 2];
+            }
+            
+            // Fallback
+            const centroCol = Math.floor(cols / 2);
+            const centroRow = Math.floor(rows / 2);
+            return [centroRow * cols + centroCol, (centroRow + 1) * cols + (centroCol - 1)];
+        }
+
+        /**
+         * Genera las cartas dobles y actualiza el estado
          */
         generarDobles(grid, barajas) {
             const total = this.getTotalCasillas(grid);
             
-            // 🔥 SIEMPRE solo 1 carta doble
             if (barajas.length === 0) {
                 this.cartasDobles = [];
                 this.posicionesDobles = [];
@@ -138,7 +385,6 @@
                 [barajasMezcladas[i], barajasMezcladas[j]] = [barajasMezcladas[j], barajasMezcladas[i]];
             }
             
-            // 🔥 Solo 1 carta doble
             this.cartasDobles = [barajasMezcladas[0]];
             
             // 2. Generar 2 posiciones para esa carta
@@ -158,9 +404,10 @@
             JuguemosState.asignacionDobles = this.asignacionDobles;
             JuguemosState.ubicacionDoble = this.ubicacion;
             
-            console.log('📍 Dobles generados (SIEMPRE 1 carta ×2):', {
+            console.log('📍 Dobles generados:', {
                 carta: this.cartasDobles[0]?.nombre || 'Ninguna',
-                posiciones: this.posicionesDobles
+                posiciones: this.posicionesDobles,
+                ubicacion: this.ubicacion
             });
             
             return {
@@ -170,9 +417,6 @@
             };
         }
 
-        /**
-         * Actualiza el estado global
-         */
         actualizarEstadoGlobal() {
             if (typeof JuguemosState === 'undefined') return;
         
@@ -183,9 +427,6 @@
             this.generarDobles(grid, barajas);
         }
 
-        /**
-         * Obtiene el total de casillas según el grid
-         */
         getTotalCasillas(grid) {
             const mapa = {
                 '4x4': 16,
@@ -197,9 +438,6 @@
             return mapa[grid] || 16;
         }
 
-        /**
-         * Obtiene columnas según el grid
-         */
         getColumnasGrid(grid) {
             const mapa = {
                 '4x4': 4,
@@ -211,9 +449,6 @@
             return mapa[grid] || 4;
         }
 
-        /**
-         * Obtiene filas según el grid
-         */
         getFilasGrid(grid) {
             const mapa = {
                 '4x4': 4,
@@ -225,296 +460,6 @@
             return mapa[grid] || 4;
         }
 
-        // =========================================================
-        // UBICACIONES ESPECÍFICAS - SIEMPRE RETORNAN 2 POSICIONES
-        // =========================================================
-
-        obtenerAleatorio(grid, cantidad, usadas) {
-            const total = this.getTotalCasillas(grid);
-            const disponibles = [];
-            for (let i = 0; i < total; i++) {
-                if (!usadas.has(i)) disponibles.push(i);
-            }
-            for (let i = disponibles.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [disponibles[i], disponibles[j]] = [disponibles[j], disponibles[i]];
-            }
-            return disponibles.slice(0, Math.min(cantidad, disponibles.length));
-        }
-        
-
-        obtenerCentro(grid, cantidad, usadas) {
-            const cols = this.getColumnasGrid(grid);
-            const rows = this.getFilasGrid(grid);
-            const total = cols * rows;
-            
-            if (cantidad >= total) {
-                return Array.from({ length: total }, (_, i) => i);
-            }
-            
-            const posiciones = [];
-            
-            // 🔥 Para grid 4x4, el centro son las casillas 5, 6, 9, 10 (0-based)
-            // Para 2 casillas: [5, 6] (centro superior)
-            const centroPositions = this.getCentroPositions(grid);
-            
-            for (const pos of centroPositions) {
-                if (posiciones.length >= cantidad) break;
-                if (pos < total && !usadas.has(pos)) {
-                    posiciones.push(pos);
-                    usadas.add(pos);
-                }
-            }
-            
-            return posiciones;
-        }
-        
-        /**
-         * 🔥 NUEVO: Obtiene las posiciones centrales según el grid
-         */
-        getCentroPositions(grid) {
-            switch(grid) {
-                case '4x4':
-                    // Centro: casillas 5, 6, 9, 10 (0-based)
-                    // Para 2 casillas: 5, 6 (centro superior)
-                    return [5, 6, 9, 10];
-                case '5x5':
-                    // Centro: csilla 12 (centro exacto)
-                    return [12, 7, 11, 13, 17];
-                case 'pocitos4':
-                    return [0, 1, 2, 3];
-                case 'pocitos3':
-                    return [0, 1, 2];
-                case 'cruzadas':
-                    return [1, 2, 5, 6];
-                default:
-                    return [0];
-            }
-        }
-
-        obtenerContraEsquinaDerIzq(grid, cantidad, usadas) {
-            const cols = this.getColumnasGrid(grid);
-            const rows = this.getFilasGrid(grid);
-            const total = cols * rows;
-            
-            if (cantidad >= total) {
-                return Array.from({ length: total }, (_, i) => i);
-            }
-            
-            const posiciones = [];
-            
-            // 🔥 Para 4x4: posiciones 0 (esquina superior izquierda) y 15 (esquina inferior derecha)
-            const esquinas = [0, 15];
-            
-            for (const pos of esquinas) {
-                if (posiciones.length >= cantidad) break;
-                if (pos < total && !usadas.has(pos)) {
-                    posiciones.push(pos);
-                    usadas.add(pos);
-                }
-            }
-            
-            // Si faltan, buscar vecinos
-            if (posiciones.length < cantidad) {
-                const vecinos = [];
-                for (const pos of esquinas) {
-                    if (pos >= total) continue;
-                    const row = Math.floor(pos / cols);
-                    const col = pos % cols;
-                    const offsets = [[0,1], [1,0], [0,-1], [-1,0], [1,1], [1,-1], [-1,1], [-1,-1]];
-                    for (const [dr, dc] of offsets) {
-                        const nr = row + dr, nc = col + dc;
-                        if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
-                            const idx = nr * cols + nc;
-                            if (!usadas.has(idx)) vecinos.push(idx);
-                        }
-                    }
-                }
-                for (const v of vecinos) {
-                    if (posiciones.length >= cantidad) break;
-                    if (!usadas.has(v)) {
-                        posiciones.push(v);
-                        usadas.add(v);
-                    }
-                }
-            }
-            
-            return posiciones;
-        }
-
-        obtenerContraEsquinaIzqDer(grid, cantidad, usadas) {
-            const cols = this.getColumnasGrid(grid);
-            const rows = this.getFilasGrid(grid);
-            const total = cols * rows;
-            
-            if (cantidad >= total) {
-                return Array.from({ length: total }, (_, i) => i);
-            }
-            
-            const posiciones = [];
-            
-            // 🔥 Para 4x4: posiciones 3 (esquina superior derecha) y 12 (esquina inferior izquierda)
-            const esquinas = [3, 12];
-            
-            for (const pos of esquinas) {
-                if (posiciones.length >= cantidad) break;
-                if (pos < total && !usadas.has(pos)) {
-                    posiciones.push(pos);
-                    usadas.add(pos);
-                }
-            }
-            
-            // Si faltan, buscar vecinos
-            if (posiciones.length < cantidad) {
-                const vecinos = [];
-                for (const pos of esquinas) {
-                    if (pos >= total) continue;
-                    const row = Math.floor(pos / cols);
-                    const col = pos % cols;
-                    const offsets = [[0,1], [1,0], [0,-1], [-1,0], [1,1], [1,-1], [-1,1], [-1,-1]];
-                    for (const [dr, dc] of offsets) {
-                        const nr = row + dr, nc = col + dc;
-                        if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
-                            const idx = nr * cols + nc;
-                            if (!usadas.has(idx)) vecinos.push(idx);
-                        }
-                    }
-                }
-                for (const v of vecinos) {
-                    if (posiciones.length >= cantidad) break;
-                    if (!usadas.has(v)) {
-                        posiciones.push(v);
-                        usadas.add(v);
-                    }
-                }
-            }
-            
-            return posiciones;
-        }
-
-        obtenerCentroDiagonalDerIzq(grid, cantidad, usadas) {
-            const cols = this.getColumnasGrid(grid);
-            const rows = this.getFilasGrid(grid);
-            const total = cols * rows;
-            
-            if (cantidad >= total) {
-                return Array.from({ length: total }, (_, i) => i);
-            }
-            
-            const posiciones = [];
-            
-            // 🔥 Para 4x4: diagonal derecha a izquierda (de arriba-derecha a abajo-izquierda)
-            // Posiciones: 3, 6, 9, 12
-            // Tomar las centrales primero: 6 y 9
-            const centrales = [6, 9, 3, 12];
-            
-            for (const pos of centrales) {
-                if (posiciones.length >= cantidad) break;
-                if (pos < total && !usadas.has(pos)) {
-                    posiciones.push(pos);
-                    usadas.add(pos);
-                }
-            }
-            
-            return posiciones;
-        }
-
-        obtenerCentroDiagonalIzqDer(grid, cantidad, usadas) {
-            const cols = this.getColumnasGrid(grid);
-            const rows = this.getFilasGrid(grid);
-            const total = cols * rows;
-            
-            if (cantidad >= total) {
-                return Array.from({ length: total }, (_, i) => i);
-            }
-            
-            const posiciones = [];
-            
-            // 🔥 Para 4x4: diagonal izquierda a derecha (de arriba-izquierda a abajo-derecha)
-            // Posiciones: 0, 5, 10, 15
-            // Tomar las centrales primero: 5 y 10
-            const centrales = [5, 10, 0, 15];
-            
-            for (const pos of centrales) {
-                if (posiciones.length >= cantidad) break;
-                if (pos < total && !usadas.has(pos)) {
-                    posiciones.push(pos);
-                    usadas.add(pos);
-                }
-            }
-            
-            return posiciones;
-        }
-
-        obtenerCentroHorizontal(grid, cantidad, usadas) {
-            const cols = this.getColumnasGrid(grid);
-            const rows = this.getFilasGrid(grid);
-            const total = cols * rows;
-            
-            if (cantidad >= total) {
-                return Array.from({ length: total }, (_, i) => i);
-            }
-            
-            const posiciones = [];
-            
-            // 🔥 Para 4x4: fila central superior o inferior
-            // Intentar fila superior primero (5,6), si no disponible, usar inferior (9,10)
-            const opciones = [
-                [5, 6],   // Fila 1 - centro
-                [9, 10],  // Fila 2 - centro
-                [4, 7],   // Fila 1 - extremos
-                [8, 11]   // Fila 2 - extremos
-            ];
-            
-            for (const opcion of opciones) {
-                if (posiciones.length >= cantidad) break;
-                let disponibles = opcion.filter(p => p < total && !usadas.has(p));
-                for (const pos of disponibles) {
-                    if (posiciones.length >= cantidad) break;
-                    posiciones.push(pos);
-                    usadas.add(pos);
-                }
-            }
-            
-            return posiciones;
-        }   
-
-        obtenerCentroVertical(grid, cantidad, usadas) {
-            const cols = this.getColumnasGrid(grid);
-            const rows = this.getFilasGrid(grid);
-            const total = cols * rows;
-            
-            if (cantidad >= total) {
-                return Array.from({ length: total }, (_, i) => i);
-            }
-            
-            const posiciones = [];
-            
-            // 🔥 Para 4x4: columna central izquierda o derecha
-            // Intentar columna izquierda primero (5,9), si no disponible, usar derecha (6,10)
-            const opciones = [
-                [5, 9],   // Columna 1 - centro
-                [6, 10],  // Columna 2 - centro
-                [1, 13],  // Columna 1 - extremos
-                [2, 14]   // Columna 2 - extremos
-            ];
-            
-            for (const opcion of opciones) {
-                if (posiciones.length >= cantidad) break;
-                let disponibles = opcion.filter(p => p < total && !usadas.has(p));
-                for (const pos of disponibles) {
-                    if (posiciones.length >= cantidad) break;
-                    posiciones.push(pos);
-                    usadas.add(pos);
-                }
-            }
-            
-            return posiciones;
-        }
-
-        /**
-         * Refresca la vista previa
-         */
         refreshPreview() {
             if (typeof llenarCasillasAutomatico === 'function') {
                 llenarCasillasAutomatico();
@@ -553,6 +498,10 @@
         },
         obtenerPosicionesPorUbicacion: function(grid, cantidad) {
             return getInstance().obtenerPosicionesPorUbicacion(grid, cantidad);
+        },
+        // 🔥 NUEVO: Forzar actualización de posiciones
+        actualizarPosiciones: function() {
+            getInstance().actualizarPosiciones();
         }
     };
 
@@ -569,6 +518,6 @@
         }
     });
 
-    console.log('📦 Dobles.js cargado correctamente (SIEMPRE 2 casillas dobles)');
+    console.log('📦 Dobles.js cargado correctamente (CORREGIDO)');
 
 })();

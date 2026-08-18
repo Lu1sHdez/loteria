@@ -68,9 +68,43 @@
 
 /* Celdas invisibles (8) - fondo gris SIN icono */
 .j-grid-preview[data-grid="cruzadas"] .cell.invisible {
-    background: #E8E8E8;
-    border: 1px solid #D0D0D0;
+    background: transparent;
+    border: none;
     border-radius: 4px;
+}
+
+.j-grid-preview .cell.visible-sin-fondo {
+    background: #D9D9D9;
+    border: 2px solid #D9D9D9;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* =====================================================
+   MODO FAVORITAS - CELDAS CON RELLENO
+   ===================================================== */
+
+/* Celda con relleno rosa e icono corazón */
+.j-grid-preview .cell.favorita-ubicacion {
+    background: #FA299C;
+    border: 2px solid #D9D9D9;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+}
+
+.j-grid-preview .cell.favorita-ubicacion .j-modo-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50%;
+    height: 50%;
+    object-fit: contain;
+    z-index: 2;
+    pointer-events: none;
+    filter: brightness(0) invert(1);
 }
 
 /* Ocultar icono en celdas invisibles */
@@ -101,17 +135,17 @@
 }
 
 /* =====================================================
-   POCITOS 3
+   POCITOS 3 - CON IMÁGENES PRE-CORTADAS
    ===================================================== */
 
-.j-grid-preview[data-grid="pocitos3"] {
+   .j-grid-preview[data-grid="pocitos3"] {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
     gap: 2px;
     width: 100%;
     max-width: 100%;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 4 / 3;
     box-sizing: border-box;
 }
 
@@ -139,6 +173,48 @@
     grid-row: 2;
 }
 
+/* Celda izquierda: icono completo y centrado */
+.j-grid-preview[data-grid="pocitos3"] .cell:nth-child(1) .j-modo-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50%;
+    height: 50%;
+    object-fit: contain;
+    z-index: 2;
+    pointer-events: none;
+    filter: brightness(0) invert(1);
+}
+
+/* Celda superior derecha: MITAD INFERIOR (pegado ARRIBA) */
+.j-grid-preview[data-grid="pocitos3"] .cell:nth-child(2) .j-modo-icon {
+    content: url('/wp-content/uploads/2026/08/sencilla-cut-arriba.png');
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50%;
+    height: auto;
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Celda inferior derecha: MITAD SUPERIOR (pegado ABAJO) */
+.j-grid-preview[data-grid="pocitos3"] .cell:nth-child(3) .j-modo-icon {
+    content: url('/wp-content/uploads/2026/08/sencilla-cut-abajo.png');
+    position: absolute;
+    bottom: 0;                   /* 🔥 Se pega al borde INFERIOR */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50%;
+    height: auto;
+    z-index: 2;
+    pointer-events: none;
+    object-position: bottom center; /* 🔥 Alinea la imagen al borde inferior */
+}
+
+
 /* =====================================================
    ANIMACIÓN SUAVE
    ===================================================== */
@@ -156,4 +232,45 @@
         opacity: 1;
         transform: scale(1);
     }
+}
+
+/* =====================================================
+   MODO DOBLES - VISTA ESTÁTICA
+   ===================================================== */
+
+/* Celda sin relleno - solo contorno gris */
+.j-grid-preview .cell.sin-relleno {
+    background: #E8E8E8;
+    border: 2px solid #D0D0D0;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Celda con relleno rosa e icono ×2 para dobles */
+.j-grid-preview .cell.doble-ubicacion {
+    background: #FA299C;
+    border: 2px solid #D9D9D9;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Icono ×2 en las celdas dobles */
+.j-grid-preview .cell.doble-ubicacion .j-modo-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50%;
+    height: 50%;
+    object-fit: contain;
+    z-index: 2;
+    pointer-events: none;
+    filter: brightness(0) invert(1);
+}
+
+/* Ocultar icono en celdas sin relleno */
+.j-grid-preview .cell.sin-relleno .j-modo-icon {
+    display: none;
 }
