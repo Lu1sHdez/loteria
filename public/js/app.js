@@ -778,14 +778,13 @@ function drawGrid() {
                 var esFavorita = posicionesFavoritas.includes(i);
                 
                 if (esFavorita) {
-                    // ✅ Celdas con relleno rosa + icono corazón
                     html += `
                         <div class="cell">
                             ${icono ? '<img src="' + icono + '" class="j-modo-icon" alt="Favoritas" loading="lazy">' : ''}
                         </div>
                     `;
                 } else {
-                    // ⬜ Celdas sin relleno (gris con contorno)
+                    
                     html += `
                         <div class="cell sin-relleno"></div>
                     `;

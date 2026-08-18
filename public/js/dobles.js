@@ -318,38 +318,8 @@
             const cols = this.getColumnasGrid(grid);
             
             if (grid === '4x4') {
-                // 🔥 4x4: diagonal derecha→izquierda (0,5,10,15), tomar 5 y 10
-                return [5, 10];
-            } else if (grid === '5x5') {
-                // 🔥 5x5: diagonal derecha→izquierda (4,8,12,16,20), tomar 8 y 16
-                return [8, 16];
-            } else if (grid === 'cruzadas') {
-                return [1, 2];
-            } else if (grid === 'pocitos4') {
-                return [1, 2];
-            } else if (grid === 'pocitos3') {
-                return [1, 2];
-            }
-            
-            // Fallback
-            const centroCol = Math.floor(cols / 2);
-            const centroRow = Math.floor(rows / 2);
-            return [centroRow * cols + (centroCol - 1), (centroRow + 1) * cols + centroCol];
-        }
-
-        /**
-         * CENTRO DIAGONAL IZQUIERDA A DERECHA
-         * 4x4: posiciones 6 y 9
-         * 5x5: posiciones 7 y 17
-         */
-        obtenerCentroDiagonalIzqDer(grid, cantidad) {
-            const cols = this.getColumnasGrid(grid);
-            
-            if (grid === '4x4') {
-                // 🔥 4x4: diagonal izquierda→derecha (3,6,9,12), tomar 6 y 9
                 return [6, 9];
             } else if (grid === '5x5') {
-                // 🔥 5x5: diagonal izquierda→derecha (0,6,12,18,24), tomar 6 y 18
                 return [6, 18];
             } else if (grid === 'cruzadas') {
                 return [1, 2];
@@ -363,6 +333,34 @@
             const centroCol = Math.floor(cols / 2);
             const centroRow = Math.floor(rows / 2);
             return [centroRow * cols + centroCol, (centroRow + 1) * cols + (centroCol - 1)];
+        }
+
+        /**
+         * CENTRO DIAGONAL IZQUIERDA A DERECHA
+         * 4x4: posiciones 6 y 9
+         * 5x5: posiciones 7 y 17
+         */
+        obtenerCentroDiagonalIzqDer(grid, cantidad) {
+            const cols = this.getColumnasGrid(grid);
+            
+            if (grid === '4x4') {
+                // 🔥 Diagonal derecha→izquierda (0,5,10,15), tomar 5 y 10
+                return [5, 10];
+            } else if (grid === '5x5') {
+                // 🔥 Diagonal derecha→izquierda (4,8,12,16,20), tomar 8 y 16
+                return [8, 16];
+            } else if (grid === 'cruzadas') {
+                return [1, 2];
+            } else if (grid === 'pocitos4') {
+                return [1, 2];
+            } else if (grid === 'pocitos3') {
+                return [1, 2];
+            }
+            
+            // Fallback
+            const centroCol = Math.floor(cols / 2);
+            const centroRow = Math.floor(rows / 2);
+            return [centroRow * cols + (centroCol - 1), (centroRow + 1) * cols + centroCol];
         }
 
         /**

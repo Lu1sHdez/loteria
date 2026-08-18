@@ -1,6 +1,6 @@
 /**
  * =====================================================
- * FAVORITAS DISTRIBUCIÓN - Lógica avanzada de ubicaciones múltiples
+ * FAVORITAS DISTRIBUCIÓN - Lógica avanzada de ubicaciones múltiples (ACUMULATIVA)
  * =====================================================
  */
 
@@ -79,29 +79,43 @@
         }
 
         // =========================================================
-        // LÓGICA PRINCIPAL DE DISTRIBUCIÓN
+        // LÓGICA PRINCIPAL DE DISTRIBUCIÓN (ACUMULATIVA)
         // =========================================================
 
-        static distribuir(favoritas, totalTablas, grid, ubicacionesSeleccionadas) {
+        static distribuir(favoritas, totalTablas, grid, ubicacionesSeleccionadas, asignacionAnterior = []) {
             if (!favoritas || favoritas.length === 0) return [];
             
             const totalFavoritas = favoritas.length;
             const posicionesOcupadas = [];
             const asignacion = [];
 
+            // 🔥 PASO 1: RESTAURAR LA ASIGNACIÓN ANTERIOR (si existe)
+            // Si ya hay una asignación previa, la usamos como base
+            if (asignacionAnterior && asignacionAnterior.length > 0) {
+                // Restaurar posiciones ocupadas y barajas ya asignadas
+                asignacionAnterior.forEach(item => {
+                    posicionesOcupadas.push(item.posicion);
+                    asignacion.push(item);
+                });
+            }
+
+            // 🔥 PASO 2: IDENTIFICAR BARAJAS QUE FALTAN POR ASIGNAR
+            // Buscar las favoritas que aún no han sido asignadas
+            const barajasYaAsignadas = asignacion.map(item => item.favorita.numero);
+            const favoritasPendientes = favoritas.filter(f => !barajasYaAsignadas.includes(f.numero));
+
+            // Si no hay pendientes, retornar la asignación actual
+            if (favoritasPendientes.length === 0) {
+                return asignacion;
+            }
+
             // 🔥 PRIORIDAD: Centro > Marco > Esquinas > Aleatoria
             const ordenPrioridad = ['centro', 'marco', 'esquinas', 'aleatoria'];
             const ubicaciones = ubicacionesSeleccionadas || ['aleatoria'];
 
-            // Si solo hay 1 ubicación, distribuir todas ahí
-            if (ubicaciones.length === 1) {
-                return this.distribuirUnaUbicacion(favoritas, grid, ubicaciones[0]);
-            }
+            let favoritasRestantes = [...favoritasPendientes];
 
-            // Si hay múltiples ubicaciones
-            let favoritasRestantes = [...favoritas];
-            
-            // 1. Primero asignar a las ubicaciones fijas (centro, marco, esquinas)
+            // 🔥 PASO 3: ASIGNAR LAS PENDIENTES A LAS NUEVAS UBICACIONES
             ordenPrioridad.forEach(ubicacion => {
                 if (!ubicaciones.includes(ubicacion)) return;
                 if (favoritasRestantes.length === 0) return;
@@ -109,13 +123,18 @@
                 const posicionesFijas = this.getPosicionesPorUbicacion(grid, ubicacion);
                 if (posicionesFijas.length === 0) return;
 
-                // Tomar las favoritas que caben en esta ubicación
-                const cantidad = Math.min(posicionesFijas.length, favoritasRestantes.length);
+                // 🔥 FILTRAR POSICIONES QUE YA ESTÁN OCUPADAS
+                const posicionesLibres = posicionesFijas.filter(pos => !posicionesOcupadas.includes(pos));
+
+                if (posicionesLibres.length === 0) return;
+
+                // Tomar las favoritas que caben en las posiciones libres
+                const cantidad = Math.min(posicionesLibres.length, favoritasRestantes.length);
                 const favoritasAsignadas = favoritasRestantes.splice(0, cantidad);
 
-                // Asignar a las posiciones fijas
+                // Asignar a las posiciones libres
                 for (let i = 0; i < favoritasAsignadas.length; i++) {
-                    const pos = posicionesFijas[i];
+                    const pos = posicionesLibres[i];
                     posicionesOcupadas.push(pos);
                     asignacion.push({
                         posicion: pos,
@@ -125,7 +144,7 @@
                 }
             });
 
-            // 2. Si quedan favoritas sin asignar, ponerlas en aleatorio
+            // 🔥 PASO 4: SI AÚN QUEDAN FAVORITAS SIN ASIGNAR, PONERLAS EN ALEATORIO
             if (favoritasRestantes.length > 0) {
                 const aleatorias = this.getPosicionesAleatorias(grid, favoritasRestantes.length, posicionesOcupadas);
                 for (let i = 0; i < favoritasRestantes.length; i++) {
@@ -141,61 +160,9 @@
                 }
             }
 
-            // 3. Ordenar por posición para mostrarlo bonito
+            // 🔥 PASO 5: ORDENAR POR POSICIÓN
             asignacion.sort((a, b) => a.posicion - b.posicion);
             return asignacion;
-        }
-
-        // Distribución para una sola ubicación
-        static distribuirUnaUbicacion(favoritas, grid, ubicacion) {
-            const total = this.getTotalCasillas(grid);
-            const posicionesFijas = this.getPosicionesPorUbicacion(grid, ubicacion);
-            
-            const resultado = [];
-            const posicionesOcupadas = [];
-
-            // Si la ubicación tiene posiciones fijas
-            if (posicionesFijas.length > 0) {
-                for (let i = 0; i < Math.min(favoritas.length, posicionesFijas.length); i++) {
-                    const pos = posicionesFijas[i];
-                    posicionesOcupadas.push(pos);
-                    resultado.push({
-                        posicion: pos,
-                        favorita: favoritas[i],
-                        ubicacion: ubicacion
-                    });
-                }
-
-                // Si hay más favoritas que posiciones fijas, rellenar con aleatorio
-                if (favoritas.length > posicionesFijas.length) {
-                    const restantes = favoritas.slice(posicionesFijas.length);
-                    const aleatorias = this.getPosicionesAleatorias(grid, restantes.length, posicionesOcupadas);
-                    for (let i = 0; i < restantes.length; i++) {
-                        const pos = aleatorias[i];
-                        if (pos !== undefined) {
-                            posicionesOcupadas.push(pos);
-                            resultado.push({
-                                posicion: pos,
-                                favorita: restantes[i],
-                                ubicacion: 'aleatoria'
-                            });
-                        }
-                    }
-                }
-            } else {
-                // Si es aleatoria pura, distribuir todas aleatoriamente
-                const aleatorias = this.getPosicionesAleatorias(grid, favoritas.length, []);
-                for (let i = 0; i < favoritas.length; i++) {
-                    resultado.push({
-                        posicion: aleatorias[i],
-                        favorita: favoritas[i],
-                        ubicacion: 'aleatoria'
-                    });
-                }
-            }
-
-            resultado.sort((a, b) => a.posicion - b.posicion);
-            return resultado;
         }
 
         // =========================================================
@@ -229,6 +196,6 @@
 
     window.FavoritasDistribucion = FavoritasDistribucion;
 
-    console.log('📦 FavoritasDistribucion.js cargado correctamente');
+    console.log('📦 FavoritasDistribucion.js cargado correctamente (ACUMULATIVO)');
 
 })();

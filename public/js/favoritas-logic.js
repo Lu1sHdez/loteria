@@ -68,14 +68,6 @@
             const maxPorTabla = this.getMaxPorUbicacion(ubicacion, grid);
             const totalFavoritas = favoritas.length;
 
-            console.log('📊 Distribuyendo favoritas:', {
-                totalFavoritas,
-                totalTablas,
-                grid,
-                ubicacion,
-                maxPorTabla
-            });
-
             if (totalTablas === 1) {
                 return [favoritas.slice(0, maxPorTabla)];
             }
@@ -126,33 +118,32 @@
         }
 
         static getMaxPorUbicacion(ubicacion, grid) {
-    const total = this.getGridConfig(grid).total;
+            const total = this.getGridConfig(grid).total;
     
-    // 🔥 PARA POCITOS 3 - SOLO PERMITE 1 FAVORITA (en casilla 2)
-    if (grid === 'pocitos3') {
-        return 1;  // Solo 1 favorita permitida
-    }
+            // 🔥 PARA POCITOS 3 - SOLO PERMITE 1 FAVORITA (en casilla 2)
+            if (grid === 'pocitos3') {
+                return 1;
+            }
     
-    if (typeof GridPosiciones !== 'undefined') {
-        const todas = GridPosiciones.getPositions(ubicacion, grid, total);
-        return Math.min(todas.length, 12);
-    }
+            if (typeof GridPosiciones !== 'undefined') {
+                const todas = GridPosiciones.getPositions(ubicacion, grid, total);
+                return Math.min(todas.length, 12);
+            }
     
-    // Fallback
-    switch(ubicacion) {
-        case 'centro':
-            if (grid === '5x5') return 1;
-            if (grid === '4x4') return 4;
-            if (grid === 'cruzadas') return 2;
-            return Math.min(4, total);
-        case 'esquinas':
-            return Math.min(4, total);
-        case 'marco':
-            return Math.min(12, total);
-        default:
-            return Math.min(12, total);
-    }
-}
+            switch(ubicacion) {
+                case 'centro':
+                    if (grid === '5x5') return 1;
+                    if (grid === '4x4') return 4;
+                    if (grid === 'cruzadas') return 2;
+                    return Math.min(4, total);
+                case 'esquinas':
+                    return Math.min(4, total);
+                case 'marco':
+                    return Math.min(12, total);
+                default:
+                    return Math.min(12, total);
+            }
+        }
 
         static getPosicionesParaTabla(favoritasTabla, grid, ubicacion) {
             if (!favoritasTabla || favoritasTabla.length === 0) {
@@ -188,7 +179,6 @@
                 });
             }
             
-            console.log('📊 Estructura completa:', resultado);
             return resultado;
         }
     }

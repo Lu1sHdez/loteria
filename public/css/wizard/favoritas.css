@@ -662,32 +662,3 @@
     accent-color: #FA299C;
     cursor: pointer;
 }
-
-/* Opcional: si quieres un estilo personalizado para el checkbox */
-.j-checkbox-custom {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border: 2px solid #D8D8D8;
-    border-radius: 4px;
-    background: #FFFFFF;
-    position: relative;
-    flex-shrink: 0;
-    transition: all 0.2s;
-}
-
-.j-ubicacion-checkbox:checked + .j-checkbox-custom {
-    background: #FA299C;
-    border-color: #FA299C;
-}
-
-.j-ubicacion-checkbox:checked + .j-checkbox-custom::after {
-    content: '✓';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #FFFFFF;
-    font-size: 12px;
-    font-weight: 700;
-}

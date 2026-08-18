@@ -165,6 +165,13 @@
                     }
                 }.bind(this));
             }.bind(this));
+
+            document.addEventListener('change', function(e) {
+                if (e.target.classList.contains('j-ubicacion-checkbox')) {
+                    this.esSeleccionAleatoria = false; 
+                    this.actualizarPreviewCasillas();
+                }   
+            }.bind(this));
         }
 
         renderCategorias(categoriasOrdenadas) {
@@ -261,11 +268,13 @@ actualizarPreviewCasillas() {
     JuguemosState.favoritas = this.seleccionadas;
     JuguemosState.favoritasUbicacion = this.ubicacion;
     
-    this.generarDistribucionInteligente();
-    
     var grid = JuguemosState.grid || '4x4';
+
+    if (this.gridAnterior !== grid) {
+        this.asignacionAnterior = [];
+        this.gridAnterior = grid;
+    }
     
-    // 🔥 Si es Cruzadas, usar la función específica
     if (grid === 'cruzadas') {
         this.actualizarPreviewCruzadas();
         return;
@@ -300,20 +309,30 @@ actualizarPreviewCasillas() {
     
     // 🔥 OBTENER UBICACIONES SELECCIONADAS (checkboxes)
     const ubicacionesSeleccionadas = [];
-    document.querySelectorAll('.j-ubicacion-checkbox:checked').forEach(cb => {
-        ubicacionesSeleccionadas.push(cb.dataset.ubicacion);
-    });
-    if (ubicacionesSeleccionadas.length === 0) {
-        ubicacionesSeleccionadas.push('aleatoria');
+    
+    if (this.esSeleccionAleatoria) {
+        // Selección aleatoria: repartir en TODAS las zonas para evitar amontonamiento
+        ubicacionesSeleccionadas.push('centro', 'marco', 'esquinas', 'aleatoria');
+    } else {
+        document.querySelectorAll('.j-ubicacion-checkbox:checked').forEach(cb => {
+            ubicacionesSeleccionadas.push(cb.dataset.ubicacion);
+        });
+        if (ubicacionesSeleccionadas.length === 0) {
+            ubicacionesSeleccionadas.push('aleatoria');
+        }
     }
 
-    // 🔥 DISTRIBUIR FAVORITAS usando FavoritasDistribucion
+    // 🔥 DISTRIBUIR FAVORITAS usando FavoritasDistribucion (acumulativo)
     const distribucion = FavoritasDistribucion.distribuir(
         this.seleccionadas,
         1, // Solo mostramos la primera tabla
         grid,
-        ubicacionesSeleccionadas
+        ubicacionesSeleccionadas,
+        this.asignacionAnterior || [] // 🔥 PASAMOS LA ASIGNACIÓN ANTERIOR
     );
+
+    // 🔥 GUARDAR LA ASIGNACIÓN ACTUAL PARA LA PRÓXIMA VEZ
+    this.asignacionAnterior = distribucion;
 
     // 🔥 GENERAR HTML
     let html = '';
@@ -588,10 +607,12 @@ actualizarPreviewCruzadas() {
         // =========================================================
 
         toggleSeleccion(baraja) {
+            this.esSeleccionAleatoria = false; 
             var numero = parseInt(baraja.numero);
             var index = this.seleccionadas.findIndex(function(s) { return parseInt(s.numero) === numero; });
-            
+        
             if (JuguemosState.grid === 'pocitos3') {
+                this.asignacionAnterior = []; // aquí sí se resetea, es un caso especial de 1 sola favorita
                 if (index !== -1) {
                     this.seleccionadas.splice(index, 1);
                 } else {
@@ -600,39 +621,46 @@ actualizarPreviewCruzadas() {
                     }
                     this.seleccionadas.push(baraja);
                 }
-                
+        
                 this.renderGrid();
                 this.updateContador();
                 this.updateProgress();
                 this.actualizarPreviewCasillas();
-                
+        
                 if (typeof llenarCasillasAutomatico === 'function') {
                     setTimeout(function() { llenarCasillasAutomatico(); }, 100);
                 }
                 return;
             }
-            
+        
             if (index !== -1) {
+                // Se está quitando una favorita: sacarla también de la memoria de posiciones
                 this.seleccionadas.splice(index, 1);
+                if (this.asignacionAnterior && this.asignacionAnterior.length > 0) {
+                    this.asignacionAnterior = this.asignacionAnterior.filter(function(item) {
+                        return parseInt(item.favorita.numero) !== numero;
+                    });
+                }
             } else {
                 if (this.seleccionadas.length >= this.maxSeleccion) {
                     alert('Solo puedes seleccionar ' + this.maxSeleccion + ' favoritas.');
                     return;
                 }
                 this.seleccionadas.push(baraja);
+                // 👆 No tocamos asignacionAnterior: lo ya colocado se mantiene,
+                // distribuir() solo va a ubicar la nueva favorita en un hueco libre
             }
-            
+        
             this.renderGrid();
             this.updateContador();
             this.updateProgress();
-            
-            // 🔥 Si es Cruzadas, usar la función específica
+        
             if (JuguemosState.grid === 'cruzadas') {
                 this.actualizarPreviewCruzadas();
             } else {
                 this.actualizarPreviewCasillas();
             }
-            
+        
             if (typeof llenarCasillasAutomatico === 'function') {
                 setTimeout(function() { llenarCasillasAutomatico(); }, 100);
             }
@@ -659,6 +687,8 @@ actualizarPreviewCruzadas() {
             }
             
             this.seleccionadas = mezcladas.slice(0, limite);
+            this.asignacionAnterior = [];
+            this.esSeleccionAleatoria = true;
             
             this.renderGrid();
             this.updateContador();

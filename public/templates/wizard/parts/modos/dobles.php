@@ -69,18 +69,19 @@ if (!defined('ABSPATH')) {
         <!-- Fila 4 -->
         <div class="j-ubicacion-row">
             <label class="j-ubicacion-radio">
+                <input type="radio" class="j-ubicacion-radio-input" name="ubicacion-doble" data-ubicacion="centro-diagonal-izq-der">
+                <span class="j-radio-custom"></span>
+                <img src="/wp-content/uploads/2026/08/Dob-Diag-C-Der-Izq.png" alt="Centro - Diagonal Izq. a Der." class="j-ubicacion-icon" loading="lazy">
+                <span class="j-ubicacion-label">Centro - Diagonal Izq. a Der.</span>
+            </label>
+            <label class="j-ubicacion-radio">
                 <input type="radio" class="j-ubicacion-radio-input" name="ubicacion-doble" data-ubicacion="centro-diagonal-der-izq">
                 <span class="j-radio-custom"></span>
-                <img src="/wp-content/uploads/2026/08/Dob-Diag-C-Der-Izq.png" alt="Centro - Diagonal Der. a Izq." class="j-ubicacion-icon" loading="lazy">
+                <img src="/wp-content/uploads/2026/08/Dob-Diag-C-Izq-Der.png" alt="Centro - Diagonal Der. a Izq." class="j-ubicacion-icon" loading="lazy">
                 <span class="j-ubicacion-label">Centro - Diagonal Der. a Izq.</span>
             </label>
             
-            <label class="j-ubicacion-radio">
-                <input type="radio" class="j-ubicacion-radio-input" name="ubicacion-doble" data-ubicacion="centro-diagonal-izq-der">
-                <span class="j-radio-custom"></span>
-                <img src="/wp-content/uploads/2026/08/Dob-Diag-C-Izq-Der.png" alt="Centro - Diagonal Izq. a Der." class="j-ubicacion-icon" loading="lazy">
-                <span class="j-ubicacion-label">Centro - Diagonal Izq. a Der.</span>
-            </label>
+            
         </div>
         
     </div>
