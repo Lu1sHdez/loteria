@@ -368,7 +368,7 @@
 #j-casilla-preview-grid[data-grid="pocitos3"] .cell:nth-child(1) {
     grid-column: 1;
     grid-row: 1 / 3;
-    background: #DDDDDD; /* Fondo gris para la celda izquierda */
+    background: #DDDDDD; 
 }
 
 #j-casilla-preview-grid[data-grid="pocitos3"] .cell:nth-child(2) {
@@ -381,39 +381,32 @@
     grid-row: 2;
 }
 
-/* ==========================================
-   IMÁGENES CON CORTE A LA MITAD (SIN DEFORMAR)
-   ========================================== */
-
-/* Celda izquierda: imagen COMPLETA y SIN estirar */
 #j-casilla-preview-grid[data-grid="pocitos3"] .cell:nth-child(1) img {
     width: 100%;
     height: 100%;
-    object-fit: contain;   /* 🔥 NO se estira, mantiene proporciones */
+    object-fit: contain;   
     object-position: center center;
     position: absolute;
     top: 0;
     left: 0;
 }
 
-/* Celda superior derecha: imagen CORTADA (mitad inferior) pegada ARRIBA */
 #j-casilla-preview-grid[data-grid="pocitos3"] .cell:nth-child(2) img {
     width: 100%;
-    height: 200%;          /* 🔥 Se estira al doble para cubrir */
-    object-fit: cover;     /* 🔥 Cubre la celda sin deformar */
+    height: 200%;          
+    object-fit: cover;     
     object-position: botton center;
     position: absolute;
     top: 0;
     left: 0;
 }
 
-/* Celda inferior derecha: imagen CORTADA (mitad superior) pegada ABAJO */
 #j-casilla-preview-grid[data-grid="pocitos3"] .cell:nth-child(3) img {
     width: 100%;
-    height: 200%;          /* 🔥 Se estira al doble para cubrir */
-    object-fit: cover;     /* 🔥 Cubre la celda sin deformar */
+    height: 200%;          
+    object-fit: cover;     
     object-position: bottom center;
     position: absolute;
-    bottom: 0;             /* 🔥 Se pega al borde inferior */
+    bottom: 0;             
     left: 0;
 }

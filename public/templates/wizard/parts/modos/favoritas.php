@@ -55,29 +55,33 @@ if (!defined('ABSPATH')) {
             <p class="j-ubicacion-titulo" style="margin-bottom: 6px;">Ubicación(es)</p>
 
             <div class="j-ubicacion-opciones-vertical">
-                <button class="j-ubicacion-btn active" data-ubicacion="aleatoria">
-                    <span class="j-ubicacion-radiof"></span>
-                    <img src="/wp-content/uploads/2026/08/fav-aleatoria.png" alt="Aleatoria" class="j-ubicacion-icon-img">
-                    <span class="j-ubicacion-texto">Aleatoria</span>
-                </button>
-
-                <button class="j-ubicacion-btn" data-ubicacion="centro">
-                    <span class="j-ubicacion-radiof"></span>
+                <label class="j-ubicacion-checkbox-label">
+                    <input type="checkbox" class="j-ubicacion-checkbox" data-ubicacion="centro" checked>
+                    <span class="j-checkbox-custom"></span>
                     <img src="/wp-content/uploads/2026/08/fav-centro.png" alt="Centro" class="j-ubicacion-icon-img">
                     <span class="j-ubicacion-texto">Centro</span>
-                </button>
+                </label>
 
-                <button class="j-ubicacion-btn" data-ubicacion="esquinas">
-                    <span class="j-ubicacion-radiof"></span>
+                <label class="j-ubicacion-checkbox-label">
+                    <input type="checkbox" class="j-ubicacion-checkbox" data-ubicacion="esquinas">
+                    <span class="j-checkbox-custom"></span>
                     <img src="/wp-content/uploads/2026/08/fav-esquinas.png" alt="Esquinas" class="j-ubicacion-icon-img">
                     <span class="j-ubicacion-texto">Esquinas</span>
-                </button>
+                </label>
 
-                <button class="j-ubicacion-btn" data-ubicacion="marco">
-                    <span class="j-ubicacion-radiof"></span>
+                <label class="j-ubicacion-checkbox-label">
+                    <input type="checkbox" class="j-ubicacion-checkbox" data-ubicacion="marco">
+                    <span class="j-checkbox-custom"></span>
                     <img src="/wp-content/uploads/2026/08/fav-marco.png" alt="Marco" class="j-ubicacion-icon-img">
                     <span class="j-ubicacion-texto">Marco</span>
-                </button>
+                </label>
+
+                <label class="j-ubicacion-checkbox-label">
+                    <input type="checkbox" class="j-ubicacion-checkbox" data-ubicacion="aleatoria">
+                    <span class="j-checkbox-custom"></span>
+                    <img src="/wp-content/uploads/2026/08/fav-aleatoria.png" alt="Aleatoria" class="j-ubicacion-icon-img">
+                    <span class="j-ubicacion-texto">Aleatoria</span>
+                </label>
             </div>
         </div>
 

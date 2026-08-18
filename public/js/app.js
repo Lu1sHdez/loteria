@@ -984,11 +984,38 @@ function actualizarPreviewCasillas(casillas) {
         return;
     }
     
-    // CASO 3: FAVORITAS + CRUZADAS
+    // CASO 3: FAVORITAS + CRUZADAS (con distribución inteligente)
     if (esFavoritasCruzadas) {
         const casillasVisibles = [0, 3, 5, 6, 9, 10, 12, 15];
         let html = '';
         
+        // 🔥 OBTENER UBICACIONES SELECCIONADAS (checkboxes)
+        const ubicacionesSeleccionadas = [];
+        document.querySelectorAll('.j-ubicacion-checkbox:checked').forEach(cb => {
+            ubicacionesSeleccionadas.push(cb.dataset.ubicacion);
+        });
+        if (ubicacionesSeleccionadas.length === 0) {
+            ubicacionesSeleccionadas.push('aleatoria');
+        }
+
+        // 🔥 DISTRIBUIR FAVORITAS usando FavoritasDistribucion
+        let distribucion = [];
+        if (typeof FavoritasDistribucion !== 'undefined') {
+            distribucion = FavoritasDistribucion.distribuir(
+                favoritas,
+                1, // Solo mostramos la primera tabla
+                grid,
+                ubicacionesSeleccionadas
+            );
+        } else {
+            // Fallback si no está cargado el script
+            distribucion = favoritas.map((f, i) => ({
+                posicion: i < casillasVisibles.length ? casillasVisibles[i] : i,
+                favorita: f,
+                ubicacion: 'aleatoria'
+            }));
+        }
+
         // 🔥 Generar 16 celdas (4x4) con las 8 visibles en forma de X
         for (let i = 0; i < 16; i++) {
             const row = Math.floor(i / 4) + 1;
@@ -996,15 +1023,16 @@ function actualizarPreviewCasillas(casillas) {
             const esVisible = casillasVisibles.includes(i);
             
             if (esVisible) {
-                // Celdas visibles: muestran la imagen
-                const casilla = casillas && casillas[i] ? casillas[i] : null;
-                const esFavorita = casilla && favoritas.some(f => f && parseInt(f.numero) === casilla.numero);
+                // Buscar si hay una favorita asignada a esta posición
+                const item = distribucion.find(d => d.posicion === i);
+                const casilla = item ? item.favorita : null;
+                const esFavorita = casilla !== null;
                 
                 if (casilla) {
                     html += `
-                        <div class="cell visible ${esFavorita ? 'favorita' : ''}" style="grid-row: ${row}; grid-column: ${col};">
+                        <div class="cell visible favorita" style="grid-row: ${row}; grid-column: ${col};">
                             <img src="${casilla.imagen || ''}" alt="${casilla.nombre || ''}" loading="lazy">
-                            ${esFavorita ? '<span class="j-favorita-badge"></span>' : ''}
+                            <span class="j-favorita-badge">⭐</span>
                         </div>
                     `;
                 } else {
@@ -1014,7 +1042,7 @@ function actualizarPreviewCasillas(casillas) {
                     `;
                 }
             } else {
-                // Celdas invisibles: completamente vacías (sin borde, sin fondo)
+                // Celdas invisibles: completamente vacías
                 html += `
                     <div class="cell invisible" style="grid-row: ${row}; grid-column: ${col};"></div>
                 `;
@@ -1060,28 +1088,86 @@ function actualizarPreviewCasillas(casillas) {
         container.innerHTML = html;
         return;
     }
-    
-    // GRIDS NORMALES (4x4, 5x5, pocitos)
-    const total = getTotalCasillas(grid);
-    container.innerHTML = casillas.map(function(casilla, index) {
-        const esFavorita = tieneFavoritas && favoritas.some(function(f) { return f && parseInt(f.numero) === casilla?.numero; });
-        const esDoble = esModoDobles && posicionesDobles.includes(index);
-        const claseExtra = esFavorita ? ' favorita' : (esDoble ? ' doble' : '');
+        // =========================================================
+    // 🔥 NUEVO: FAVORITAS + 4x4, 5x5, Pocitos (con distribución inteligente)
+    // =========================================================
+    if (tieneFavoritas && (grid === '4x4' || grid === '5x5' || grid === 'pocitos4' || grid === 'pocitos3')) {
+        const total = getTotalCasillas(grid);
         
-        if (casilla) {
-            return `
-                <div class="cell${claseExtra}" data-index="${index}" title="${casilla.nombre || ''}${esFavorita ? '  Favorita' : ''}${esDoble ? ' ×2 Doble' : ''}">
-                    <img src="${casilla.imagen || ''}" alt="${casilla.nombre || ''}" loading="lazy">
-                    ${esFavorita ? '<span class="j-favorita-badge"></span>' : ''}
-                    ${esDoble ? '<span class="j-doble-badge">×2</span>' : ''}
-                </div>
-            `;
-        } else {
-            return '<div class="cell empty" data-index="' + index + '"></div>';
+        // 🔥 OBTENER UBICACIONES SELECCIONADAS
+        const ubicacionesSeleccionadas = [];
+        document.querySelectorAll('.j-ubicacion-checkbox:checked').forEach(cb => {
+            ubicacionesSeleccionadas.push(cb.dataset.ubicacion);
+        });
+        if (ubicacionesSeleccionadas.length === 0) {
+            ubicacionesSeleccionadas.push('aleatoria');
         }
-    }).join('');
+
+        // 🔥 DISTRIBUIR FAVORITAS usando FavoritasDistribucion
+        let distribucion = [];
+        if (typeof FavoritasDistribucion !== 'undefined') {
+            distribucion = FavoritasDistribucion.distribuir(
+                favoritas,
+                1, // Solo mostramos la primera tabla
+                grid,
+                ubicacionesSeleccionadas
+            );
+        } else {
+            // Fallback si no está cargado el script
+            const posiciones = [];
+            for (let i = 0; i < Math.min(favoritas.length, total); i++) {
+                posiciones.push(i);
+            }
+            distribucion = favoritas.slice(0, posiciones.length).map((f, i) => ({
+                posicion: posiciones[i],
+                favorita: f,
+                ubicacion: 'aleatoria'
+            }));
+        }
+
+        // 🔥 GENERAR HTML
+        let html = '';
+        for (let i = 0; i < total; i++) {
+            const item = distribucion.find(d => d.posicion === i);
+            if (item) {
+                html += `
+                    <div class="cell favorita" data-index="${i}" data-ubicacion="${item.ubicacion}">
+                        <img src="${item.favorita.imagen || ''}" alt="${item.favorita.nombre || ''}" loading="lazy">
+                        <span class="j-favorita-badge">⭐</span>
+                    </div>
+                `;
+            } else {
+                html += `<div class="cell empty" data-index="${i}"></div>`;
+            }
+        }
+        container.innerHTML = html;
+        return;
+    }
     
-    JuguemosState.casillasAsignadas = casillas;
+        // =========================================================
+    // GRIDS NORMALES (4x4, 5x5, pocitos) - SOLO PARA SENCILLA Y DOBLES
+    // =========================================================
+    if (JuguemosState.mode !== 'favoritas') {
+        const total = getTotalCasillas(grid);
+        container.innerHTML = casillas.map(function(casilla, index) {
+            const esFavorita = false; // No aplica en modo no-favoritas
+            const esDoble = esModoDobles && posicionesDobles.includes(index);
+            const claseExtra = esDoble ? ' doble' : '';
+            
+            if (casilla) {
+                return `
+                    <div class="cell${claseExtra}" data-index="${index}" title="${casilla.nombre || ''}${esDoble ? ' ×2 Doble' : ''}">
+                        <img src="${casilla.imagen || ''}" alt="${casilla.nombre || ''}" loading="lazy">
+                        ${esDoble ? '<span class="j-doble-badge">×2</span>' : ''}
+                    </div>
+                `;
+            } else {
+                return '<div class="cell empty" data-index="' + index + '"></div>';
+            }
+        }).join('');
+        
+        JuguemosState.casillasAsignadas = casillas;
+    }
 }
 function limpiarCasillas() {
     const container = document.getElementById('j-casilla-preview-grid');
@@ -1649,6 +1735,19 @@ function obtenerPosicionesFavoritas(grid, cantidad, ubicacion) {
         default:
             return obtenerPosicionesAleatorias(grid, cantidadReal);
     }
+}
+
+// =========================================================
+// FUNCIÓN AUXILIAR PARA GENERAR POSICIONES ALEATORIAS EN 4x4
+// =========================================================
+function obtenerPosicionesAleatorias4x4(cantidad) {
+    const total = 16;
+    const indices = Array.from({ length: total }, (_, i) => i);
+    for (let i = indices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+    return indices.slice(0, cantidad);
 }
 
 // =========================================================

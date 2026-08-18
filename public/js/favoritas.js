@@ -271,7 +271,7 @@ actualizarPreviewCasillas() {
         return;
     }
     
-    // 🔥 Para otros grids (4x4, 5x5, pocitos4)
+    // 🔥 Para otros grids (4x4, 5x5, pocitos4, pocitos3)
     var container = document.getElementById('j-casilla-preview-grid');
     if (!container) return;
     
@@ -280,6 +280,9 @@ actualizarPreviewCasillas() {
     
     // Configurar grid según tipo
     if (grid === 'pocitos4') {
+        container.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        container.style.gridTemplateRows = 'repeat(2, 1fr)';
+    } else if (grid === 'pocitos3') {
         container.style.gridTemplateColumns = 'repeat(2, 1fr)';
         container.style.gridTemplateRows = 'repeat(2, 1fr)';
     } else {
@@ -295,40 +298,99 @@ actualizarPreviewCasillas() {
         return;
     }
     
-    // Usar la estructura generada
-    var estructura = JuguemosState.favoritasEstructura;
-    if (estructura && estructura.length > 0) {
-        this.mostrarPreviewConEstructura(estructura);
-    } else {
-        // Fallback: mostrar favoritas en posiciones aleatorias
-        var posiciones = FavoritasLogic.getPosicionesPorUbicacion(
-            this.ubicacion, 
-            grid, 
-            this.seleccionadas.length
-        );
+    // 🔥 OBTENER UBICACIONES SELECCIONADAS (checkboxes)
+    const ubicacionesSeleccionadas = [];
+    document.querySelectorAll('.j-ubicacion-checkbox:checked').forEach(cb => {
+        ubicacionesSeleccionadas.push(cb.dataset.ubicacion);
+    });
+    if (ubicacionesSeleccionadas.length === 0) {
+        ubicacionesSeleccionadas.push('aleatoria');
+    }
+
+    // 🔥 DISTRIBUIR FAVORITAS usando FavoritasDistribucion
+    const distribucion = FavoritasDistribucion.distribuir(
+        this.seleccionadas,
+        1, // Solo mostramos la primera tabla
+        grid,
+        ubicacionesSeleccionadas
+    );
+
+    // 🔥 GENERAR HTML
+    let html = '';
+    for (let i = 0; i < total; i++) {
+        const item = distribucion.find(d => d.posicion === i);
+        if (item) {
+            html += `
+                <div class="cell favorita" data-index="${i}" data-ubicacion="${item.ubicacion}">
+                    <img src="${item.favorita.imagen || ''}" alt="${item.favorita.nombre || ''}" loading="lazy">
+                    <span class="j-favorita-badge">⭐</span>
+                </div>
+            `;
+        } else {
+            html += `<div class="cell empty" data-index="${i}"></div>`;
+        }
+    }
+    container.innerHTML = html;
+}
+
+/**
+ * VISTA PREVIA DE CASILLAS - CRUZADAS (8 celdas visibles)
+ */
+actualizarPreviewCruzadas() {
+    console.log('🔄 actualizarPreviewCruzadas - Favoritas:', this.seleccionadas.length);
+    
+    JuguemosState.favoritas = this.seleccionadas;
+    
+    var container = document.getElementById('j-casilla-preview-grid');
+    if (!container) return;
+    
+    container.dataset.grid = 'cruzadas';
+    container.style.gridTemplateColumns = 'repeat(4, 1fr)';
+    container.style.gridTemplateRows = 'repeat(4, 1fr)';
+    
+    var casillasVisibles = [0, 3, 5, 6, 9, 10, 12, 15];
+    var html = '';
+    
+    for (var i = 0; i < 16; i++) {
+        var row = Math.floor(i / 4) + 1;
+        var col = (i % 4) + 1;
+        var esVisible = casillasVisibles.includes(i);
         
-        var html = '';
-        for (var i = 0; i < total; i++) {
-            var esFavorita = posiciones.includes(i);
-            var baraja = null;
-            if (esFavorita) {
-                var idx = posiciones.indexOf(i);
-                if (idx < this.seleccionadas.length) {
-                    baraja = this.seleccionadas[idx];
+        if (esVisible) {
+            var casilla = null;
+            var esFavorita = false;
+            
+            for (var f = 0; f < this.seleccionadas.length; f++) {
+                var fav = this.seleccionadas[f];
+                if (fav && parseInt(fav.numero) === i + 1) {
+                    casilla = fav;
+                    esFavorita = true;
+                    break;
                 }
             }
-            if (baraja) {
+            
+            if (casilla) {
                 html += `
-                    <div class="cell favorita" data-index="${i}" title="${baraja.nombre}  Favorita">
-                        <img src="${baraja.imagen}" alt="${baraja.nombre}" loading="lazy">
+                    <div class="cell visible ${esFavorita ? 'favorita' : ''}" 
+                         style="grid-row: ${row}; grid-column: ${col};">
+                        <img src="${casilla.imagen || ''}" alt="${casilla.nombre || ''}" loading="lazy">
+                        ${esFavorita ? '<span class="j-favorita-badge"></span>' : ''}
                     </div>
                 `;
             } else {
-                html += '<div class="cell empty" data-index="' + i + '"></div>';
+                html += `
+                    <div class="cell visible" style="grid-row: ${row}; grid-column: ${col};">
+                    </div>
+                `;
             }
+        } else {
+            html += `
+                <div class="cell invisible" style="grid-row: ${row}; grid-column: ${col};"></div>
+            `;
         }
-        container.innerHTML = html;
     }
+    
+    container.innerHTML = html;
 }
 
 /**
