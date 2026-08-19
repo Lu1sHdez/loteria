@@ -1,246 +1,3 @@
-/* ==========================================
-   MODAL DE PAGO - ESTILOS
-   ========================================== */
-
-/* Overlay - fondo oscuro */
-.j-payment-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    z-index: 99999;
-    justify-content: center;
-    align-items: center;
-}
-
-.j-payment-overlay.active {
-    display: flex;
-}
-
-/* Modal - ventana blanca */
-.j-payment-modal {
-    display: none;
-    background: white;
-    border-radius: 16px;
-    max-width: 420px;
-    width: 90%;
-    padding: 30px;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    position: relative;
-    animation: modalFadeIn 0.3s ease;
-}
-
-.j-payment-modal.active {
-    display: block;
-}
-
-/* Animación de entrada */
-@keyframes modalFadeIn {
-    from { 
-        opacity: 0; 
-        transform: scale(0.9) translateY(20px); 
-    }
-    to { 
-        opacity: 1; 
-        transform: scale(1) translateY(0); 
-    }
-}
-
-/* Botón cerrar */
-.j-payment-modal-close {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 24px;
-    cursor: pointer;
-    color: #999;
-    background: none;
-    border: none;
-    transition: color 0.2s ease;
-}
-
-.j-payment-modal-close:hover {
-    color: #333;
-}
-
-/* Header */
-.j-payment-header {
-    text-align: center;
-    margin-bottom: 10px;
-}
-
-.j-payment-header h3 {
-    margin: 0 0 5px 0;
-    color: #1E2249;
-    font-size: 18px;
-}
-
-.j-payment-header p {
-    color: #666;
-    font-size: 14px;
-    margin: 0;
-}
-
-.j-payment-header strong {
-    color: #FA299C;
-    font-size: 20px;
-}
-
-/* Métodos de pago */
-.j-payment-methods {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    margin: 20px 0;
-}
-
-.j-payment-method {
-    padding: 12px 15px;
-    border: 2px solid #24B8C8;
-    border-radius: 10px;
-    background: white;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
-    transition: all 0.2s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    flex: 1;
-    min-width: 80px;
-}
-
-.j-payment-method .j-payment-icon {
-    height: 30px;
-    width: auto;
-    object-fit: contain;
-}
-
-.j-payment-method:hover{
-    border-color: #24B8C8;
-    background: #f0f9fa;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-.j-payment-method.active {
-    border-color: #24B8C8;                                                      
-    background: #f0f9fa;
-    box-shadow: 0 4px 12px rgba(36, 184, 200, 0.15);
-}
-
-.j-payment-method span {
-    font-size: 12px;
-    color: #333;
-}
-
-.j-payment-method:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* Detalles del pago */
-.j-payment-details {
-    margin-top: 15px;
-    padding: 20px;
-    background: #f8f8f8;
-    border-radius: 10px;
-    text-align: center;
-}
-
-.j-payment-info p {
-    color: #555;
-    font-size: 14px;
-    margin: 0 0 5px 0;
-}
-
-.j-payment-info .j-payment-sub {
-    color: #999;
-    font-size: 12px;
-    margin-bottom: 15px;
-}
-
-.j-payment-details .j-btn-next {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-/* Spinner de carga */
-.j-spinner {
-    display: inline-block;
-    width: 30px;
-    height: 30px;
-    border: 4px solid #e0e0e0;
-    border-top: 4px solid #FA299C;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 10px;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-#j-process-payment:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-/* Redes sociales */
-.j-payment-social {
-    text-align: center;
-    margin-top: 15px;
-}
-
-.j-social-icons {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 5px;
-}
-
-/* ==========================================
-   RESPONSIVE
-   ========================================== */
-
-@media (max-width: 480px) {
-    .j-payment-modal {
-        padding: 20px;
-    }
-    
-    .j-payment-methods {
-        flex-wrap: wrap;
-    }
-    
-    .j-payment-method {
-        flex: 1 1 calc(33% - 10px);
-        min-width: 70px;
-        padding: 10px;
-    }
-    
-    .j-payment-method .j-payment-icon {
-        height: 24px;
-    }
-}
-
-@media (max-width: 380px) {
-    .j-payment-method {
-        flex: 1 1 calc(50% - 10px);
-    }
-}
-
-
-
-
 /* =====================================================
    SPINNER PARA BOTÓN DESCARGAR
 ===================================================== */
@@ -266,230 +23,159 @@
     display: inline-block;
 }
 
-
-/* public/css/wizard/pago.css - Agregar al final */
-
-.j-zelle-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    z-index: 99999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(4px);
-}
-
-.j-zelle-modal-content {
-    background: #ffffff;
-    border-radius: 16px;
-    padding: 32px;
-    max-width: 460px;
-    width: 90%;
-    max-height: 90vh;
-    overflow-y: auto;
-    position: relative;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    animation: jZelleModalIn 0.3s ease;
-}
-
-@keyframes jZelleModalIn {
-    from { opacity: 0; transform: scale(0.95) translateY(-20px); }
-    to { opacity: 1; transform: scale(1) translateY(0); }
-}
-
-.j-zelle-close {
-    position: absolute;
-    top: 12px;
-    right: 16px;
-    background: none;
-    border: none;
-    font-size: 24px;
-    color: #999;
-    cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 4px;
-    transition: all 0.2s;
-    line-height: 1;
-}
-
-.j-zelle-close:hover {
-    background: #f5f5f5;
-    color: #333;
-}
-
-.j-zelle-header {
-    text-align: center;
-    margin-bottom: 24px;
-}
-
-.j-zelle-icon {
-    height: 48px;
-    margin-bottom: 8px;
-}
-
-.j-zelle-title {
-    font-size: 22px;
-    color: #1E2249;
-    margin: 0;
-    font-weight: 600;
-}
-
-.j-zelle-body {
-    padding: 0 4px;
-}
-
-.j-zelle-info {
-    background: #f8f9fa;
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin-bottom: 12px;
-}
-
-.j-zelle-label {
-    font-size: 12px;
-    color: #888;
-    margin: 0 0 4px 0;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-weight: 600;
-}
-
-.j-zelle-amount {
-    font-size: 28px;
-    font-weight: 700;
-    color: #1E2249;
-    margin: 0;
-}
-
-.j-zelle-phone {
-    font-size: 22px;
-    font-weight: 600;
-    color: #0066FF;
-    margin: 0;
-}
-
-.j-zelle-name {
-    font-size: 14px;
-    color: #666;
-    margin: 4px 0 0;
-}
-
-.j-zelle-steps {
-    background: #f0f7ff;
-    padding: 16px 20px;
-    border-radius: 8px;
-    margin: 16px 0;
-    border-left: 4px solid #0066FF;
-}
-
-.j-zelle-steps-title {
-    font-weight: 600;
-    color: #1E2249;
-    margin: 0 0 8px 0;
-    font-size: 14px;
-}
-
-.j-zelle-steps-list {
-    margin: 0;
-    padding-left: 20px;
-    color: #444;
-    font-size: 14px;
-    line-height: 1.8;
-}
-
-.j-zelle-steps-list li {
-    margin-bottom: 4px;
-}
-
-.j-zelle-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.j-zelle-actions .j-btn-primary,
-.j-zelle-actions .j-btn-back {
-    flex: 1;
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 15px;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: none;
-    text-align: center;
-}
-
-.j-zelle-actions .j-btn-primary {
-    background: #0066FF;
-    color: white;
-}
-
-.j-zelle-actions .j-btn-primary:hover {
-    background: #0052cc;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
-}
-
-.j-zelle-actions .j-btn-back {
-    background: #f0f0f0;
-    color: #666;
-}
-
-.j-zelle-actions .j-btn-back:hover {
-    background: #e0e0e0;
-}
-
-.j-payment-info {
-    margin-top: 15px;
-    padding: 15px 20px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.j-payment-info.success {
-    background: #d4edda;
-    color: #155724;
-    border-left: 4px solid #28a745;
-}
-
-.j-payment-info-icon {
-    font-size: 24px;
-    font-weight: 700;
-}
-
-.j-payment-info-content strong {
-    display: block;
-}
-
-.j-payment-info-content p {
-    margin: 4px 0 0 0;
-    font-size: 13px;
-}
-
-@media (max-width: 480px) {
-    .j-zelle-modal-content {
-        padding: 20px;
-        width: 95%;
-    }
-    .j-zelle-amount { font-size: 22px; }
-    .j-zelle-phone { font-size: 18px; }
-    .j-zelle-actions { flex-direction: column; }
-}
-
-
-
-
+/* ==========================================
+   GRID DE MÉTODOS DE PAGO - PASO 4
+   ========================================== */
 
 .j-payment-actions {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
+}
+
+#j-process-payment:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.j-payment-methods-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 40px 0 60px 0;
+}
+
+.j-payment-method {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px 10px;
+    background: transparent;
+    border: 2px solid #24B8C8;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    height: 30px;
+    min-height: 50px;
+    width: 100%;
+    
+}
+
+.j-payment-method:hover {
+    border-color: #adb5bd;
+    background: #f1f3f5;
+}
+
+.j-payment-method.active {
+    border-color: #24B8C8;
+    background: #24B8C8;
+    color: #FFFFFF;
+}
+
+/* Spinner de carga */
+.j-spinner {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border: 4px solid #e0e0e0;
+    border-top: 4px solid #FA299C;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px;
+}
+
+/* ==========================================
+   TARJETA - CON TEXTO EN LA MISMA LÍNEA
+   ========================================== */
+.j-payment-method-with-label {
+    flex-direction: row !important;
+    gap: 10px;
+    padding: 12px 16px;
+    height: 20px;
+    min-height: 50px;
+}
+
+.j-payment-method-with-label .j-payment-icon {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    margin-bottom: 0;
+}
+
+.j-payment-method-with-label .j-payment-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 800;
+    color: #000000;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.j-payment-method-with-label.active .j-payment-label {
+    color: #FFFFFF;
+}
+
+
+/* ==========================================
+   PAYPAL, GOOGLE PAY, APPLE PAY - SOLO ICONO
+   ========================================== */
+.j-payment-method:not(.j-payment-method-with-label) {
+    flex-direction: column;
+}
+
+.j-payment-method:not(.j-payment-method-with-label) .j-payment-icon {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    margin-bottom: 0;
+}
+
+.j-payment-method:not(.j-payment-method-with-label) .j-payment-label {
+    display: none;
+}
+
+.j-payment-method .paypal {
+    width: 120px !important;
+    height: 120px !important;
+}
+
+/* ==========================================
+   RESPONSIVE - TABLET (2 × 2)
+   ========================================== */
+@media (max-width: 992px) and (min-width: 481px) {
+    .j-payment-methods-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ==========================================
+   RESPONSIVE - MÓVIL (4 × 1)
+   ========================================== */
+@media (max-width: 480px) {
+    .j-payment-methods-grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+    
+    .j-payment-method-with-label .j-payment-icon {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .j-payment-method-with-label .j-payment-label {
+        font-size: 11px;
+        white-space: normal;
+    }
+    
+    .j-payment-method:not(.j-payment-method-with-label) .j-payment-icon {
+        width: 60px;
+        height: 60px;
+    }
+    
+    /* PayPal responsivo */
+    .j-payment-method .paypal {
+        width: 80px !important;
+        height: 80px !important;
+    }
 }

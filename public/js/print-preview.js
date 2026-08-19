@@ -410,6 +410,31 @@ window.PrintPaper = {
         const container = document.getElementById('j-print-preview');
         if (!container) return;
     
+        // =========================================================
+        // 🔥 VERIFICAR QUE todasLasTablas ESTÉ GENERADO CORRECTAMENTE
+        // =========================================================
+        const totalTablasEsperadas = (JuguemosState.quantity || 1) * (JuguemosState.pages || 1);
+        const tablasActuales = JuguemosState.todasLasTablas || [];
+        
+        if (tablasActuales.length !== totalTablasEsperadas) {
+            console.warn(`⚠️ PrintPaper: Se esperaban ${totalTablasEsperadas} tablas, pero hay ${tablasActuales.length}. Regenerando...`);
+            
+            // 🔥 Sincronizar favoritas antes de regenerar
+            if (JuguemosState.mode === 'favoritas' && window.FavoritasManagerInstance) {
+                const favs = window.FavoritasManagerInstance.getFavoritas();
+                if (favs.length > 0) {
+                    JuguemosState.favoritas = favs;
+                    JuguemosState.favoritasUbicacion = window.FavoritasManagerInstance.getUbicacion();
+                }
+            }
+            
+            if (typeof ejecutarLlenadoAleatorio === 'function') {
+                ejecutarLlenadoAleatorio();
+            } else {
+                console.error('❌ ejecutarLlenadoAleatorio no está definido en print-preview.js');
+            }
+        }
+    
         container.innerHTML = '';
     
         const paper = this.getPaperConfig();
@@ -427,9 +452,7 @@ window.PrintPaper = {
         const maxScale = 2.5;
         scale = Math.max(minScale, Math.min(scale, maxScale));
         
-        // 🔥 Si es horizontal, ajustar escala para que quepa mejor
         if (paper.orientation === 'horizontal') {
-            // Permitir un poco más de escala horizontal
             scale = Math.min(scaleX * 0.95, scaleY * 0.9);
             scale = Math.max(minScale, Math.min(scale, maxScale));
         }
@@ -600,6 +623,9 @@ window.PrintPaper = {
         const numerosDobles = cartasDobles.map(c => parseInt(c.numero));
         const esModoDobles = JuguemosState.mode === 'dobles';
     
+        // =========================================================
+        // 🔥 POCITOS 3 - LÓGICA ESPECIAL
+        // =========================================================
         if (isPocitos3) {
             Object.assign(grid.style, {
                 display: 'grid',
@@ -779,17 +805,21 @@ window.PrintPaper = {
             return board;
         }
     
+        // =========================================================
+        // 🔥 POCITOS 4, 4x4, 5x5, CRUZADAS
+        // =========================================================
         const { cols: gridCols, rows: gridRows, total } = config;
         
         let gapValue = '2px';
         if (isPocitos4) gapValue = '0px';
         
+        // 🔥🔥🔥 CORRECCIÓN: Asignar valores correctos para Pocitos 4
         let finalCols = gridCols;
         let finalRows = gridRows;
         
         if (isPocitos4) {
-            gridCols = 2;
-            gridRows = 2;
+            finalCols = 2;  // ← 2 columnas
+            finalRows = 2;  // ← 2 filas
         }
         
         Object.assign(grid.style, {
@@ -803,11 +833,15 @@ window.PrintPaper = {
             boxSizing: 'border-box'
         });
     
+        // =========================================================
+        // 🔥 GENERAR CELDAS
+        // =========================================================
         for (let i = 0; i < total; i++) {
             const cell = document.createElement('div');
             cell.className = 'j-board-cell';
             cell.dataset.index = i;
             
+            // 🔥 POSICIONAMIENTO PARA CRUZADAS
             if (isCruzadas) {
                 const positions = {
                     0: { row: 1, col: 1 },
@@ -826,6 +860,7 @@ window.PrintPaper = {
                 }
             }
             
+            // 🔥 ESTILO DE LA CELDA
             Object.assign(cell.style, {
                 border: `1px solid ${JuguemosState.marcoColor || '#FA299C'}`,
                 borderRadius: '2px',
@@ -843,9 +878,11 @@ window.PrintPaper = {
             const esFavorita = tieneFavoritas && casilla && favoritas.some(f => f && f.numero === casilla.numero);
             const esDoble = esModoDobles && casilla && numerosDobles.includes(parseInt(casilla.numero));
     
+            // 🔥 SI HAY CASILLA, MOSTRAR IMAGEN
             if (casilla) {
                 const img = document.createElement('img');
                 
+                // 🔥 MODO LIBRE: usar imágenes personalizadas
                 if (JuguemosState.mode === 'libre' && JuguemosState.libreImages && JuguemosState.libreImages.length > 0) {
                     const libreIndex = casilla.numero ? casilla.numero - 1 : i;
                     if (JuguemosState.libreImages[libreIndex]) {
@@ -877,6 +914,7 @@ window.PrintPaper = {
                 
                 cell.appendChild(img);
                 
+                // 🔥 BADGE PARA FAVORITAS
                 if (esFavorita) {
                     const badge = document.createElement('span');
                     badge.textContent = '⭐';
@@ -892,7 +930,9 @@ window.PrintPaper = {
                     cell.appendChild(badge);
                 }
             } else {
+                // 🔥 CELDA VACÍA
                 if (isPocitos4) {
+                    // Pocitos 4: celdas vacías sin bordes (transparentes)
                     cell.textContent = '';
                     Object.assign(cell.style, {
                         backgroundColor: 'transparent',
@@ -900,6 +940,7 @@ window.PrintPaper = {
                         boxShadow: 'none'
                     });
                 } else {
+                    // Otros grids: mostrar número de posición
                     cell.textContent = i + 1;
                     Object.assign(cell.style, {
                         fontSize: '10px',

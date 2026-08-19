@@ -128,11 +128,9 @@
 
                 if (posicionesLibres.length === 0) return;
 
-                // Tomar las favoritas que caben en las posiciones libres
                 const cantidad = Math.min(posicionesLibres.length, favoritasRestantes.length);
                 const favoritasAsignadas = favoritasRestantes.splice(0, cantidad);
 
-                // Asignar a las posiciones libres
                 for (let i = 0; i < favoritasAsignadas.length; i++) {
                     const pos = posicionesLibres[i];
                     posicionesOcupadas.push(pos);
@@ -144,7 +142,6 @@
                 }
             });
 
-            // 🔥 PASO 4: SI AÚN QUEDAN FAVORITAS SIN ASIGNAR, PONERLAS EN ALEATORIO
             if (favoritasRestantes.length > 0) {
                 const aleatorias = this.getPosicionesAleatorias(grid, favoritasRestantes.length, posicionesOcupadas);
                 for (let i = 0; i < favoritasRestantes.length; i++) {
@@ -159,15 +156,9 @@
                     }
                 }
             }
-
-            // 🔥 PASO 5: ORDENAR POR POSICIÓN
             asignacion.sort((a, b) => a.posicion - b.posicion);
             return asignacion;
         }
-
-        // =========================================================
-        // GENERAR HTML PARA VISTA PREVIA DE CASILLAS
-        // =========================================================
 
         static generarHTML(grid, distribucion, totalFavoritas) {
             const total = this.getTotalCasillas(grid);
@@ -189,13 +180,5 @@
             return html;
         }
     }
-
-    // =========================================================
-    // EXPOSICIÓN GLOBAL
-    // =========================================================
-
     window.FavoritasDistribucion = FavoritasDistribucion;
-
-    console.log('📦 FavoritasDistribucion.js cargado correctamente (ACUMULATIVO)');
-
 })();

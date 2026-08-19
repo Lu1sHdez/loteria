@@ -59,29 +59,38 @@ if (!defined('ABSPATH')) {
                     <div class="subtitulo-aqua">2. Selecciona tu método de pago</div>
                 </div>
 
-                <div class="j-payment-methods">
-                    <button class="j-payment-method active" data-method="paypal">
-                        <img src="/wp-content/uploads/2026/08/paypal-scaled.png" alt="PayPal" class="j-payment-icon">
-                       
-                    </button>
-
+                <div class="j-payment-methods-grid">
                     <?php 
                         $stripe_creds = Juguemos_Payment_Settings::get_stripe_credentials();
                         if ($stripe_creds['is_configured']): 
-                        ?>
-                        <button class="j-payment-method" data-method="stripe">
-                            <img src="/wp-content/uploads/2026/08/strupe.webp" alt="Stripe" class="j-payment-icon">
-                            
-                        </button>
-                        <?php endif;
                     ?>
+                    <!-- Tarjeta - CON clase .j-payment-method-with-label -->
+                    <button class="j-payment-method j-payment-method-with-label active" data-method="stripe_card">
+                        <img src="/wp-content/uploads/2026/08/credit-card.png" alt="Tarjeta" class="j-payment-icon">
+                        <span class="j-payment-label">Tarjetas crédito y débito</span>
+                    </button>
 
+                    <!-- PayPal - SIN clase .j-payment-method-with-label -->
+                    <button class="j-payment-method" data-method="paypal">
+                        <img src="/wp-content/uploads/2026/08/paypal-scaled.png" alt="PayPal" class="j-payment-icon paypal">
+                    </button>
+
+                    <!-- Google Pay - SIN clase .j-payment-method-with-label -->
+                    <button class="j-payment-method" data-method="stripe_googlepay">
+                        <img src="/wp-content/uploads/2026/08/google-pay.webp" alt="Google Pay" class="j-payment-icon">
+                    </button>
+
+                    <!-- Apple Pay - SIN clase .j-payment-method-with-label -->
+                    <button class="j-payment-method" data-method="stripe_applepay">
+                        <img src="/wp-content/uploads/2026/08/Apple-pay.png" alt="Apple Pay" class="j-payment-icon">
+                    </button>
+                    <?php endif; ?>
                 </div>
+
 
                 <div class="j-payment-actions">
                     <button id="j-process-payment" class="j-btn-next">
-                        <img src="/wp-content/uploads/2026/07/paypal.png" alt="PayPal" style="height:20px;vertical-align:middle;margin-right:8px;">
-                        Pagar con PayPal
+                        Pagar con Tarjeta
                     </button>
                 </div>
 

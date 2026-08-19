@@ -4,7 +4,7 @@
     class JuguemosPayment {
         constructor() {
             this.isDownloading = false;
-            this.currentMethod = 'paypal';
+            this.currentMethod = 'stripe_card';
             this.init();
         }
         
@@ -13,7 +13,20 @@
             setTimeout(() => {
                 this.updatePaymentSummary();
                 this.checkPaymentStatus();
+                this.updateDefaultButton(); 
             }, 300);
+        }
+
+        updateDefaultButton() {
+            const btn = $('#j-process-payment');
+            const labels = {
+                'stripe_card': 'Pagar con Tarjeta',
+                'stripe_googlepay': 'Pagar con Google Pay',
+                'stripe_applepay': 'Pagar con Apple Pay',
+                'paypal': 'Pagar con PayPal'
+            };
+            btn.text(labels[this.currentMethod] || 'Pagar');
+            btn.show();
         }
         
         bindEvents() {
@@ -57,23 +70,20 @@
             
             const btn = $('#j-process-payment');
             
-            switch(method) {
-                case 'paypal':
-                    btn.html('<img src="/wp-content/uploads/2026/07/paypal.png" alt="PayPal" style="height:20px;vertical-align:middle;margin-right:8px;"> Pagar con PayPal');
-                    btn.show();
-                    break;
-                case 'stripe':
-                    btn.html('<i class="fas fa-credit-card"></i> Pagar con Tarjeta');
-                    btn.show();
-                    break;
-                case 'zelle':
-                    btn.html('<i class="fas fa-mobile-alt"></i> Pagar con Zelle');
-                    btn.show();
-                    break;
-                default:
-                    btn.html('Pagar');
-                    btn.show();
-            }
+            // Mapeo de métodos a textos
+            const methodLabels = {
+                'stripe_card': 'Pagar con Tarjeta',
+                'stripe_googlepay': 'Pagar con Google Pay',
+                'stripe_applepay': 'Pagar con Apple Pay',
+                'paypal': 'Pagar con PayPal'
+            };
+            
+            // Obtener el texto según el método
+            const label = methodLabels[method] || 'Pagar';
+            
+            // Actualizar el botón (solo texto, sin iconos)
+            btn.text(label);
+            btn.show();
         }
         
         processPayment() {
@@ -93,20 +103,17 @@
             
             const amount = subtotal + costoBarajas;
             const currency = JuguemosState.currency || 'USD';
-
-            switch(this.currentMethod) {
-                case 'paypal':
-                    this.processPayPal(amount, currency);
-                    break;
-                case 'stripe':
-                    this.processStripe(amount, currency);
-                    break;
-                case 'zelle':
-                    this.processZelle(amount);
-                    break;
-                default:
-                    alert('Método de pago no disponible');
-                    this.restoreButton(btn);
+        
+            const stripeMethods = ['stripe_card', 'stripe_googlepay', 'stripe_applepay'];
+            
+            if (stripeMethods.includes(this.currentMethod)) {
+                sessionStorage.setItem('juguemos_selected_payment_method', this.currentMethod);
+                this.processStripe(amount, currency);
+            } else if (this.currentMethod === 'paypal') {
+                this.processPayPal(amount, currency);
+            } else {
+                alert('Método de pago no disponible');
+                this.restoreButton(btn);
             }
         }
         
@@ -280,7 +287,7 @@ startStripeVerification(order_id, session_id) {
                 sessionStorage.removeItem('juguemos_order_id');
                 
                 $('#j-waiting-message').remove();
-                $('.j-payment-methods').show();
+                $('.j-payment-methods-grid').show();
                 $('#j-process-payment').show();
                 $('#j-process-payment').prop('disabled', false);
                 $('#j-payment-loading').hide();
@@ -289,7 +296,7 @@ startStripeVerification(order_id, session_id) {
             // Evento para volver a métodos de pago
             $(document).off('click', '#j-back-to-payment-methods').on('click', '#j-back-to-payment-methods', function() {
                 $('#j-waiting-message').remove();
-                $('.j-payment-methods').show();
+                $('.j-payment-methods-grid').show();
                 $('#j-process-payment').show();
                 $('#j-process-payment').prop('disabled', false);
                 $('#j-payment-loading').hide();
@@ -330,7 +337,7 @@ startStripeVerification(order_id, session_id) {
             
             $('#j-process-payment').hide();
             $('#j-payment-loading').hide();
-            $('.j-payment-methods').hide();
+            $('.j-payment-methods-grid').hide();
             
             if (!$('#j-waiting-message').length) {
                 $('#juguemos-payment .j-section:last').before(`
@@ -474,7 +481,7 @@ startStripeVerification(order_id, session_id) {
                         sessionStorage.removeItem('juguemos_order_id');
                         
                         $('#j-waiting-message').remove();
-                        $('.j-payment-methods').show();
+                        $('.j-payment-methods-grid').show();
                         $('#j-process-payment').show();
                         $('#j-process-payment').prop('disabled', false);
                         $('#j-payment-loading').hide();
@@ -482,7 +489,7 @@ startStripeVerification(order_id, session_id) {
                     
                     $(document).off('click', '#j-back-to-payment-methods').on('click', '#j-back-to-payment-methods', function() {
                         $('#j-waiting-message').remove();
-                        $('.j-payment-methods').show();
+                        $('.j-payment-methods-grid').show();
                         $('#j-process-payment').show();
                         $('#j-process-payment').prop('disabled', false);
                         $('#j-payment-loading').hide();
@@ -498,7 +505,7 @@ startStripeVerification(order_id, session_id) {
             }
             this.isDownloading = true;
             
-            $('.j-payment-methods, #j-process-payment, #j-payment-loading').hide();
+            $('.j-payment-methods-grid, #j-process-payment, #j-payment-loading').hide();
             $('#j-waiting-message, #j-zelle-info').remove();
             $('#j-download-section').show();
             

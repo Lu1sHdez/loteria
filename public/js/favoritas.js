@@ -253,104 +253,142 @@
             return estructura;
         }
 
-    
-        // =========================================================
-// VISTA PREVIA DE CASILLAS
-// =========================================================
 
-/**
- * 🔥 NUEVO: Método principal que decide qué renderizar según el grid
- */
-actualizarPreviewCasillas() {
-    console.log('🔄 actualizarPreviewCasillas - Favoritas:', this.seleccionadas.length);
-    console.log('🔄 actualizarPreviewCasillas - Grid:', JuguemosState.grid);
-    
-    JuguemosState.favoritas = this.seleccionadas;
-    JuguemosState.favoritasUbicacion = this.ubicacion;
-    
-    var grid = JuguemosState.grid || '4x4';
-
-    if (this.gridAnterior !== grid) {
-        this.asignacionAnterior = [];
-        this.gridAnterior = grid;
-    }
-    
-    if (grid === 'cruzadas') {
-        this.actualizarPreviewCruzadas();
-        return;
-    }
-    
-    // 🔥 Para otros grids (4x4, 5x5, pocitos4, pocitos3)
-    var container = document.getElementById('j-casilla-preview-grid');
-    if (!container) return;
-    
-    var total = this.getTotalCasillas(grid);
-    container.dataset.grid = grid;
-    
-    // Configurar grid según tipo
-    if (grid === 'pocitos4') {
-        container.style.gridTemplateColumns = 'repeat(2, 1fr)';
-        container.style.gridTemplateRows = 'repeat(2, 1fr)';
-    } else if (grid === 'pocitos3') {
-        container.style.gridTemplateColumns = 'repeat(2, 1fr)';
-        container.style.gridTemplateRows = 'repeat(2, 1fr)';
-    } else {
-        container.style.gridTemplateColumns = '';
-        container.style.gridTemplateRows = '';
-    }
-    
-    // Si no hay favoritas, mostrar vacío
-    if (this.seleccionadas.length === 0) {
-        container.innerHTML = Array(total)
-            .fill('<div class="cell empty"></div>')
-            .join('');
-        return;
-    }
-    
-    // 🔥 OBTENER UBICACIONES SELECCIONADAS (checkboxes)
-    const ubicacionesSeleccionadas = [];
-    
-    if (this.esSeleccionAleatoria) {
-        // Selección aleatoria: repartir en TODAS las zonas para evitar amontonamiento
-        ubicacionesSeleccionadas.push('centro', 'marco', 'esquinas', 'aleatoria');
-    } else {
-        document.querySelectorAll('.j-ubicacion-checkbox:checked').forEach(cb => {
-            ubicacionesSeleccionadas.push(cb.dataset.ubicacion);
-        });
-        if (ubicacionesSeleccionadas.length === 0) {
-            ubicacionesSeleccionadas.push('aleatoria');
+        actualizarPreviewCasillas() {
+            console.log('🔄 actualizarPreviewCasillas - Favoritas:', this.seleccionadas.length);
+            console.log('🔄 actualizarPreviewCasillas - Grid:', JuguemosState.grid);
+            
+            JuguemosState.favoritas = this.seleccionadas;
+            JuguemosState.favoritasUbicacion = this.ubicacion;
+            
+            var grid = JuguemosState.grid || '4x4';
+        
+            // 🔥 CRUZADAS
+            if (grid === 'cruzadas') {
+                this.actualizarPreviewCruzadas();
+                return;
+            }
+            
+            var container = document.getElementById('j-casilla-preview-grid');
+            if (!container) return;
+            
+            var total = this.getTotalCasillas(grid);
+            container.dataset.grid = grid;
+            
+            // Configurar grid
+            if (grid === 'pocitos4') {
+                container.style.gridTemplateColumns = 'repeat(2, 1fr)';
+                container.style.gridTemplateRows = 'repeat(2, 1fr)';
+            } else {
+                container.style.gridTemplateColumns = '';
+                container.style.gridTemplateRows = '';
+            }
+            
+            // Si no hay favoritas, mostrar vacío
+            if (this.seleccionadas.length === 0) {
+                container.innerHTML = Array(total)
+                    .fill('<div class="cell empty"></div>')
+                    .join('');
+                return;
+            }
+            
+            // Obtener ubicaciones seleccionadas
+            const ubicacionesSeleccionadas = [];
+            
+            if (this.esSeleccionAleatoria) {
+                ubicacionesSeleccionadas.push('centro', 'marco', 'esquinas', 'aleatoria');
+            } else {
+                document.querySelectorAll('.j-ubicacion-checkbox:checked').forEach(cb => {
+                    ubicacionesSeleccionadas.push(cb.dataset.ubicacion);
+                });
+                if (ubicacionesSeleccionadas.length === 0) {
+                    ubicacionesSeleccionadas.push('aleatoria');
+                }
+            }
+        
+            // =========================================================
+            // 🔥🔥🔥 POCITOS 4 - ROTACIÓN AUTOMÁTICA 🔥🔥🔥
+            // =========================================================
+            
+            let distribucion = [];
+            let favoritasParaMostrar = this.seleccionadas;
+            
+            if (grid === 'pocitos4') {
+                
+                // 🔥 CONTADOR DE TABLA
+                if (typeof this._contadorTabla === 'undefined') {
+                    this._contadorTabla = 0;
+                }
+                
+                const totalFavoritas = this.seleccionadas.length;
+                const maxPorTabla = 2;
+                const totalTablasNecesarias = Math.ceil(totalFavoritas / maxPorTabla);
+                
+                if (this._contadorTabla >= totalTablasNecesarias) {
+                    this._contadorTabla = 0;
+                }
+                
+                const inicio = this._contadorTabla * maxPorTabla;
+                const fin = Math.min(inicio + maxPorTabla, totalFavoritas);
+                favoritasParaMostrar = this.seleccionadas.slice(inicio, fin);
+                
+                this._contadorTabla++;
+                
+                distribucion = FavoritasDistribucion.distribuir(
+                    favoritasParaMostrar,
+                    1,
+                    grid,
+                    ubicacionesSeleccionadas,
+                    []
+                );
+                
+                // 🔥 LIMPIAR TIMER ANTERIOR
+                if (this._timerRotacion) {
+                    clearTimeout(this._timerRotacion);
+                }
+                
+                // 🔥 PROGRAMAR PRÓXIMA ROTACIÓN (2 segundos)
+                if (totalTablasNecesarias > 1) {
+                    this._timerRotacion = setTimeout(() => {
+                        this.actualizarPreviewCasillas();
+                    }, 2000);
+                }
+                
+            } else {
+                distribucion = FavoritasDistribucion.distribuir(
+                    this.seleccionadas,
+                    1,
+                    grid,
+                    ubicacionesSeleccionadas,
+                    this.asignacionAnterior || []
+                );
+                this.asignacionAnterior = distribucion;
+            }
+        
+            // =========================================================
+            // GENERAR HTML
+            // =========================================================
+            
+            let html = '';
+            for (let i = 0; i < total; i++) {
+                const item = distribucion.find(d => d.posicion === i);
+                if (item) {
+                    html += `
+                        <div class="cell favorita" data-index="${i}" data-ubicacion="${item.ubicacion}">
+                            <img src="${item.favorita.imagen || ''}" alt="${item.favorita.nombre || ''}" loading="lazy">
+                            <span class="j-favorita-badge">⭐</span>
+                        </div>
+                    `;
+                } else {
+                    html += `<div class="cell empty" data-index="${i}"></div>`;
+                }
+            }
+            container.innerHTML = html;
+            
+            // ❌ ELIMINAR INDICADOR
+            const indicator = container.parentElement?.querySelector('.j-tabla-indicator');
+            if (indicator) indicator.remove();
         }
-    }
-
-    // 🔥 DISTRIBUIR FAVORITAS usando FavoritasDistribucion (acumulativo)
-    const distribucion = FavoritasDistribucion.distribuir(
-        this.seleccionadas,
-        1, // Solo mostramos la primera tabla
-        grid,
-        ubicacionesSeleccionadas,
-        this.asignacionAnterior || [] // 🔥 PASAMOS LA ASIGNACIÓN ANTERIOR
-    );
-
-    // 🔥 GUARDAR LA ASIGNACIÓN ACTUAL PARA LA PRÓXIMA VEZ
-    this.asignacionAnterior = distribucion;
-
-    // 🔥 GENERAR HTML
-    let html = '';
-    for (let i = 0; i < total; i++) {
-        const item = distribucion.find(d => d.posicion === i);
-        if (item) {
-            html += `
-                <div class="cell favorita" data-index="${i}" data-ubicacion="${item.ubicacion}">
-                    <img src="${item.favorita.imagen || ''}" alt="${item.favorita.nombre || ''}" loading="lazy">
-                    <span class="j-favorita-badge">⭐</span>
-                </div>
-            `;
-        } else {
-            html += `<div class="cell empty" data-index="${i}"></div>`;
-        }
-    }
-    container.innerHTML = html;
-}
 
 /**
  * VISTA PREVIA DE CASILLAS - CRUZADAS (8 celdas visibles)
@@ -601,18 +639,40 @@ actualizarPreviewCruzadas() {
                 `;
             }
         }
-
-        // =========================================================
-        // SELECCIÓN DE FAVORITAS
-        // =========================================================
-
         toggleSeleccion(baraja) {
             this.esSeleccionAleatoria = false; 
             var numero = parseInt(baraja.numero);
             var index = this.seleccionadas.findIndex(function(s) { return parseInt(s.numero) === numero; });
         
+            if (JuguemosState.grid === 'pocitos4') {
+                // 🔥 NUEVO: Resetear tabla actual al cambiar selección
+                this.tablaActual = 0;
+                this.asignacionAnterior = [];
+                
+                if (index !== -1) {
+                    this.seleccionadas.splice(index, 1);
+                } else {
+                    // 🔥 NUEVO: Permitir más de 2 (se distribuirán en tablas)
+                    if (this.seleccionadas.length >= this.maxSeleccion) {
+                        alert('Solo puedes seleccionar ' + this.maxSeleccion + ' favoritas.');
+                        return;
+                    }
+                    this.seleccionadas.push(baraja);
+                }
+        
+                this.renderGrid();
+                this.updateContador();
+                this.updateProgress();
+                this.actualizarPreviewCasillas();  // ← Ahora muestra SOLO 2 por tabla
+                
+                if (typeof llenarCasillasAutomatico === 'function') {
+                    setTimeout(function() { llenarCasillasAutomatico(); }, 100);
+                }
+                return;
+            }
+
             if (JuguemosState.grid === 'pocitos3') {
-                this.asignacionAnterior = []; // aquí sí se resetea, es un caso especial de 1 sola favorita
+                this.asignacionAnterior = []; 
                 if (index !== -1) {
                     this.seleccionadas.splice(index, 1);
                 } else {
@@ -673,9 +733,14 @@ actualizarPreviewCruzadas() {
                 return;
             }
             
-            var limite = this.maxSeleccion;
+            var limite = this.maxSeleccion;  // 12 (por defecto)
+            
             if (JuguemosState.grid === 'pocitos3') {
                 limite = 1;
+            }
+            
+            if (JuguemosState.grid === 'pocitos4') {
+                this.tablaActual = 0;
             }
             
             var mezcladas = [...barajas];
@@ -693,7 +758,7 @@ actualizarPreviewCruzadas() {
             this.renderGrid();
             this.updateContador();
             this.updateProgress();
-            this.actualizarPreviewCasillas();
+            this.actualizarPreviewCasillas();  
             
             if (typeof llenarCasillasAutomatico === 'function') {
                 setTimeout(function() { llenarCasillasAutomatico(); }, 100);
