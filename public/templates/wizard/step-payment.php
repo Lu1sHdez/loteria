@@ -2,10 +2,12 @@
 if (!defined('ABSPATH')) {
     exit;
 }
-$is_admin = false;
+/* $is_admin = false;
 if (is_user_logged_in() && current_user_can('manage_options')) {
     $is_admin = true;
-}
+} */
+
+$is_admin = false; 
 ?>
 
 <section id="juguemos-payment" class="j-step">
