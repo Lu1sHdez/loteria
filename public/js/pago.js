@@ -5,6 +5,7 @@
         constructor() {
             this.isDownloading = false;
             this.currentMethod = 'stripe_card';
+            this.isAdmin = document.getElementById('j-download-section')?.dataset.admin === 'true';
             this.init();
         }
         
@@ -496,7 +497,7 @@ startStripeVerification(order_id, session_id) {
             }, 3000);
         }
         
-        paymentSuccess() {
+        paymentSuccess(forceDownload = false) {
             if (this.isDownloading) {
                 console.log('Descarga ya en proceso, ignorando...');
                 return;
@@ -512,6 +513,10 @@ startStripeVerification(order_id, session_id) {
             
             if (btnDownload) btnDownload.style.display = 'inline-block';
             if (btnText) btnText.textContent = 'Descargar PDF';
+            
+            if (this.isAdmin) {
+                sessionStorage.setItem('juguemos_payment_token', 'admin_' + Date.now());
+            }
             
             sessionStorage.setItem('juguemos_payment_verified', 'true');
             

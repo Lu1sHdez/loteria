@@ -640,6 +640,16 @@ if (btnIncluir) {
 
     document.getElementById('j-download-pdf')?.addEventListener('click', (e) => {
         e.preventDefault();
+
+        const downloadSection = document.getElementById('j-download-section');
+        const isAdmin = downloadSection?.dataset.admin === 'true';
+
+        if (isAdmin) {
+            sessionStorage.setItem('juguemos_payment_verified', 'true');
+            sessionStorage.setItem('juguemos_payment_token', 'admin_' + Date.now());
+            JuguemosPDF?.generate();
+            return;
+        }
         const verified = sessionStorage.getItem('juguemos_payment_verified') === 'true';
         const token = sessionStorage.getItem('juguemos_payment_token');
         if (verified && token) {
