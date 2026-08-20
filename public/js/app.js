@@ -132,6 +132,8 @@ document.addEventListener("DOMContentLoaded", () => {
             
             setTimeout(() => {
                 drawGrid();
+                var event = new Event('gridChanged');
+                document.dispatchEvent(event);
             }, 50);
             
             actualizarYRegenerar(llenarCasillasAutomatico);
@@ -169,6 +171,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         
         setTimeout(llenarCasillasAutomatico, 200);
+        var event = new Event('gridChanged');
+        document.dispatchEvent(event);
     };
 
     document.querySelectorAll(".j-grid").forEach(button => {
@@ -188,6 +192,8 @@ document.addEventListener("DOMContentLoaded", () => {
             button.classList.add("active");
             JuguemosState.orientation = button.dataset.orientation;
             updateOrderSummary();
+            var event = new Event('gridChanged');
+            document.dispatchEvent(event);
         });
     });
 
@@ -198,6 +204,9 @@ document.addEventListener("DOMContentLoaded", () => {
             JuguemosState.quantity = parseInt(tablesPerPageInput.value) || 1;
             updatePrice();        
             updateOrderSummary();
+
+            var event = new Event('gridChanged');
+            document.dispatchEvent(event);
         };
         tablesPerPageInput.value = JuguemosState.quantity;
         document.querySelector(".j-tables-per-page-plus")?.addEventListener("click", () => {
@@ -231,6 +240,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (typeof PrintPaper !== "undefined") {
                 setTimeout(() => PrintPaper.refresh(), 150);
             }
+            var event = new Event('gridChanged');
+            document.dispatchEvent(event);
         });
     }
 
@@ -264,6 +275,8 @@ document.querySelectorAll(".j-color-swatch").forEach(swatch => {
         
         aplicarColores();
         if (typeof updateOrderSummary === 'function') updateOrderSummary();
+        var event = new Event('gridChanged');
+        document.dispatchEvent(event);
     });
 });
 
@@ -282,6 +295,8 @@ document.querySelectorAll(".j-fondo-swatch").forEach(swatch => {
         
         aplicarColores();
         if (typeof updateOrderSummary === 'function') updateOrderSummary();
+        var event = new Event('gridChanged');
+        document.dispatchEvent(event);
     });
 });
 
@@ -363,6 +378,8 @@ if (btnIncluir) {
         if (typeof PrintPaper !== "undefined") {
             setTimeout(() => PrintPaper.refresh(), 150);
         }
+        var event = new Event('gridChanged');
+        document.dispatchEvent(event);
     };
     
     // Por defecto DESACTIVADO
@@ -825,6 +842,9 @@ function drawGrid() {
     }
     
     container.innerHTML = html;
+
+    var event = new Event('gridChanged');
+    document.dispatchEvent(event);
 }
 
 // =========================================================
@@ -885,6 +905,8 @@ function llenarCasillasAleatorio() {
     if (!JuguemosState.deck) { alert('Primero selecciona un diseño.'); return; }
     if (!JuguemosState.barajas?.length) { alert('No hay barajas disponibles para este diseño.'); return; }
     ejecutarLlenadoAleatorio();
+    var event = new Event('gridChanged');
+    document.dispatchEvent(event);
 }
 function actualizarPreviewCasillas(casillas) {
     const container = document.getElementById('j-casilla-preview-grid');
@@ -925,19 +947,13 @@ function actualizarPreviewCasillas(casillas) {
         JuguemosState.posicionesDobles = posicionesDobles;
     }
     
-    // =========================================================
-    // ✅ NUEVO: Si no hay casillas, mostrar loading en lugar de vacío
-    // =========================================================
+
     if (!casillas || casillas.length === 0) {
         const total = getTotalCasillas(grid);
         container.innerHTML = Array(total).fill('<div class="cell loading"></div>').join('');
         return;
     }
-    
-    // =========================================================
-    // RESTO DEL CÓDIGO EXISTENTE...
-    // =========================================================
-    
+
     const esLibreCruzadas = JuguemosState.mode === 'libre' && grid === 'cruzadas';
     const esFavoritasCruzadas = JuguemosState.mode === 'favoritas' && grid === 'cruzadas';
     const esSencillaCruzadas = JuguemosState.mode === 'sencilla' && grid === 'cruzadas';
@@ -1107,68 +1123,62 @@ function actualizarPreviewCasillas(casillas) {
         container.innerHTML = html;
         return;
     }
-    // =========================================================
-// 🔥 NUEVO: FAVORITAS + 4x4, 5x5, Pocitos (con distribución inteligente y limitación a 2)
-// =========================================================
-if (tieneFavoritas && (grid === '4x4' || grid === '5x5' || grid === 'pocitos4' || grid === 'pocitos3')) {
-    const total = getTotalCasillas(grid);
-    
-    const ubicacionesSeleccionadas = [];
-    document.querySelectorAll('.j-ubicacion-checkbox:checked').forEach(cb => {
-        ubicacionesSeleccionadas.push(cb.dataset.ubicacion);
-    });
-    if (ubicacionesSeleccionadas.length === 0) {
-        ubicacionesSeleccionadas.push('aleatoria');
-    }
 
-    // ✅ LIMITACIÓN ESPECIAL PARA POCITOS 4
-    let favoritasParaMostrar = favoritas;
-    if (grid === 'pocitos4') {
-        favoritasParaMostrar = favoritas.slice(0, 2);
-    }
-
-    let distribucion = [];
-    if (typeof FavoritasDistribucion !== 'undefined') {
-        distribucion = FavoritasDistribucion.distribuir(
-            favoritasParaMostrar,   
-            1,
-            grid,
-            ubicacionesSeleccionadas
-        );
-    } else {
-        const posiciones = [];
-        for (let i = 0; i < Math.min(favoritasParaMostrar.length, total); i++) {
-            posiciones.push(i);
+    if (tieneFavoritas && (grid === '4x4' || grid === '5x5' || grid === 'pocitos4' || grid === 'pocitos3')) {
+        const total = getTotalCasillas(grid);
+        
+        const ubicacionesSeleccionadas = [];
+        document.querySelectorAll('.j-ubicacion-checkbox:checked').forEach(cb => {
+            ubicacionesSeleccionadas.push(cb.dataset.ubicacion);
+        });
+        if (ubicacionesSeleccionadas.length === 0) {
+            ubicacionesSeleccionadas.push('aleatoria');
         }
-        distribucion = favoritasParaMostrar.slice(0, posiciones.length).map((f, i) => ({
-            posicion: posiciones[i],
-            favorita: f,
-            ubicacion: 'aleatoria'
-        }));
-    }
 
-    // Generar HTML
-    let html = '';
-    for (let i = 0; i < total; i++) {
-        const item = distribucion.find(d => d.posicion === i);
-        if (item) {
-            html += `
-                <div class="cell favorita" data-index="${i}" data-ubicacion="${item.ubicacion}">
-                    <img src="${item.favorita.imagen || ''}" alt="${item.favorita.nombre || ''}" loading="lazy">
-                    <span class="j-favorita-badge">⭐</span>
-                </div>
-            `;
+        let favoritasParaMostrar = favoritas;
+        if (grid === 'pocitos4') {
+            favoritasParaMostrar = favoritas.slice(0, 2);
+        }
+
+        let distribucion = [];
+        if (typeof FavoritasDistribucion !== 'undefined') {
+            distribucion = FavoritasDistribucion.distribuir(
+                favoritasParaMostrar,   
+                1,
+                grid,
+                ubicacionesSeleccionadas
+            );
         } else {
-            html += `<div class="cell empty" data-index="${i}"></div>`;
+            const posiciones = [];
+            for (let i = 0; i < Math.min(favoritasParaMostrar.length, total); i++) {
+                posiciones.push(i);
+            }
+            distribucion = favoritasParaMostrar.slice(0, posiciones.length).map((f, i) => ({
+                posicion: posiciones[i],
+                favorita: f,
+                ubicacion: 'aleatoria'
+            }));
         }
+
+        // Generar HTML
+        let html = '';
+        for (let i = 0; i < total; i++) {
+            const item = distribucion.find(d => d.posicion === i);
+            if (item) {
+                html += `
+                    <div class="cell favorita" data-index="${i}" data-ubicacion="${item.ubicacion}">
+                        <img src="${item.favorita.imagen || ''}" alt="${item.favorita.nombre || ''}" loading="lazy">
+                        <span class="j-favorita-badge">⭐</span>
+                    </div>
+                `;
+            } else {
+                html += `<div class="cell empty" data-index="${i}"></div>`;
+            }
+        }
+        container.innerHTML = html;
+        return;
     }
-    container.innerHTML = html;
-    return;
-}
-    
-        // =========================================================
-    // GRIDS NORMALES (4x4, 5x5, pocitos) - SOLO PARA SENCILLA Y DOBLES
-    // =========================================================
+
     if (JuguemosState.mode !== 'favoritas') {
         const total = getTotalCasillas(grid);
         container.innerHTML = casillas.map(function(casilla, index) {
@@ -1211,11 +1221,17 @@ function limpiarCasillas() {
     container.innerHTML = Array(total).fill('<div class="cell empty"></div>').join('');
     JuguemosState.casillasAsignadas = [];
     JuguemosState.todasLasTablas = [];
+
+    var event = new Event('gridChanged');
+    document.dispatchEvent(event);
 }
 
 function aplicarColores() {
     document.documentElement.style.setProperty('--j-marco-color', JuguemosState.marcoColor || '#FA299C');
     document.documentElement.style.setProperty('--j-fondo-color', JuguemosState.fondoColor || '#FFFFFF');
+
+    var event = new Event('gridChanged');
+    document.dispatchEvent(event);
 }
 
 function drawMarcosPreview() {
@@ -1237,6 +1253,9 @@ function drawMarcosPreview() {
     }
     
     container.innerHTML = html;
+
+    var event = new Event('gridChanged');
+    document.dispatchEvent(event);
 }
 function getGridConfig(grid) {
     const configs = {
@@ -1348,7 +1367,11 @@ function updateOrderSummary() {
         }
     });
 }
-function regenerarTodasLasTablas() { llenarCasillasAleatorio(); }
+function regenerarTodasLasTablas() { 
+    llenarCasillasAleatorio(); 
+    var event = new Event('gridChanged');
+    document.dispatchEvent(event);
+}
 
 // =========================================================
 // PAÍS Y GTRANSLATE
@@ -1372,6 +1395,9 @@ function sincronizarPais() {
     updatePaperOptions();
     updatePrice();
     updateOrderSummary();
+
+    var event = new Event('gridChanged');
+    document.dispatchEvent(event);
 }
 
 function getCookie(name) {
@@ -1712,12 +1738,10 @@ function ejecutarLlenadoAleatorio() {
             container.innerHTML = Array(total).fill('<div class="cell loading"></div>').join('');
         }
     }
+    var event = new Event('gridChanged');
+    document.dispatchEvent(event);
     
-    console.log('✅ Tablas generadas:', todasLasTablas.length);
 }
-// =========================================================
-// FUNCIÓN PARA OBTENER POSICIONES DE FAVORITAS
-// =========================================================
 
 function obtenerPosicionesFavoritas(grid, cantidad, ubicacion) {
     const total = getTotalCasillas(grid);
@@ -1741,9 +1765,6 @@ function obtenerPosicionesFavoritas(grid, cantidad, ubicacion) {
     }
 }
 
-// =========================================================
-// FUNCIÓN AUXILIAR PARA GENERAR POSICIONES ALEATORIAS EN 4x4
-// =========================================================
 function obtenerPosicionesAleatorias4x4(cantidad) {
     const total = 16;
     const indices = Array.from({ length: total }, (_, i) => i);
@@ -1753,10 +1774,6 @@ function obtenerPosicionesAleatorias4x4(cantidad) {
     }
     return indices.slice(0, cantidad);
 }
-
-// =========================================================
-// FUNCIONES DE POSICIONAMIENTO
-// =========================================================
 
 function obtenerPosicionesAleatorias(grid, cantidad) {
     const total = getTotalCasillas(grid);

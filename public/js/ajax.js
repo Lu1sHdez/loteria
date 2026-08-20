@@ -131,6 +131,8 @@ const JuguemosAjax = {
                 }
     
                 llenarCasillasAutomatico();
+                var event = new Event('gridChanged');
+                document.dispatchEvent(event);
     
             })
             .catch(function(error) {
