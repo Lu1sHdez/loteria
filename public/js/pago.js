@@ -261,19 +261,17 @@ startStripeVerification(order_id, session_id) {
         
         if (attempts >= maxAttempts) {
             clearInterval(checkPayment);
-            
-            // ✅ Si el usuario cerró la ventana sin pagar, mostrar opciones
             $('#j-waiting-message').html(
                 '<div style="text-align:center;padding:20px;">' +
-                    '<h3 style="color:#F39C12;margin:0 0 10px 0;">⏱️ Tiempo de espera agotado</h3>' +
+                    '<h3 style="color:#FA299C;margin:0 0 10px 0;font-weight:700;">Tiempo de espera agotado</h3>' +
                     '<p class="j-texto-normal" style="color:#666;font-size:14px;text-align:center;">' +
                         'Si ya realizaste el pago, cierra esta ventana y recarga la página.' +
                     '</p>' +
                     '<div style="display:flex;flex-direction:column;gap:10px;max-width:300px;margin:0 auto;">' +
-                        '<button id="j-retry-stripe" class="j-btn-primary" style="background:#635BFF;border-color:#635BFF;width:100%;text-align:center;">' +
-                            '🔄 Reintentar pago' +
+                        '<button id="j-retry-stripe" class="j-btn-primary" style="background:#FA299C;border-color:#FA299C;color:#FFFFFF;width:100%;text-align:center;padding:12px;border-radius:8px;font-weight:600;font-size:15px;cursor:pointer;border:none;transition:all 0.2s ease;">' +
+                            'Reintentar pago' +
                         '</button>' +
-                        '<button id="j-back-to-payment-methods" class="j-btn-back" style="width:100%;text-align:center;justify-content:center;">' +
+                        '<button id="j-back-to-payment-methods" class="j-btn-back" style="background:#24B8C8;border-color:#24B8C8;color:#FFFFFF;width:100%;text-align:center;padding:12px;border-radius:8px;font-weight:600;font-size:15px;cursor:pointer;border:none;transition:all 0.2s ease;justify-content:center;">' +
                             'Volver a métodos de pago' +
                         '</button>' +
                     '</div>' +

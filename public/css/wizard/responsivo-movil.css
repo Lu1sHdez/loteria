@@ -1,0 +1,57 @@
+/* =====================================================
+   PREVIEWS MÓVILES - OCULTOS EN ESCRITORIO
+   ===================================================== */
+   .j-mobile-preview {
+    display: none;
+}
+
+/* =====================================================
+   OCULTAR ASIDE Y MOSTRAR PREVIEWS EN MÓVIL
+   ===================================================== */
+@media (max-width: 1024px) {
+    .juguemos-right {
+        display: none !important;
+    }
+
+    .j-mobile-preview {
+        display: block;
+        margin-top: 0;
+        padding-top: 15px;
+        border-top: 2px solid #f0f0f0;
+    }
+
+    /* Ajustar tamaños de previews en móvil */
+    .j-mobile-preview .j-grid-preview,
+    .j-mobile-preview .j-casilla-preview-grid,
+    .j-mobile-preview .j-marcos-preview-grid {
+        max-width: 200px;
+        width: 200px;
+        margin: 0 auto;
+    }
+
+    .j-mobile-preview .j-preview-ubicacion-wrapper,
+    .j-mobile-preview .j-preview-casillas-wrapper,
+    .j-mobile-preview .j-preview-marcos-wrapper {
+        height: auto;
+        min-height: 150px;
+        padding: 10px 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .j-mobile-preview .j-grid-preview,
+    .j-mobile-preview .j-casilla-preview-grid,
+    .j-mobile-preview .j-marcos-preview-grid {
+        max-width: 180px;
+        width: 180px;
+    }
+}
+
+@media (max-width: 480px) {
+    .j-mobile-preview .j-grid-preview,
+    .j-mobile-preview .j-casilla-preview-grid,
+    .j-mobile-preview .j-marcos-preview-grid {
+        max-width: 150px;
+        width: 150px;
+    }
+}

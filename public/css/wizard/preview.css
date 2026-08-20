@@ -34,56 +34,6 @@
     border-radius: 8px;
 }
 
-/* ===== DECKS ===== */
-#juguemos-decks {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 20px;
-    justify-items: center;
-}
-
-.j-deck {
-    font-family: 'Cairo', sans-serif;
-    border: 2px solid #EAEAEA;
-    border-radius: 12px;
-    overflow: hidden;
-    background: #FFFFFF;
-    transition: border-color .25s;
-    width: 180px;
-    cursor: pointer;
-}
-
-.j-deck.active {
-    border-color: #FA299C;
-}
-
-.j-deck-image {
-    background: #FFFFFF;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 10px;
-    height: 180px;
-    overflow: hidden;
-}
-
-.j-deck-image img {
-    display: block;
-    width: auto;
-    max-width: 140px;
-    max-height: 160px;
-    height: auto;
-    object-fit: contain;
-    border-radius: 8px;
-}
-
-.j-deck-name {
-    padding: 6px 8px 10px;
-    text-align: center;
-    font-weight: bold;
-    color: #1E2249;
-    font-size: 14px;
-}
 
 /* ===== VISTA PREVIEW COVER ===== */
 .j-preview-cover {

@@ -1937,8 +1937,7 @@ function distribuirFavoritasPorTablas(favoritas, totalTablas, maxPorTabla) {
 }
 
     document.addEventListener('dragstart', e => e.preventDefault());
-/*     document.addEventListener('contextmenu', e => e.preventDefault());
- */
+    document.addEventListener('contextmenu', e => e.preventDefault());
 
 document.addEventListener('DOMContentLoaded', () => {
     setTimeout(sincronizarPais, 100);

@@ -2,124 +2,111 @@
    WIZARD
    ========================================== */
 
-   .juguemos-wizard{
-    width:100%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:28px;
-    padding:30px 10px;
-    background:transparent;
-    border-radius:0;
-    box-shadow:none;
-    margin-bottom:40px;
+   .juguemos-wizard {
+    width: 100%;
+    display: flex;
+    justify-content: left;
+    gap: 28px;
+    padding: 30px 10px;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    margin-bottom: 40px;
 }
-
 
 /* ==========================================
    PASOS
    ========================================== */
 
-.juguemos-step{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    color:#999;
-    transition:.3s;
-    padding:18px 20px;
-    border-radius:10px;
+.juguemos-step {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    gap: 10px;
+    color: #999;
+    transition: .3s;
+    padding: 18px 20px;
+    border-radius: 10px;
 }
 
-.juguemos-step.active{
-    color:#FFFFFF;
-    background-color:#FA299C;
+.juguemos-step.active {
+    color: #FFFFFF;
+    
+    background-color: #FA299C;
 }
-
 
 /* ==========================================
    ICONOS DE LOS PASOS
    ========================================== */
 
-.step-icon{
-    width:36px;
-    height:26px;
-    flex:0 0 36px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+.step-icon {
+    width: 36px;
+    height: 26px;
+    flex: 0 0 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.step-icon img{
-    width:100%;
-    height:100%;
-    object-fit:contain;
-    display:block;
+.step-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
 }
 
-
-/* Imagen normal */
-
-.step-icon-on{
-    display:none !important;
+.step-icon-on {
+    display: none !important;
 }
 
-
-/* Imagen activa */
-
-.juguemos-step.active .step-icon-off{
-    display:none !important;
+.juguemos-step.active .step-icon-off {
+    display: none !important;
 }
 
-.juguemos-step.active .step-icon-on{
-    display:block !important;
+.juguemos-step.active .step-icon-on {
+    display: block !important;
 }
-
 
 /* ==========================================
    NÚMERO
    ========================================== */
 
-.step-number{
-    width:42px;
-    height:42px;
-    min-width:42px;
-    border-radius:50%;
-    background:#999;
-    color:#fff;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    font-weight:bold;
-    font-size:25px;
+.step-number {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    border-radius: 50%;
+    background: #999;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 25px;
 }
 
-.juguemos-step.active .step-number{
-    background:#FFFFFF;
-    color:#FA299C;
+.juguemos-step.active .step-number {
+    background: #FFFFFF;
+    color: #FA299C;
 }
-
 
 /* ==========================================
    TEXTO
    ========================================== */
 
-.step-text{
-    font-size:15px;
-    font-weight:600;
-    white-space:nowrap;
+.step-text {
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
 }
-
 
 /* ==========================================
    LÍNEAS
    ========================================== */
 
-.juguemos-line{
-    display:none;
+.juguemos-line {
+    display: none;
 }
-
 
 /* ==========================================
    PASOS DEL WIZARD
@@ -127,108 +114,203 @@
 
 #juguemos-design,
 #juguemos-preview-completo,
-#juguemos-payment{
-    display:none;
+#juguemos-payment {
+    display: none;
 }
 
-#juguemos-design.active{
-    display:block;
+#juguemos-design.active {
+    display: block;
 }
 
 #juguemos-preview-completo.active,
-#juguemos-payment.active{
-    display:block;
+#juguemos-payment.active {
+    display: block;
 }
 
-
 /* ==========================================
-   TABLET
+   TABLET (≤ 1024px)
    ========================================== */
 
-@media (max-width:1024px){
+@media (max-width: 1024px) {
 
-    .j-step-body{
-        flex-direction:column;
-        gap:30px;
+    .j-step-body {
+        flex-direction: column;
+        gap: 30px;
     }
 
     .juguemos-left,
-    .juguemos-right{
-        width:100%;
-        max-width:100%;
+    .juguemos-right {
+        width: 100%;
+        max-width: 100%;
     }
 
-    .juguemos-right{
-        order:1;
+    .juguemos-right {
+        order: 1;
     }
 
-    .juguemos-wizard{
-        gap:18px;
-        padding:25px 10px;
+    /* ==========================================
+       WIZARD EN TABLET - 4 pasos en una fila
+       ========================================== */
+    .juguemos-wizard {
+        gap: 12px;
+        padding: 20px 10px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        justify-content: flex-start;
     }
 
-    .juguemos-step{
-        padding:16px 14px;
+    .juguemos-step {
+        flex: 0 0 auto;
+        padding: 12px 14px;
+        gap: 8px;
+        white-space: nowrap;
     }
 
-    .step-icon{
-        width:32px;
-        height:24px;
-        flex-basis:32px;
+    .step-icon {
+        width: 28px;
+        height: 20px;
+        flex-basis: 28px;
     }
 
-    .step-number{
-        width:38px;
-        height:38px;
-        min-width:38px;
-        font-size:22px;
+    .step-number {
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        font-size: 18px;
     }
 
-    .step-text{
-        font-size:14px;
+    .step-text {
+        font-size: 12px;
     }
-
 }
 
-
 /* ==========================================
-   MÓVIL
+   MÓVIL (≤ 768px)
    ========================================== */
 
-@media (max-width:768px){
+@media (max-width: 768px) {
 
-    .juguemos-wizard{
-        flex-wrap:wrap;
-        justify-content:center;
-        gap:15px;
-        padding:20px 15px;
+    /* ==========================================
+       WIZARD EN MÓVIL - 2 columnas
+       ========================================== */
+    .juguemos-wizard {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding: 15px 10px;
+        margin-bottom: 25px;
+        overflow: visible;
+        flex-wrap: wrap;
+        justify-content: center;
     }
 
-    .juguemos-step{
-        width:48%;
-        justify-content:left;
-        padding:14px 12px;
+    .juguemos-step {
+        width: 100%;
+        justify-content: left;
+        padding: 10px 8px;
+        gap: 6px;
+        border-radius: 8px;
+        background: #f5f5f5;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
     }
 
-    .step-icon{
-        width:28px;
-        height:20px;
-        flex-basis:28px;
+    .juguemos-step.active {
+        background: #FA299C;
+        border-color: #FA299C;
+        color: #FFFFFF;
     }
 
-    .step-text{
-        font-size:14px;
+    .step-icon {
+        width: 22px;
+        height: 16px;
+        flex-basis: 22px;
     }
 
-    .step-number{
-        width:36px;
-        height:36px;
-        min-width:36px;
-        font-size:20px;
+    .step-number {
+        width: 26px;
+        height: 26px;
+        min-width: 26px;
+        font-size: 13px;
+        background: #ccc;
+        color: #fff;
     }
 
-    .j-step-body{
-        gap:20px;
+    .juguemos-step.active .step-number {
+        background: #FFFFFF;
+        color: #FA299C;
     }
 
+    .step-text {
+        font-size: 10px;
+        font-weight: 600;
+        white-space: normal;
+        text-align: center;
+        line-height: 1.2;
+    }
+
+    .step-text strong {
+        font-weight: 700;
+        display: block;
+        font-size: 9px;
+    }
+
+    /* Ocultar líneas en móvil */
+    .juguemos-line {
+        display: none !important;
+    }
+
+    /* Ajuste de alineación para cada paso */
+    .juguemos-step[data-step="1"],
+    .juguemos-step[data-step="3"] {
+        justify-self: end;
+    }
+
+    .juguemos-step[data-step="2"],
+    .juguemos-step[data-step="4"] {
+        justify-self: start;
+    }
+
+    .j-step-body {
+        gap: 15px;
+    }
+}
+
+/* ==========================================
+   MÓVIL MUY PEQUEÑO (≤ 400px)
+   ========================================== */
+
+@media (max-width: 400px) {
+
+    .juguemos-wizard {
+        gap: 6px;
+        padding: 10px 6px;
+        justify-content: left;
+    }
+
+    .juguemos-step {
+        padding: 6px 4px;
+        gap: 4px;
+    }
+
+    .step-icon {
+        width: 16px;
+        height: 12px;
+        flex-basis: 16px;
+    }
+
+    .step-number {
+        width: 20px;
+        height: 20px;
+        min-width: 20px;
+        font-size: 10px;
+    }
+
+    .step-text {
+        font-size: 8px;
+    }
+
+    .step-text strong {
+        font-size: 7px;
+    }
 }

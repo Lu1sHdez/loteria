@@ -59,7 +59,12 @@ if (!defined('ABSPATH')) {
                 <div id="j-incluir-status" class="j-incluir-status inactive">
                     Barajas incluidas en el diseño
                 </div>
-
+            </div>
+            <div class="j-section j-mobile-preview j-mobile-preview-design">
+                <p class="text-aqua-normal">Vista previa de diseño</p>
+                <div id="deck-preview-mobile" class="j-preview-design-container">
+                    <?php include __DIR__ . '/parts/skeleton-design.php'; ?>
+                </div>
             </div>
 
             <!-- ========================= -->
@@ -77,11 +82,22 @@ if (!defined('ABSPATH')) {
                 <?php include __DIR__ . '/parts/design-config.php'; ?>
 
             </div>
+            <div class="j-section j-mobile-preview j-mobile-preview-ubicacion">
+                <p class="text-aqua-normal">Vista previa de ubicación</p>
+                <div class="j-preview-ubicacion-wrapper">
+                    <div id="j-grid-preview-mobile" class="j-grid-preview j-preview-ubicacion-grid"></div>
+                </div>
+            </div>
 
             
             <div class="j-section j-section-casillas-definir">
                 <?php include __DIR__ . '/parts/casillas-definir.php'; ?>
-
+            </div>
+            <div class="j-section j-mobile-preview j-mobile-preview-casillas">
+                <p class="text-aqua-normal">Vista previa casillas</p>
+                <div class="j-preview-casillas-wrapper">
+                    <div id="j-casilla-preview-grid-mobile" class="j-casilla-preview-grid j-preview-casillas-grid"></div>
+                </div>
             </div>
 
 
@@ -92,7 +108,12 @@ if (!defined('ABSPATH')) {
                     </div>
                 </div>
                 <?php include __DIR__ . '/parts/color-style.php'; ?>
-
+            </div>
+            <div class="j-section j-mobile-preview j-mobile-preview-marcos">
+                <p class="text-aqua-normal">Vista previa marcos</p>
+                <div class="j-preview-marcos-wrapper">
+                    <div id="j-marcos-preview-grid-mobile" class="j-marcos-preview-grid j-preview-marcos-grid"></div>
+                </div>
             </div>
 
             <div class="j-section j-section-next">

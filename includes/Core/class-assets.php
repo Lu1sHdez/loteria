@@ -135,6 +135,14 @@ class Juguemos_Assets
         );
 
         wp_enqueue_script(
+            'juguemos-mobile-previews',
+            JUGUEMOS_URL . 'public/js/mobile-previews.js',
+            ['juguemos-app'],
+            JUGUEMOS_VERSION,
+            true
+        );
+
+        wp_enqueue_script(
             'juguemos-favoritas-logic',
             JUGUEMOS_URL . 'public/js/favoritas-logic.js',
             [],

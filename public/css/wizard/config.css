@@ -280,3 +280,91 @@
     background: #f5f5f5;
     border: 1px solid #e0e0e0;
 }
+
+/* =====================================================
+   GRIDS - VERSIÓN MÓVIL Y TABLET
+   ===================================================== */
+
+/* Tablet (769px - 1024px) */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .j-grids {
+        gap: 6px;
+    }
+
+    .j-grid {
+        padding: 6px 10px;
+        font-size: 11px;
+        border-radius: 6px;
+    }
+
+    .j-grid span {
+        font-size: 10px;
+    }
+}
+
+/* Móvil (≤ 768px) */
+@media (max-width: 768px) {
+    .j-grids {
+        gap: 4px;
+        justify-content: flex-start;
+    }
+
+    .j-grid {
+        padding: 4px 8px;
+        font-size: 9px;
+        border-radius: 4px;
+        border-width: 1px;
+    }
+
+    .j-grid span {
+        font-size: 7px;
+        display: block;
+        line-height: 1.2;
+    }
+}
+
+/* =====================================================
+   MODOS (Tipo de tablas) - VERSIÓN MÓVIL Y TABLET
+   ===================================================== */
+
+/* Tablet (769px - 1024px) */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .j-modes {
+        gap: 6px;
+    }
+
+    .j-mode {
+        padding: 6px 12px;
+        font-size: 12px;
+        border-radius: 8px;
+        gap: 6px;
+    }
+
+    .j-mode-icon {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+/* Móvil (≤ 768px) */
+@media (max-width: 768px) {
+    .j-modes {
+        gap: 4px;
+        justify-content: flex-start;
+        margin-top: 12px;
+        margin-bottom: 12px;
+    }
+
+    .j-mode {
+        padding: 4px 8px;
+        font-size: 9px;
+        border-radius: 4px;
+        border-width: 1px;
+        gap: 4px;
+    }
+
+    .j-mode-icon {
+        width: 16px;
+        height: 16px;
+    }
+}

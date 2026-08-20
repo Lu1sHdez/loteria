@@ -177,3 +177,106 @@
     text-align: center;
     margin: 0;
 }
+
+/* =====================================================
+   DISEÑOS - VERSIÓN MÓVIL (horizontal)
+   ===================================================== */
+
+@media (max-width: 768px) {
+
+    #juguemos-categories {
+        gap: 6px;
+        margin-bottom: 12px;
+        justify-content: left;
+    }
+
+    .j-category {
+        font-size: 11px;
+        padding: 4px 10px;
+        border-radius: 6px;
+        border-width: 1.5px;
+        white-space: nowrap;
+    }
+
+    #juguemos-decks {
+        display: flex ;
+        flex-wrap: nowrap ;
+        overflow-x: auto ;
+        gap: 12px ;
+        padding: 10px 5px ;
+        scroll-snap-type: x mandatory ;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #juguemos-decks .j-deck {
+        flex: 0 0 120px ;
+        min-width: 120px ;
+        width: 120px ;
+        scroll-snap-align: start;
+    }
+
+    #juguemos-decks .j-deck-image {
+        height: 120px ;
+        padding: 6px ;
+    }
+
+    #juguemos-decks .j-deck-image img {
+        max-width: 80px ;
+        max-height: 100px ;
+    }
+
+    #juguemos-decks .j-deck-name {
+        font-size: 11px ;
+        padding: 4px 6px 8px ;
+    }
+
+    /* Ocultar scrollbar pero mantener funcionalidad */
+    #juguemos-decks::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    #juguemos-decks::-webkit-scrollbar-track {
+        background: #f0f0f0;
+        border-radius: 2px;
+    }
+
+    #juguemos-decks::-webkit-scrollbar-thumb {
+        background: #FA299C;
+        border-radius: 2px;
+    }
+
+    /* Botón "Ver todos" en móvil */
+    .j-decks-view-all {
+        font-size: 13px ;
+        margin-top: 10px ;
+    }
+}
+
+/* =====================================================
+   TABLET - Mantener grid pero más pequeño
+   ===================================================== */
+
+@media (max-width: 1024px) and (min-width: 769px) {
+    #juguemos-decks {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) ;
+        gap: 15px ;
+    }
+
+    #juguemos-decks .j-deck {
+        width: 140px ;
+    }
+
+    #juguemos-decks .j-deck-image {
+        height: 140px ;
+        padding: 8px ;
+    }
+
+    #juguemos-decks .j-deck-image img {
+        max-width: 100px ;
+        max-height: 120px ;
+    }
+
+    #juguemos-decks .j-deck-name {
+        font-size: 12px ;
+    }
+}
