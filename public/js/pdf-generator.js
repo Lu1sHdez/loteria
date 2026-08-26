@@ -31,24 +31,31 @@ window.JuguemosPDF = {
         const spinner = document.getElementById('j-download-spinner');
         const progress = document.getElementById('j-pdf-progress');
         const progressCount = document.getElementById('j-pdf-progress-count');
+        const progressBar = document.getElementById('j-pdf-progress-bar');
+        const statusText = document.getElementById('j-pdf-status');
     
-        // ✅ MOSTRAR ESTADO DE CARGA
+        // Mostrar estado de carga
         if (btn) {
             btn.disabled = true;
             btn.style.opacity = '0.7';
             btn.style.cursor = 'wait';
         }
-        if (btnText) btnText.textContent = 'Descargando...';
+        if (btnText) btnText.textContent = 'Descargando PDF...';
         if (spinner) spinner.style.display = 'inline-block';
+        
+        // Mostrar barra de progreso
+        if (progress) progress.style.display = 'block';
+        if (progressBar) progressBar.style.width = '0%';
+        if (statusText) statusText.textContent = 'Preparando...';
     
         if (typeof window.jspdf === 'undefined' || typeof html2canvas === 'undefined') {
-            alert('No se pudieron cargar las librerías de PDF. Revisa tu conexión.');
+            alert('No se pudieron cargar las librerias de PDF. Revisa tu conexion.');
             this.restoreButton(btn, btnText, spinner);
             return;
         }
     
         if (typeof JuguemosState === 'undefined' || typeof PrintPaper === 'undefined') {
-            alert('No se pudo acceder a la configuración de la lotería.');
+            alert('No se pudo acceder a la configuracion de la loteria.');
             this.restoreButton(btn, btnText, spinner);
             return;
         }
@@ -76,15 +83,15 @@ window.JuguemosPDF = {
         const sheets = container ? Array.from(container.querySelectorAll('.j-sheet')) : [];
     
         if (sheets.length === 0) {
-            alert('No hay vista previa generada. Ve al paso 3 y configura tu lotería.');
+            alert('No hay vista previa generada. Ve al paso 3 y configura tu loteria.');
             this.restoreStep(stepPreview, stepWasHidden);
             this.restoreButton(btn, btnText, spinner);
+            if (progress) progress.style.display = 'none';
             return;
         }
     
-        if (btnText) btnText.textContent = 'Descargando...';
-        if (progress) progress.style.display = 'block';
-    
+        if (btnText) btnText.textContent = 'Descargando PDF...';
+        
         const paperConfig = PrintPaper.getPaperConfig();
         const orientation = paperConfig.orientation === 'horizontal' ? 'landscape' : 'portrait';
     
@@ -94,13 +101,24 @@ window.JuguemosPDF = {
             format: [paperConfig.width, paperConfig.height]
         });
     
+        const totalPages = sheets.length;
+    
         try {
             for (let i = 0; i < sheets.length; i++) {
+                // Actualizar progreso
+                const percent = Math.round(((i + 1) / sheets.length) * 100);
+                
                 if (progressCount) {
-                    progressCount.textContent = `${i + 1}/${sheets.length}`;
+                    progressCount.textContent = i + 1 + '/' + sheets.length;
+                }
+                if (progressBar) {
+                    progressBar.style.width = percent + '%';
                 }
                 if (btnText) {
-                    btnText.textContent = 'Descargando...';
+                    btnText.textContent = 'Descargando ' + (i + 1) + '/' + sheets.length + '...';
+                }
+                if (statusText) {
+                    statusText.textContent = 'Pagina ' + (i + 1) + ' de ' + sheets.length;
                 }
     
                 const sheet = sheets[i];
@@ -164,36 +182,43 @@ window.JuguemosPDF = {
                 });
     
                 await new Promise(resolve => setTimeout(resolve, 200));
-    
-                if (progressCount) {
-                    progressCount.textContent = `${i + 1}/${sheets.length} ✅`;
-                }
             }
     
-            const nombreArchivo = `loteria-la-dama-${Date.now()}.pdf`;
+            if (statusText) {
+                statusText.textContent = 'Listo';
+            }
+            if (progressBar) {
+                progressBar.style.width = '100%';
+            }
+            if (btnText) {
+                btnText.textContent = 'Preparando descarga...';
+            }
             
-            if (btnText) btnText.textContent = 'Descargando...';            
+            await new Promise(resolve => setTimeout(resolve, 300));
+
+            const nombreArchivo = 'loteria-la-dama-' + Date.now() + '.pdf';
             pdf.save(nombreArchivo);
     
-            // ✅ LIMPIAR SESSION STORAGE
+            // Limpiar session storage
             sessionStorage.removeItem('juguemos_payment_verified');
             sessionStorage.removeItem('juguemos_payment_token');
             sessionStorage.removeItem('juguemos_page_loaded');
             sessionStorage.removeItem('juguemos_order_id');
+            sessionStorage.removeItem('juguemos_payment_just_made');
+            sessionStorage.removeItem('juguemos_monto_pagado');
     
-            // ✅ MOSTRAR MENSAJE DE ÉXITO
-            if (btnText) btnText.textContent = '✅ PDF descargado!';
+            if (btnText) btnText.textContent = 'PDF descargado';
+            if (statusText) statusText.textContent = 'Completado';
     
-            // ✅ REDIRIGIR DESPUÉS DE 2 SEGUNDOS
             setTimeout(function() {
                 window.location.href = '/juguemos';
             }, 2000);
     
         } catch (error) {
             console.error('Error generando PDF:', error);
-            alert('Ocurrió un error al generar el PDF. Revisa la consola para más detalles.');
+            alert('Ocurrio un error al generar el PDF. Revisa la consola para mas detalles.');
+            if (statusText) statusText.textContent = 'Error';
         } finally {
-            // ✅ RESTAURAR BOTÓN
             this.restoreButton(btn, btnText, spinner);
             if (progress) progress.style.display = 'none';
             this.restoreStep(stepPreview, stepWasHidden);

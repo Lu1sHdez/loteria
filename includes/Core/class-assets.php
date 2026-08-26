@@ -104,6 +104,13 @@ class Juguemos_Assets
             JUGUEMOS_VERSION,
             true
         );
+        wp_enqueue_script(
+            'juguemos-payment-validation',
+            JUGUEMOS_URL . 'public/js/payment-validation.js',
+            ['jquery'],
+            JUGUEMOS_VERSION,
+            true
+        );
 
         wp_enqueue_script(
             'juguemos-print-preview',

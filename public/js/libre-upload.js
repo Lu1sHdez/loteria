@@ -254,7 +254,6 @@
             
             this.images[index] = null;
             
-            // ✅ COMPACTAR: eliminar nulls y reordenar
             this.images = this.images.filter(img => img !== null && img !== undefined);
             
             this.renderGrid();

@@ -33,6 +33,9 @@
     font-weight: 700;
     color: #FA299C;
 }
+.text-rosa-negrita.md{
+    font-size: 20px;
+}
 
 .j-texto-normal {
     font-family: 'Cairo', sans-serif;
@@ -41,9 +44,13 @@
     margin-top: 10px;   
     line-height: 1.4;
 }
+.j-texto-normal.md{
+    font-size: 18px;
+}
 .j-texto-normal.sm{
     font-size: 10px;
 }
+
 
 .j-select-papel{
     font-size:12px;

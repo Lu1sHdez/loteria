@@ -2,10 +2,11 @@
 if (!defined('ABSPATH')) {
     exit;
 }
+
 /* $is_admin = false;
 if (is_user_logged_in() && current_user_can('manage_options')) {
     $is_admin = true;
-} */
+}  */
 
 $is_admin = false; 
 ?>
@@ -19,11 +20,11 @@ $is_admin = false;
         </div>
     </div>
 
-    <div class="j-step-body">
+    <div class="j-step-body">   
         <div class="juguemos-left">
 
             <!-- ==========================================
-            RESUMEN DEL PEDIDO
+            SECCIÓN 1: RESUMEN DEL PEDIDO
             ========================================== -->
             <div class="j-section">
                 <div class="j-panel-item">
@@ -48,7 +49,7 @@ $is_admin = false;
             </div>
 
             <!-- ==========================================
-            MÉTODOS DE PAGO
+            SECCIÓN 2: MÉTODOS DE PAGO
             ========================================== -->
             <div class="j-section">
                 <div class="j-panel-item">
@@ -76,6 +77,15 @@ $is_admin = false;
                     <?php endif; ?>
                 </div>
 
+                <!-- MENSAJE DE ADVERTENCIA -->
+                <div id="j-minimum-amount-warning" style="display:none;text-align:center;margin-bottom:12px;padding:10px 16px;border-radius:8px;font-size:14px;font-weight:600;color:#FA299C;background:transparent;font-style:italic;">
+                    <span id="j-min-amount-text-wrapper">
+                        ⚠️ <span id="j-min-amount-label">El monto mínimo para pagar con tarjeta es de</span> <strong id="j-min-amount-text">$10.00 MXN</strong>.
+                    </span>
+                    <br>
+                    <span id="j-min-amount-action" style="font-size:12px;font-weight:400;font-style:italic;">Agrega más tablas o usa PayPal.</span>
+                </div>
+
                 <div class="j-payment-actions">
                     <button id="j-process-payment" class="j-btn-next">
                         Pagar con Tarjeta
@@ -89,21 +99,37 @@ $is_admin = false;
             </div>
 
             <!-- ==========================================
-            SECCIÓN DE DESCARGA
+            SECCIÓN 3: DESCARGA (SEPARADA)
             ========================================== -->
-            <div id="j-download-section" 
-                style="<?php echo $is_admin ? 'display:flex;' : 'display:none;'; ?> flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:30px; background:#f0f9fa; border-radius:12px; margin-top:20px;"
-                data-admin="<?php echo $is_admin ? 'true' : 'false'; ?>">
-                
-                <p class="text-aqua-normal" style="margin-bottom:8px;"><?php echo $is_admin ? 'Descarga disponible' : '¡Pago confirmado!'; ?></p>
-                <p class="j-texto-normal" style="max-width:400px; margin:0 auto 15px auto;">
-                    <?php echo $is_admin ? 'Como administrador, puedes descargar el PDF sin realizar el pago.' : 'Tu pago ha sido procesado exitosamente. Ahora puedes descargar tu PDF.'; ?>
-                </p>
-                
-                <button id="j-download-pdf" class="j-btn-download" style="margin:0 auto;">
-                    <span id="j-download-text">Descargar PDF <?php echo $is_admin ? '(Admin)' : ''; ?></span>
-                    <span id="j-download-spinner" style="display:none; width:18px; height:18px; border:2px solid #fff; border-top-color: transparent; border-radius:50%; animation: spin 0.8s linear infinite;"></span>
-                </button>
+            <div class="j-section" id="j-download-section-wrapper">
+                <div id="j-download-section" 
+                    style="<?php echo $is_admin ? 'display:flex;' : 'display:none;'; ?> flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:30px; background:#f0f9fa; border-radius:12px;"
+                    data-admin="<?php echo $is_admin ? 'true' : 'false'; ?>">
+                    
+                    <p class="text-aqua-normal" style="margin-bottom:8px;"><?php echo $is_admin ? 'Descarga disponible' : '¡Pago confirmado!'; ?></p>
+                    <p class="j-texto-normal" style="max-width:600px; margin:0 auto 15px auto;">
+                        <?php echo $is_admin ? 'Como administrador, puedes descargar el PDF sin realizar el pago.' : 'Tu pago ha sido procesado exitosamente. Ahora puedes descargar tu PDF.'; ?>
+                    </p>
+
+                    <!-- 🔥 BARRA DE PROGRESO -->
+                    <div id="j-pdf-progress" style="display:none; margin-top:15px; width:100%; max-width:450px; margin-left:auto; margin-right:auto;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                            <span style="font-size:15px; color:#1E2249; font-family:'Cairo',sans-serif; font-weight:700;">Descargando PDF...</span>
+                            <span style="font-size:15px; color:#1E2249; font-family:'Cairo',sans-serif; font-weight:700;" id="j-pdf-progress-count">0/0</span>
+                        </div>
+                        <div style="width:100%; height:16px; background:#E5E5E5; border-radius:4px; overflow:hidden;">
+                            <div id="j-pdf-progress-bar" style="width:0%; height:100%; background: #24B8C8; border-radius:4px; transition:width 0.3s ease;"></div>
+                        </div>
+                        <div style="text-align:center; margin-top:6px;">
+                            <span style="font-size:12px; color:#999; font-family:'Cairo',sans-serif;" id="j-pdf-status">Preparando...</span>
+                        </div>
+                    </div>
+                    
+                    <button id="j-download-pdf" class="j-btn-download" style="margin:15px auto 0;">
+                        <span id="j-download-text">Descargar PDF <?php echo $is_admin ? '(Admin)' : ''; ?></span>
+                        <span id="j-download-spinner" style="display:none; width:18px; height:18px; border:2px solid #fff; border-top-color: transparent; border-radius:50%; animation: spin 0.8s linear infinite;"></span>
+                    </button>
+                </div>
             </div>
 
             <!-- ==========================================

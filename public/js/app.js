@@ -1,11 +1,16 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    // ========== LIMPIEZA DE SESSION ==========
-    if (sessionStorage.getItem('juguemos_page_loaded')) {
-        ['juguemos_payment_verified', 'juguemos_payment_token', 'juguemos_page_loaded', 'juguemos_order_id'].forEach(key => {
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const isPaymentSuccess = urlParams.get('payment') === 'stripe_success' || urlParams.get('payment') === 'success';
+    
+    // Si NO venimos de un pago exitoso, limpiar TODO
+    if (!isPaymentSuccess) {
+        ['juguemos_payment_verified', 'juguemos_payment_token', 'juguemos_page_loaded', 'juguemos_order_id', 'juguemos_stripe_session_id', 'juguemos_paypal_token', 'juguemos_payment_just_made',  'juguemos_monto_pagado'].forEach(key => {
             sessionStorage.removeItem(key);
         });
     } else {
+        // Si venimos de un pago exitoso, mantener solo lo necesario
         sessionStorage.setItem('juguemos_page_loaded', 'true');
     }
 
@@ -511,7 +516,6 @@ if (btnIncluir) {
         }
 
         // Verificar retorno de Stripe
-        const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('payment') === 'stripe_success') {
             const sessionId = urlParams.get('session_id');
             const orderId = urlParams.get('order_id');
@@ -555,36 +559,6 @@ if (btnIncluir) {
             }
         }
     });
-
-    // ========== EDITAR PEDIDO ==========
-    document.getElementById("j-edit-order")?.addEventListener("click", () => {
-        ['juguemos_payment_verified', 'juguemos_payment_token', 'juguemos_page_loaded', 'juguemos_order_id'].forEach(key => {
-            sessionStorage.removeItem(key);
-        });
-        document.getElementById("tables-number").value = JuguemosState.quantity;
-        document.getElementById("tables-range").value = JuguemosState.quantity;
-        document.getElementById("tables-range").dispatchEvent(new Event("input"));
-        document.querySelectorAll(".j-step").forEach(s => s.classList.remove("active"));
-        document.getElementById("juguemos-design").classList.add("active");
-        document.querySelectorAll(".juguemos-step").forEach(s => s.classList.remove("active"));
-        document.querySelector('.juguemos-step[data-step="1"]')?.classList.add("active");
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    });
-
-    // ========== CONFIRMAR PEDIDO ==========
-    document.getElementById("j-confirm-order")?.addEventListener("click", () => {
-        if (typeof updatePrice === 'function') updatePrice();
-        document.querySelectorAll(".j-step").forEach(s => s.classList.remove("active"));
-        document.getElementById("juguemos-payment").classList.add("active");
-        document.querySelectorAll(".juguemos-step").forEach(s => s.classList.remove("active"));
-        document.querySelector('.juguemos-step[data-step="4"]')?.classList.add("active");
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        setTimeout(() => {
-            updateOrderSummary();
-            JuguemosPaymentInstance?.updatePaymentSummary();
-        }, 200);
-    });
-
     // ========== OBSERVAR PASO 4 ==========
     new MutationObserver(() => {
         if (document.getElementById('juguemos-payment')?.classList.contains('active')) {
@@ -595,19 +569,7 @@ if (btnIncluir) {
         }
     }).observe(document.body, { attributes: true, subtree: true, attributeFilter: ['class'] });
 
-    // ========== REGRESAR A VISTA PREVIA ==========
-    document.getElementById("j-back-to-preview")?.addEventListener("click", () => {
-        ['juguemos_payment_verified', 'juguemos_payment_token'].forEach(key => sessionStorage.removeItem(key));
-        document.querySelectorAll(".j-step").forEach(s => s.classList.remove("active"));
-        document.getElementById("juguemos-preview-completo").classList.add("active");
-        document.querySelectorAll(".juguemos-step").forEach(s => s.classList.remove("active"));
-        document.querySelector('.juguemos-step[data-step="3"]')?.classList.add("active");
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        setTimeout(() => PrintPaper?.refresh(), 300);
-    });
-
     // ========== VERIFICAR PAGO ==========
-    const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('download') === 'pdf') {
         const verified = sessionStorage.getItem('juguemos_payment_verified') === 'true';
         const token = sessionStorage.getItem('juguemos_payment_token');
@@ -634,6 +596,7 @@ if (btnIncluir) {
         if (event.data?.type === 'paypal_payment_completed') {
             sessionStorage.setItem('juguemos_payment_verified', 'true');
             sessionStorage.setItem('juguemos_payment_token', event.data.token || 'verified');
+            sessionStorage.setItem('juguemos_payment_just_made', 'true');
             JuguemosPaymentInstance?.paymentSuccess();
         }
     });
@@ -658,6 +621,48 @@ if (btnIncluir) {
             alert('Por favor, realiza el pago antes de descargar el PDF.');
         }
     });
+        // ========== CONFIRMAR PEDIDO ==========
+    document.getElementById("j-confirm-order")?.addEventListener("click", () => {
+        if (typeof updatePrice === 'function') updatePrice();
+        document.querySelectorAll(".j-step").forEach(s => s.classList.remove("active"));
+        document.getElementById("juguemos-payment").classList.add("active");
+        document.querySelectorAll(".juguemos-step").forEach(s => s.classList.remove("active"));
+        document.querySelector('.juguemos-step[data-step="4"]')?.classList.add("active");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setTimeout(() => {
+            updateOrderSummary();
+            JuguemosPaymentInstance?.updatePaymentSummary();
+        }, 200);
+    });
+
+    // ========== EDITAR PEDIDO ==========
+    document.getElementById("j-edit-order")?.addEventListener("click", () => {
+        ['juguemos_payment_verified', 'juguemos_payment_token', 'juguemos_page_loaded', 'juguemos_order_id', 'juguemos_payment_just_made', 'juguemos_monto_pagado'].forEach(key => {
+            sessionStorage.removeItem(key);
+        });
+        document.getElementById("tables-number").value = JuguemosState.quantity;
+        document.getElementById("tables-range").value = JuguemosState.quantity;
+        document.getElementById("tables-range").dispatchEvent(new Event("input"));
+        document.querySelectorAll(".j-step").forEach(s => s.classList.remove("active"));
+        document.getElementById("juguemos-design").classList.add("active");
+        document.querySelectorAll(".juguemos-step").forEach(s => s.classList.remove("active"));
+        document.querySelector('.juguemos-step[data-step="1"]')?.classList.add("active");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    // ========== REGRESAR A VISTA PREVIA ==========
+    document.getElementById("j-back-to-preview")?.addEventListener("click", () => {
+        ['juguemos_payment_verified', 'juguemos_payment_token', 'juguemos_payment_just_made', 'juguemos_monto_pagado'].forEach(key => {
+            sessionStorage.removeItem(key);
+        });
+        document.querySelectorAll(".j-step").forEach(s => s.classList.remove("active"));
+        document.getElementById("juguemos-preview-completo").classList.add("active");
+        document.querySelectorAll(".juguemos-step").forEach(s => s.classList.remove("active"));
+        document.querySelector('.juguemos-step[data-step="3"]')?.classList.add("active");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setTimeout(() => PrintPaper?.refresh(), 300);
+    });
+
 
     // Inicializar visibilidad según el modo actual
     const initialMode = JuguemosState.mode || 'sencilla';
@@ -1485,17 +1490,9 @@ function ejecutarLlenadoAleatorio() {
     const totalTablas = (JuguemosState.quantity || 1) * (JuguemosState.pages || 1);
 
     if (!totalCasillas) {
-        console.warn('ejecutarLlenadoAleatorio: totalCasillas es 0');
         return;
     }
 
-    console.log('ejecutarLlenadoAleatorio - Iniciando:', {
-        modo: JuguemosState.mode,
-        grid: grid,
-        totalCasillas: totalCasillas,
-        totalTablas: totalTablas,
-        barajas: JuguemosState.barajas.length
-    });
 
     const todasLasTablas = [];
     const todasLasBarajas = [...JuguemosState.barajas];
@@ -1519,9 +1516,7 @@ function ejecutarLlenadoAleatorio() {
                 tieneFavoritas = true;
                 JuguemosState.favoritas = favoritas;
                 JuguemosState.favoritasUbicacion = ubicacion;
-                
-                console.log('Favoritas sincronizadas desde manager:', favoritas.length);
-            }
+                }
         }
         
         if (!tieneFavoritas) {
@@ -1530,7 +1525,6 @@ function ejecutarLlenadoAleatorio() {
                 favoritas = favoritasEstado;
                 ubicacion = JuguemosState.favoritasUbicacion || 'aleatoria';
                 tieneFavoritas = true;
-                console.log('Favoritas desde estado global:', favoritas.length);
             }
         }
     }
@@ -1594,9 +1588,7 @@ function ejecutarLlenadoAleatorio() {
         const maxPorTabla = 2;
         const totalTablasNecesarias = Math.ceil(favoritas.length / maxPorTabla);
         totalFavoritasPorTabla = totalTablasNecesarias;
-        
-        console.log(`📊 Pocitos 4: ${favoritas.length} favoritas en ${totalTablasNecesarias} tablas`);
-        
+                
         for (let t = 0; t < totalTablas; t++) {
             const tablaIndex = t % totalTablasNecesarias;
             const inicio = tablaIndex * maxPorTabla;
@@ -1620,9 +1612,7 @@ function ejecutarLlenadoAleatorio() {
             
             if (favoritasParaEstaTabla.length > 0) {
                 const posicionesFavoritas = obtenerPosicionesFavoritas(grid, favoritasParaEstaTabla.length, ubicacion);
-                
-                console.log(`📊 Tabla ${t + 1}: ${favoritasParaEstaTabla.length} favoritas en posiciones:`, posicionesFavoritas);
-                
+                                
                 favoritasParaEstaTabla.forEach((favorita, idx) => {
                     const pos = posicionesFavoritas[idx] !== undefined ? posicionesFavoritas[idx] : idx;
                     if (pos < totalCasillas && !casillas[pos]) {
@@ -1685,11 +1675,7 @@ function ejecutarLlenadoAleatorio() {
                 }
             });
         }
-        
-        // =========================================================
-        // 🔥 LLENAR RESTO CON BARAJAJAS ALEATORIAS
-        // =========================================================
-        
+
         for (let i = 0; i < totalCasillas; i++) {
             if (!casillas[i]) {
                 let baraja = null;
@@ -1727,10 +1713,6 @@ function ejecutarLlenadoAleatorio() {
     
     JuguemosState.todasLasTablas = todasLasTablas;
 
-    // =========================================================
-    // 🔥 ACTUALIZAR VISTA PREVIA DE CASILLAS
-    // =========================================================
-    
     if (todasLasTablas.length > 0) {
         const tablaMostrar = todasLasTablas[0];
         JuguemosState.casillasAsignadas = tablaMostrar;

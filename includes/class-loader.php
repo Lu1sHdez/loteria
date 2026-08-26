@@ -34,10 +34,12 @@ class Juguemos_Loader
         require_once JUGUEMOS_PATH . 'includes/Ajax/class-admin-ajax.php';
         require_once JUGUEMOS_PATH . 'admin/class-admin-barajas.php';
         require_once JUGUEMOS_PATH . 'includes/Files/class-files.php';
+
         require_once JUGUEMOS_PATH . 'includes/Payment/class-paypal-handler.php';
         require_once JUGUEMOS_PATH . 'includes/Payment/class-paypal-return.php';
         require_once JUGUEMOS_PATH . 'includes/Payment/class-payment-settings.php';
         require_once JUGUEMOS_PATH . 'includes/Payment/class-stripe-handler.php';
+        require_once JUGUEMOS_PATH . 'includes/Payment/class-stripe-return.php';
     }
 
 
@@ -60,6 +62,7 @@ class Juguemos_Loader
         new Juguemos_Login();
         new Juguemos_Admin_Ajax();
         new Juguemos_PayPal_Return();
+        new Juguemos_Stripe_Return();
     }
 
 }

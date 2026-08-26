@@ -6,8 +6,13 @@
             this.isDownloading = false;
             this.currentMethod = 'stripe_card';
             this.isAdmin = document.getElementById('j-download-section')?.dataset.admin === 'true';
+            this.minAmounts = {
+                'MXN': 10.00,
+                'USD': 0.50
+            };
             this.init();
         }
+        
         
         init() {
             this.bindEvents();
@@ -17,6 +22,30 @@
                 this.updateDefaultButton(); 
             }, 300);
         }
+
+        // ==================== VALIDACIÓN DE MONTO MÍNIMO ====================
+    checkMinimumAmount() {
+        const totalTablas = (JuguemosState.quantity || 1) * (JuguemosState.pages || 1);
+        const subtotal = (JuguemosState.unitPrice || 0) * totalTablas;
+        
+        const isUSA = JuguemosState.country === 'USA';
+        const precioBarajas = isUSA 
+            ? (JuguemosState.precioBarajasUSA || 15.00) 
+            : (JuguemosState.precioBarajasMexico || 50.00);
+        const costoBarajas = JuguemosState.barajasIncluidas ? precioBarajas : 0;
+        
+        const amount = subtotal + costoBarajas;
+        const currency = JuguemosState.currency || 'USD';
+        const minAmount = this.minAmounts[currency] || 0.50;
+        
+        return {
+            isBelowMinimum: amount < minAmount,
+            amount: amount,
+            minAmount: minAmount,
+            currency: currency,
+            minText: '$' + minAmount.toFixed(2) + ' ' + currency
+        };
+    }
 
         updateDefaultButton() {
             const btn = $('#j-process-payment');
@@ -41,6 +70,87 @@
             });
         }
         
+        updateMinimumAmountWarning() {
+            const totalTablas = (JuguemosState.quantity || 1) * (JuguemosState.pages || 1);
+            const subtotal = (JuguemosState.unitPrice || 0) * totalTablas;
+            
+            const isUSA = JuguemosState.country === 'USA';
+            const precioBarajas = isUSA 
+                ? (JuguemosState.precioBarajasUSA || 15.00) 
+                : (JuguemosState.precioBarajasMexico || 50.00);
+            const costoBarajas = JuguemosState.barajasIncluidas ? precioBarajas : 0;
+            
+            const amount = subtotal + costoBarajas;
+            const currency = JuguemosState.currency || 'USD';
+            const minAmount = this.minAmounts[currency] || 0.50;
+            const isBelowMinimum = amount < minAmount;
+            const minText = '$' + minAmount.toFixed(2) + ' ' + currency;
+            
+            const stripeMethods = ['stripe_card', 'stripe_googlepay', 'stripe_applepay'];
+            const isStripeSelected = stripeMethods.includes(this.currentMethod);
+            
+            let warningEl = document.getElementById('j-minimum-amount-warning');
+            let minTextEl = document.getElementById('j-min-amount-text');
+            let labelEl = document.getElementById('j-min-amount-label');
+            let actionEl = document.getElementById('j-min-amount-action');
+            
+            if (warningEl) {
+                // 🔥 TRADUCCIONES
+                const translations = {
+                    'es': {
+                        label: 'El monto mínimo para pagar con tarjeta es de',
+                        action: 'Agrega más tablas o usa PayPal.'
+                    },
+                    'en': {
+                        label: 'The minimum amount to pay by card is',
+                        action: 'Add more boards or use PayPal.'
+                    }
+                };
+                
+                const lang = isUSA ? 'en' : 'es';
+                const t = translations[lang];
+                
+                // 🔥 ACTUALIZAR SOLO EL TEXTO (NO RECREAR EL HTML)
+                if (minTextEl) minTextEl.textContent = minText;
+                if (labelEl) labelEl.textContent = t.label;
+                if (actionEl) actionEl.textContent = t.action;
+                
+                // 🔥 MOSTRAR/OCULTAR
+                if (isStripeSelected && isBelowMinimum) {
+                    warningEl.style.display = 'block';
+                } else {
+                    warningEl.style.display = 'none';
+                }
+            }
+            
+            this.updatePaymentButtonState(isBelowMinimum);
+        }
+        updatePaymentButtonState(isBelowMinimum) {
+            const btn = $('#j-process-payment');
+            const currentMethod = this.currentMethod;
+            const stripeMethods = ['stripe_card', 'stripe_googlepay', 'stripe_applepay'];
+            const isStripe = stripeMethods.includes(currentMethod);
+            
+            if (isStripe && isBelowMinimum) {
+                btn.prop('disabled', true);
+                btn.css({
+                    'opacity': '0.5',
+                    'cursor': 'not-allowed',
+                    'background': '#cccccc',
+                    'border-color': '#cccccc'
+                });
+            } else {
+                btn.prop('disabled', false);
+                btn.css({
+                    'opacity': '1',
+                    'cursor': 'pointer',
+                    'background': '',
+                    'border-color': ''
+                });
+            }
+        }
+        
+
         updatePaymentSummary() {
             const totalTablas = (JuguemosState.quantity || 1) * (JuguemosState.pages || 1);
             const subtotal = (JuguemosState.unitPrice || 0) * totalTablas;
@@ -54,13 +164,31 @@
             const totalFinal = subtotal + costoBarajas;
             const priceText = '$' + Number(totalFinal).toFixed(2) + ' ' + JuguemosState.currency;
             
-            document.getElementById('payment-summary-mode').textContent = 
+            // 🔥 MAPA DE TRADUCCIONES
+            const translations = {
+                'Sencilla': 'Simple',
+                'Dobles': 'Doubles',
+                'Favoritas': 'Favorites',
+                'Personalizadas': 'Custom'
+            };
+            
+            // 🔥 OBTENER EL TEXTO SEGÚN EL MODO
+            let modeText = 
                 JuguemosState.mode === 'sencilla' ? 'Sencilla' :
                 JuguemosState.mode === 'dobles' ? 'Dobles' :
                 JuguemosState.mode === 'favoritas' ? 'Favoritas' : 'Personalizadas';
             
+            // 🔥 SI ES USA, TRADUCIR
+            if (JuguemosState.country === 'USA') {
+                modeText = translations[modeText] || modeText;
+            }
+            
+            // 🔥 ACTUALIZAR EL TEXTO (AHORA CON TRADUCCIÓN MANUAL)
+            document.getElementById('payment-summary-mode').textContent = modeText;
             document.getElementById('payment-summary-quantity').textContent = totalTablas;
             document.getElementById('payment-summary-price').textContent = priceText;
+
+            this.updateMinimumAmountWarning();
         }
         
         selectMethod(method) {
@@ -85,13 +213,14 @@
             // Actualizar el botón (solo texto, sin iconos)
             btn.text(label);
             btn.show();
+            this.updateMinimumAmountWarning();
+
         }
+        
+
         
         processPayment() {
             const btn = $('#j-process-payment');
-            btn.prop('disabled', true);
-            btn.hide();
-            $('#j-payment-loading').show();
             
             const totalTablas = (JuguemosState.quantity || 1) * (JuguemosState.pages || 1);
             const subtotal = (JuguemosState.unitPrice || 0) * totalTablas;
@@ -104,8 +233,12 @@
             
             const amount = subtotal + costoBarajas;
             const currency = JuguemosState.currency || 'USD';
-        
+
             const stripeMethods = ['stripe_card', 'stripe_googlepay', 'stripe_applepay'];
+            
+            btn.prop('disabled', true);
+            btn.hide();
+            $('#j-payment-loading').show();
             
             if (stripeMethods.includes(this.currentMethod)) {
                 sessionStorage.setItem('juguemos_selected_payment_method', this.currentMethod);
@@ -123,7 +256,6 @@
             const order_id = sessionStorage.getItem('juguemos_order_id') || Date.now().toString();
             sessionStorage.setItem('juguemos_order_id', order_id);
             
-            //  AGREGAR NONCE
             const nonce = window.Juguemos?.nonce || '';
             
             console.log('PayPal: Enviando petición con nonce:', nonce);
@@ -139,7 +271,7 @@
                     currency: currency,
                     description: 'Lotería La Dama - Pedido',
                     order_id: order_id,
-                    nonce: nonce  //  AGREGADO
+                    nonce: nonce
                 })
             })
             .then(response => {
@@ -152,7 +284,6 @@
                 console.log('PayPal Response:', data);
                 
                 if (data.approve_url) {
-                    // Guardar el token real de PayPal
                     if (data.token) {
                         sessionStorage.setItem('juguemos_paypal_token', data.token);
                     }
@@ -160,7 +291,6 @@
                     window.open(data.approve_url, '_blank', 'width=800,height=600');
                     this.showWaitingMessage('PayPal');
                     
-                    // Verificar con el token de PayPal (no con order_id)
                     this.startPaymentVerification(data.token || order_id);
                 } else {
                     alert('Error: ' + (data.error || 'No se pudo crear la orden'));
@@ -173,136 +303,66 @@
                 this.handlePaymentError();
             });
         }
-        // ==================== STRIPE ====================
-processStripe(amount, currency) {
-    const order_id = sessionStorage.getItem('juguemos_order_id') || 'ORDER_' + Date.now();
-    sessionStorage.setItem('juguemos_order_id', order_id);
-    
-    // ✅ GUARDAR EL PASO ACTUAL ANTES DE REDIRIGIR
-    sessionStorage.setItem('juguemos_current_step', '4');
-    
-    //  MOSTRAR MENSAJE DE CARGA
-    this.showWaitingMessage('Stripe');
-    
-    fetch('/wp-content/plugins/juguemos/public/templates/payment/stripe-checkout.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            amount: amount,
-            currency: currency,
-            order_id: order_id
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Stripe response:', data);
-        
-        if (data.success && data.url) {
-            // ✅ ABRIR EN VENTANA EMERGENTE (en lugar de redirigir)
-            window.open(data.url, '_blank', 'width=800,height=600');
+        // ==================== STRIPE (CORREGIDO - IGUAL QUE PAYPAL) ====================
+        processStripe(amount, currency) {
+            const order_id = sessionStorage.getItem('juguemos_order_id') || Date.now().toString();
+            sessionStorage.setItem('juguemos_order_id', order_id);
             
-            // ✅ Guardar el session_id para verificar después
-            if (data.session_id) {
-                sessionStorage.setItem('juguemos_stripe_session_id', data.session_id);
-            }
+            sessionStorage.setItem('juguemos_current_step', '4');
             
-            // ✅ Iniciar verificación de pago (como con PayPal)
-            this.startStripeVerification(order_id, data.session_id);
-        } else {
-            alert('Error: ' + (data.error || 'No se pudo iniciar el pago con Stripe'));
-            this.restoreButton($('#j-process-payment'));
-        }
-    })
-    .catch(error => {
-        console.error('Stripe Error:', error);
-        alert('Error de conexión con Stripe');
-        this.restoreButton($('#j-process-payment'));
-    });
-}
-startStripeVerification(order_id, session_id) {
-    let attempts = 0;
-    const maxAttempts = 30;
-    const self = this;
-    
-    //  Mostrar mensaje de espera
-    this.showWaitingMessage('Stripe');
-    
-    const checkPayment = setInterval(function() {
-        attempts++;
-        
-        // Verificar si ya fue marcado como pagado
-        const paymentVerified = sessionStorage.getItem('juguemos_payment_verified') === 'true';
-        const paymentToken = sessionStorage.getItem('juguemos_payment_token');
-        
-        if (paymentVerified && paymentToken) {
-            clearInterval(checkPayment);
-            self.paymentSuccess();
-            return;
-        }
-        
-        // Verificar con el servidor
-        $.ajax({
-            url: Juguemos.ajax_url,
-            method: 'POST',
-            data: {
-                action: 'juguemos_verify_stripe',
-                nonce: Juguemos.nonce,
-                session_id: session_id,
-                order_id: order_id
-            },
-            success: function(response) {
-                if (response.success && response.data && response.data.paid) {
-                    clearInterval(checkPayment);
-                    sessionStorage.setItem('juguemos_payment_verified', 'true');
-                    sessionStorage.setItem('juguemos_payment_token', order_id);
-                    self.paymentSuccess();
+            this.showWaitingMessage('Stripe');
+            
+            const nonce = window.Juguemos?.nonce || '';
+            
+            fetch('/wp-content/plugins/juguemos/public/templates/payment/stripe-checkout.php', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-WP-Nonce': nonce
+                },
+                body: JSON.stringify({
+                    amount: amount,
+                    currency: currency,
+                    description: 'Lotería La Dama - Pedido',
+                    order_id: order_id,
+                    nonce: nonce
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('HTTP error: ' + response.status);
                 }
-            }
-        });
-        
-        if (attempts >= maxAttempts) {
-            clearInterval(checkPayment);
-            $('#j-waiting-message').html(
-                '<div style="text-align:center;padding:20px;">' +
-                    '<h3 style="color:#FA299C;margin:0 0 10px 0;font-weight:700;">Tiempo de espera agotado</h3>' +
-                    '<p class="j-texto-normal" style="color:#666;font-size:14px;text-align:center;">' +
-                        'Si ya realizaste el pago, cierra esta ventana y recarga la página.' +
-                    '</p>' +
-                    '<div style="display:flex;flex-direction:column;gap:10px;max-width:300px;margin:0 auto;">' +
-                        '<button id="j-retry-stripe" class="j-btn-primary" style="background:#FA299C;border-color:#FA299C;color:#FFFFFF;width:100%;text-align:center;padding:12px;border-radius:8px;font-weight:600;font-size:15px;cursor:pointer;border:none;transition:all 0.2s ease;">' +
-                            'Reintentar pago' +
-                        '</button>' +
-                        '<button id="j-back-to-payment-methods" class="j-btn-back" style="background:#24B8C8;border-color:#24B8C8;color:#FFFFFF;width:100%;text-align:center;padding:12px;border-radius:8px;font-weight:600;font-size:15px;cursor:pointer;border:none;transition:all 0.2s ease;justify-content:center;">' +
-                            'Volver a métodos de pago' +
-                        '</button>' +
-                    '</div>' +
-                '</div>'
-            );
-            
-            // Evento para reintentar
-            $(document).off('click', '#j-retry-stripe').on('click', '#j-retry-stripe', function() {
-                sessionStorage.removeItem('juguemos_payment_verified');
-                sessionStorage.removeItem('juguemos_payment_token');
-                sessionStorage.removeItem('juguemos_order_id');
+                return response.json();
+            })
+            .then(data => {
+                console.log('Stripe Response:', data);
                 
-                $('#j-waiting-message').remove();
-                $('.j-payment-methods-grid').show();
-                $('#j-process-payment').show();
-                $('#j-process-payment').prop('disabled', false);
-                $('#j-payment-loading').hide();
-            });
-            
-            // Evento para volver a métodos de pago
-            $(document).off('click', '#j-back-to-payment-methods').on('click', '#j-back-to-payment-methods', function() {
-                $('#j-waiting-message').remove();
-                $('.j-payment-methods-grid').show();
-                $('#j-process-payment').show();
-                $('#j-process-payment').prop('disabled', false);
-                $('#j-payment-loading').hide();
+                if (data.success && data.url) {
+                    if (data.session_id) {
+                        sessionStorage.setItem('juguemos_stripe_session_id', data.session_id);
+                    }
+                    
+                    window.open(data.url, '_blank', 'width=800,height=600');
+                    
+                    this.startPaymentVerification(data.session_id || order_id);
+                    
+                } else {
+                    this.handleStripeError(data.error, currency);
+                    this.restoreButton($('#j-process-payment'));
+                }
+            })
+            .catch(error => {
+                console.error('Stripe Error:', error);
+                alert('Error de conexión: ' + error.message);
+                this.handlePaymentError();
             });
         }
-    }, 3000);
-}
+        
+
+        handleStripeError(error, currency) {
+            // Error genérico
+            alert('Error al procesar el pago: ' + (error || 'Intenta nuevamente.'));
+        }
     
         
         // ==================== MÉTODOS DE UTILIDAD ====================
@@ -397,8 +457,11 @@ startStripeVerification(order_id, session_id) {
         checkPaymentStatus() {
             const paymentVerified = sessionStorage.getItem('juguemos_payment_verified') === 'true';
             const paymentToken = sessionStorage.getItem('juguemos_payment_token');
+
+            const justMade = sessionStorage.getItem('juguemos_payment_just_made') === 'true';
+
             
-            if (paymentVerified && paymentToken) {
+            if (paymentVerified && paymentToken&& justMade) {
                 setTimeout(() => {
                     this.paymentSuccess();
                 }, 100);
@@ -423,11 +486,13 @@ startStripeVerification(order_id, session_id) {
             
             return false;
         }
-        
         startPaymentVerification(order_id) {
             let attempts = 0;
             const maxAttempts = 30;
             const self = this;
+            
+            // Detectar si es Stripe o PayPal
+            const isStripe = sessionStorage.getItem('juguemos_stripe_session_id') !== null;
             
             const checkPayment = setInterval(function() {
                 attempts++;
@@ -441,14 +506,22 @@ startStripeVerification(order_id, session_id) {
                     return;
                 }
                 
+                // Construir datos según el método
+                let data = { nonce: Juguemos.nonce };
+                
+                if (isStripe) {
+                    data.action = 'juguemos_verify_stripe';
+                    data.session_id = sessionStorage.getItem('juguemos_stripe_session_id');
+                    data.order_id = order_id;
+                } else {
+                    data.action = 'juguemos_verify_payment';
+                    data.token = order_id;
+                }
+                
                 $.ajax({
                     url: Juguemos.ajax_url,
                     method: 'POST',
-                    data: {
-                        action: 'juguemos_verify_payment',
-                        nonce: Juguemos.nonce,
-                        token: order_id
-                    },
+                    data: data,
                     success: function(response) {
                         if (response.success && response.data && response.data.paid) {
                             clearInterval(checkPayment);
@@ -462,42 +535,43 @@ startStripeVerification(order_id, session_id) {
                 if (attempts >= maxAttempts) {
                     clearInterval(checkPayment);
                     
+                    // Mensaje de timeout con colores existentes
                     $('#j-waiting-message').html(
                         '<div style="text-align:center;padding:20px;">' +
-                            '<h3 style="color:#FA299C;margin:0 0 10px 0;">El tiempo de espera ha terminado</h3>' +
-                            '<p class="j-texto-normal" style="color:#666;font-size:14px;text-align:center;">El pago no se pudo confirmar automáticamente.</p>' +
-                            '<p style="font-size:12px;color:#999;margin:5px 0 15px 0;text-align:center;">Puedes intentar nuevamente o seleccionar otro método de pago.</p>' +
-                            '<div style="display:flex;flex-direction:column;gap:10px;max-width:300px;margin:0 auto;">' +
-                                '<button id="j-retry-payment" class="j-btn-primary" style="background:#FA299C;border-color:#FA299C;width:100%;text-align:center;">Reintentar pago</button>' +
-                                '<button id="j-back-to-payment-methods" class="j-btn-back" style="width:100%;text-align:center;justify-content:center;">Volver a métodos de pago</button>' +
-                            '</div>' +
+                            '<p class="text-rosa-negrita md">Tiempo de espera agotado</p>' +
+                            '<p class="j-texto-normal md">Si ya realizaste el pago, cierra esta ventana y recarga la página.</p>' +
+                            '<button id="j-retry-payment" class="j-btn-primary">Reintentar pago</button>' +
+                            '<button id="j-back-to-payment-methods" class="j-btn-back">Volver a métodos de pago</button>' +
                         '</div>'
                     );
                     
+                    // Evento reintentar
                     $(document).off('click', '#j-retry-payment').on('click', '#j-retry-payment', function() {
                         sessionStorage.removeItem('juguemos_payment_verified');
                         sessionStorage.removeItem('juguemos_payment_token');
                         sessionStorage.removeItem('juguemos_order_id');
+                        sessionStorage.removeItem('juguemos_stripe_session_id');
+                        sessionStorage.removeItem('juguemos_paypal_token');
                         
                         $('#j-waiting-message').remove();
                         $('.j-payment-methods-grid').show();
-                        $('#j-process-payment').show();
-                        $('#j-process-payment').prop('disabled', false);
+                        $('#j-process-payment').show().prop('disabled', false);
                         $('#j-payment-loading').hide();
                     });
                     
+                    // Evento volver
                     $(document).off('click', '#j-back-to-payment-methods').on('click', '#j-back-to-payment-methods', function() {
                         $('#j-waiting-message').remove();
                         $('.j-payment-methods-grid').show();
-                        $('#j-process-payment').show();
-                        $('#j-process-payment').prop('disabled', false);
+                        $('#j-process-payment').show().prop('disabled', false);
                         $('#j-payment-loading').hide();
                     });
                 }
             }, 3000);
         }
         
-        paymentSuccess(forceDownload = false) {
+        
+       paymentSuccess(forceDownload = false) {
             if (this.isDownloading) {
                 console.log('Descarga ya en proceso, ignorando...');
                 return;
@@ -518,13 +592,23 @@ startStripeVerification(order_id, session_id) {
                 sessionStorage.setItem('juguemos_payment_token', 'admin_' + Date.now());
             }
             
+            const totalTablas = (JuguemosState.quantity || 1) * (JuguemosState.pages || 1);
+            const subtotal = (JuguemosState.unitPrice || 0) * totalTablas;
+            const isUSA = JuguemosState.country === 'USA';
+            const precioBarajas = isUSA ? (JuguemosState.precioBarajasUSA || 15.00) : (JuguemosState.precioBarajasMexico || 50.00);
+            const costoBarajas = JuguemosState.barajasIncluidas ? precioBarajas : 0;
+            const montoPagado = subtotal + costoBarajas;
+            
+            sessionStorage.setItem('juguemos_monto_pagado', montoPagado.toString());
             sessionStorage.setItem('juguemos_payment_verified', 'true');
+            sessionStorage.setItem('juguemos_payment_just_made', 'true');
             
             setTimeout(() => {
                 this.isDownloading = false;
             }, 3000);
         }
     }
+    
     
     $(document).ready(() => {
         window.JuguemosPaymentInstance = new JuguemosPayment();

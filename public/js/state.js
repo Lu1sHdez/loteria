@@ -12,7 +12,7 @@
 
         // Configuración
         quantity: 1,
-        pages: 10,
+        pages: 1,
         mode: "sencilla",
         grid: "4x4",
 
