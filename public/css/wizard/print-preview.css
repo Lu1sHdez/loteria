@@ -194,6 +194,11 @@
     background-size: cover;
     opacity: 2;
 }
+
+.j-barajas-grid.pdf-export::before {
+    display: none !important;
+    opacity: 0 !important;
+}
 /* ==========================================
    CONTENIDO DEL GRID
    ========================================== */

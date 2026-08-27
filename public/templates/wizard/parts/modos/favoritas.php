@@ -19,9 +19,11 @@ if (!defined('ABSPATH')) {
         </div>
     </div>
 
-    <!-- FILA 2: Categorías -->
-    <div class="j-favoritas-categorias" id="j-favoritas-categorias">
-        <!-- Se generan dinámicamente con JS -->
+    <!-- FILA 2: Navegación por grupos (igual que Personalizadas) -->
+    <div class="j-libre-nav" style="margin-bottom: 15px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+        <button class="j-libre-nav-btn active" data-group="0" id="j-fav-nav-0">Barajas 1-18</button>
+        <button class="j-libre-nav-btn" data-group="1" id="j-fav-nav-1">Barajas 19-36</button>
+        <button class="j-libre-nav-btn" data-group="2" id="j-fav-nav-2">Barajas 37-54</button>
     </div>
 
     <!-- FILA 3: Grid de barajas (ocupa todo el ancho) -->

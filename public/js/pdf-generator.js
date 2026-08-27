@@ -124,7 +124,7 @@ window.JuguemosPDF = {
                 const sheet = sheets[i];
 
                 // Ocultar la marca de agua para el PDF
-                sheet.querySelectorAll('.j-board-grid').forEach(grid => {
+                sheet.querySelectorAll('.j-board-grid, .j-barajas-grid').forEach(grid => {
                     grid.classList.add('pdf-export');
                 });
     
@@ -172,8 +172,7 @@ window.JuguemosPDF = {
                     paperConfig.height
                 );
     
-                // Volver a mostrar la marca de agua
-                sheet.querySelectorAll('.j-board-grid').forEach(grid => {
+                sheet.querySelectorAll('.j-board-grid, .j-barajas-grid').forEach(grid => {
                     grid.classList.remove('pdf-export');
                 });
 

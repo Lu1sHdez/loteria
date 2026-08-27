@@ -13,6 +13,7 @@
             this.seleccionadas = [];
             this.categoriaActual = null;
             this.ubicacion = 'aleatoria';
+            this.grupoActual = 0;
             
             this.populares = [3, 6, 27, 46, 4, 35, 1];
 
@@ -58,16 +59,17 @@
                 return;
             }
             
-            var categoriasOrdenadas = Object.keys(this.categorias).sort(function(a, b) {
-                return this.categorias[a].nombre.localeCompare(this.categorias[b].nombre);
-            }.bind(this));
-            
-            this.categoriaActual = categoriasOrdenadas[0] || Object.keys(this.categorias)[0];
-            
             this.bindEvents();
-            this.renderCategorias(categoriasOrdenadas);
+            this.renderCategorias(); // Ya no recibe parámetros
             this.cargarGridInicial();
             this.observarBarajas();
+            
+            // 🔥 NUEVO: Agregar eventos para los botones de navegación
+            document.querySelectorAll('.j-libre-nav-btn').forEach(function(btn, index) {
+                btn.addEventListener('click', function() {
+                    this.cambiarGrupo(index);
+                }.bind(this));
+            }.bind(this));
             
             console.log('📋 FavoritasManager iniciado');
         }
@@ -174,28 +176,8 @@
             }.bind(this));
         }
 
-        renderCategorias(categoriasOrdenadas) {
-            var container = document.getElementById('j-favoritas-categorias');
-            if (!container) return;
-            
-            container.innerHTML = '';
-            
-            categoriasOrdenadas.forEach(function(key) {
-                var cat = this.categorias[key];
-                if (!cat) return;
-                
-                var btn = document.createElement('button');
-                btn.className = 'j-favoritas-categoria-btn' + (key === this.categoriaActual ? ' active' : '');
-                btn.dataset.categoria = key;
-                btn.textContent = cat.nombre;
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.j-favoritas-categoria-btn').forEach(function(b) { b.classList.remove('active'); });
-                    btn.classList.add('active');
-                    this.categoriaActual = key;
-                    this.renderGrid();
-                }.bind(this));
-                container.appendChild(btn);
-            }.bind(this));
+        renderCategorias() {
+            return;
         }
 
         generarDistribucionInteligente() {
@@ -581,12 +563,6 @@ actualizarPreviewCruzadas() {
             
             grid.innerHTML = '';
             
-            var cat = this.categorias[this.categoriaActual];
-            if (!cat || !cat.numeros || cat.numeros.length === 0) {
-                grid.innerHTML = '<p style="color:#999;text-align:center;">No hay barajas en esta categoría</p>';
-                return;
-            }
-            
             var barajasDisponibles = this.getBarajasDelDiseno();
             
             if (barajasDisponibles.length === 0) {
@@ -599,27 +575,34 @@ actualizarPreviewCruzadas() {
                 return;
             }
             
+            // =========================================================
+            // 🔥 NUEVO: Mostrar TODAS las barajas por grupos (1-18, 19-36, 37-54)
+            // =========================================================
             var encontradas = 0;
-            cat.numeros.forEach(function(numero) {
-                var baraja = barajasDisponibles.find(function(b) { return parseInt(b.numero) === numero; });
-                if (!baraja) return;
+            var grupoActual = this.grupoActual || 0; // 0, 1, 2
+            var inicio = grupoActual * 18;
+            var fin = Math.min(inicio + 18, barajasDisponibles.length);
+            
+            for (var i = inicio; i < fin; i++) {
+                var baraja = barajasDisponibles[i];
+                if (!baraja) continue;
                 
                 encontradas++;
-                var isSelected = this.seleccionadas.some(function(s) { return parseInt(s.numero) === numero; });
-                var isPopular = this.populares.includes(numero);
+                var isSelected = this.seleccionadas.some(function(s) { return parseInt(s.numero) === parseInt(baraja.numero); });
+                var isPopular = this.populares.includes(parseInt(baraja.numero));
                 
                 var item = document.createElement('div');
                 item.className = 'j-favoritas-item' + (isSelected ? ' selected' : '');
                 
                 var html = `
                     <img src="${baraja.imagen}" alt="${baraja.nombre}" loading="lazy">
-                    ${isSelected ? '<span class="j-heart-center"></span>' : ''}
+                    ${isSelected ? '<span class="j-heart-center">❤️</span>' : ''}
                     <span class="j-favoritas-nombre">${baraja.nombre}</span>
                     <span class="j-check-circle">✓</span>
                 `;
                 
                 if (isPopular) {
-                    html += '<span class="j-popular-badge"><span class="heart"></span> Popular</span>';
+                    html += '<span class="j-popular-badge"><span class="heart">⭐</span> Popular</span>';
                 }
                 
                 item.innerHTML = html;
@@ -629,12 +612,12 @@ actualizarPreviewCruzadas() {
                 }.bind(this));
                 
                 grid.appendChild(item);
-            }.bind(this));
+            }
             
             if (encontradas === 0) {
                 grid.innerHTML = `
-                    <p class="j-favoritas-grid-wrapper">
-                        <span class="j-favoritas-mensaje">Prueba con otra categoría</span>
+                    <p style="color:#999;text-align:center;padding:20px;">
+                        No hay barajas en este grupo
                     </p>
                 `;
             }
@@ -724,6 +707,15 @@ actualizarPreviewCruzadas() {
             if (typeof llenarCasillasAutomatico === 'function') {
                 setTimeout(function() { llenarCasillasAutomatico(); }, 100);
             }
+        }
+        cambiarGrupo(grupo) {
+            this.grupoActual = grupo;
+            this.renderGrid();
+            
+            // Actualizar botones de navegación
+            document.querySelectorAll('.j-libre-nav-btn').forEach(function(btn, index) {
+                btn.classList.toggle('active', index === grupo);
+            });
         }
 
         seleccionAleatoria() {
