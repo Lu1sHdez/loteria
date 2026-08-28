@@ -14,7 +14,6 @@ class Juguemos_Assets
             'wp_enqueue_scripts',
             [$this, 'frontend_assets']
         );
-
     }
 
     public function frontend_assets()
@@ -259,5 +258,4 @@ class Juguemos_Assets
         );
 
     }
-
 }

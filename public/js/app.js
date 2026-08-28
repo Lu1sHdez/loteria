@@ -1,26 +1,91 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+    // =========================================================
+    // 1. DETECTAR PAÍS POR IP (SOLO PARA MONEDA)
+    // =========================================================
+    function detectarPaisPorIP() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const lang = urlParams.get('lang');
+        const forceCountry = urlParams.get('force_country');
+        
+        // 1. Si hay force por URL, usarlo (prioridad máxima)
+        if (lang === 'en' || forceCountry === 'USA') {
+            JuguemosState.country = 'USA';
+            JuguemosState.currency = 'USD';
+            actualizarUIPais('USA');
+            updatePaperOptions();
+            updatePrice();
+            updateOrderSummary();
+            return;
+        }
+        
+        if (lang === 'es' || forceCountry === 'Mexico') {
+            JuguemosState.country = 'Mexico';
+            JuguemosState.currency = 'MXN';
+            actualizarUIPais('Mexico');
+            updatePaperOptions();
+            updatePrice();
+            updateOrderSummary();
+            return;
+        }
+        
+        // 2. Si no hay force, detectar por IP (SOLO para moneda)
+        fetch(Juguemos.ajax_url + "?action=juguemos_get_country&t=" + Date.now())
+            .then(r => r.json())
+            .then(response => {
+                if (response.success) {
+                    const country = response.data.country;
+                    const currency = response.data.currency;
+                    
+                    // Solo actualizar si cambió
+                    if (JuguemosState.country !== country) {
+                        JuguemosState.country = country;
+                        JuguemosState.currency = currency;
+                        
+                        actualizarUIPais(country);
+                        updatePaperOptions();
+                        updatePrice();
+                        updateOrderSummary();
+                        console.log('📍 País detectado por IP:', country, currency);
+                    }
+                }
+            })
+            .catch(error => {
+                console.warn('⚠️ No se pudo detectar país por IP');
+            });
+    }
 
+    // =========================================================
+    // 2. ACTUALIZAR UI DEL PAÍS (SOLO BOTONES)
+    // =========================================================
+    function actualizarUIPais(country) {
+        document.querySelectorAll(".country").forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.country === country);
+        });
+    }
+
+    // =========================================================
+    // 3. LIMPIAR SESSION STORAGE (pagos)
+    // =========================================================
     const urlParams = new URLSearchParams(window.location.search);
     const isPaymentSuccess = urlParams.get('payment') === 'stripe_success' || urlParams.get('payment') === 'success';
     
-    // Si NO venimos de un pago exitoso, limpiar TODO
     if (!isPaymentSuccess) {
-        ['juguemos_payment_verified', 'juguemos_payment_token', 'juguemos_page_loaded', 'juguemos_order_id', 'juguemos_stripe_session_id', 'juguemos_paypal_token', 'juguemos_payment_just_made',  'juguemos_monto_pagado'].forEach(key => {
+        ['juguemos_payment_verified', 'juguemos_payment_token', 'juguemos_page_loaded', 'juguemos_order_id', 'juguemos_stripe_session_id', 'juguemos_paypal_token', 'juguemos_payment_just_made', 'juguemos_monto_pagado'].forEach(key => {
             sessionStorage.removeItem(key);
         });
     } else {
-        // Si venimos de un pago exitoso, mantener solo lo necesario
         sessionStorage.setItem('juguemos_page_loaded', 'true');
     }
 
-    // ========== INICIALIZACIÓN ==========
+    // =========================================================
+    // 4. INICIALIZACIÓN
+    // =========================================================
     if (typeof JuguemosAjax !== 'undefined' && typeof JuguemosState !== 'undefined') {
         JuguemosAjax.loadCategories();
         updatePrice();
         updatePaperOptions();
     } else {
-        console.error('JuguemosAjax o JuguemosState no están definidos');
         return;
     }
 
@@ -190,7 +255,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     drawGrid();
 
-    // ========== ORIENTACIÓN ==========
     document.querySelectorAll(".j-orientation").forEach(button => {
         button.addEventListener("click", () => {
             document.querySelectorAll(".j-orientation").forEach(b => b.classList.remove("active"));
@@ -202,7 +266,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // ========== TABLAS POR HOJA ==========
     const tablesPerPageInput = document.getElementById("j-tables-per-page");
     if (tablesPerPageInput) {
         const updateTables = () => {
@@ -265,135 +328,133 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ========== COLORES ==========
 
-// 1. Color de Marco (12 colores)
-document.querySelectorAll(".j-color-swatch").forEach(swatch => {
-    swatch.addEventListener("click", function() {
-        document.querySelectorAll(".j-color-swatch").forEach(s => s.classList.remove("active"));
-        this.classList.add("active");
-        JuguemosState.marcoColor = this.dataset.color;
-        
-        // Actualizar indicador
-        const display = document.getElementById('j-marco-color-display');
-        const preview = document.getElementById('j-marco-color-preview');
-        if (display) display.textContent = this.dataset.color;
-        if (preview) preview.style.background = this.dataset.color;
-        
-        aplicarColores();
-        if (typeof updateOrderSummary === 'function') updateOrderSummary();
-        var event = new Event('gridChanged');
-        document.dispatchEvent(event);
-    });
-});
-
-// 2. Color Fondo de Tabla (12 colores)
-document.querySelectorAll(".j-fondo-swatch").forEach(swatch => {
-    swatch.addEventListener("click", function() {
-        document.querySelectorAll(".j-fondo-swatch").forEach(s => s.classList.remove("active"));
-        this.classList.add("active");
-        JuguemosState.fondoColor = this.dataset.color;
-        
-        // Actualizar indicador
-        const display = document.getElementById('j-fondo-color-display');
-        const preview = document.getElementById('j-fondo-color-preview');
-        if (display) display.textContent = this.dataset.color;
-        if (preview) preview.style.background = this.dataset.color;
-        
-        aplicarColores();
-        if (typeof updateOrderSummary === 'function') updateOrderSummary();
-        var event = new Event('gridChanged');
-        document.dispatchEvent(event);
-    });
-});
-
-// 3. Función para aplicar colores
-function aplicarColores() {
-    document.documentElement.style.setProperty('--j-marco-color', JuguemosState.marcoColor || '#FA299C');
-    document.documentElement.style.setProperty('--j-fondo-color', JuguemosState.fondoColor || '#FA299C');
-}
-
-// 4. Inicializar colores al cargar
-function inicializarColores() {
-    // Marco
-    const marcoActivo = document.querySelector('.j-color-swatch.active');
-    if (marcoActivo) {
-        JuguemosState.marcoColor = marcoActivo.dataset.color;
-        const display = document.getElementById('j-marco-color-display');
-        const preview = document.getElementById('j-marco-color-preview');
-        if (display) display.textContent = marcoActivo.dataset.color;
-        if (preview) preview.style.background = marcoActivo.dataset.color;
-    } else {
-        const primerMarco = document.querySelector('.j-color-swatch');
-        if (primerMarco) {
-            primerMarco.classList.add('active');
-            JuguemosState.marcoColor = primerMarco.dataset.color;
+    document.querySelectorAll(".j-color-swatch").forEach(swatch => {
+        swatch.addEventListener("click", function() {
+            document.querySelectorAll(".j-color-swatch").forEach(s => s.classList.remove("active"));
+            this.classList.add("active");
+            JuguemosState.marcoColor = this.dataset.color;
+            
+            // Actualizar indicador
             const display = document.getElementById('j-marco-color-display');
             const preview = document.getElementById('j-marco-color-preview');
-            if (display) display.textContent = primerMarco.dataset.color;
-            if (preview) preview.style.background = primerMarco.dataset.color;
-        }
-    }
+            if (display) display.textContent = this.dataset.color;
+            if (preview) preview.style.background = this.dataset.color;
+            
+            aplicarColores();
+            if (typeof updateOrderSummary === 'function') updateOrderSummary();
+            var event = new Event('gridChanged');
+            document.dispatchEvent(event);
+        });
+    });
 
-    // Fondo
-    const fondoActivo = document.querySelector('.j-fondo-swatch.active');
-    if (fondoActivo) {
-        JuguemosState.fondoColor = fondoActivo.dataset.color;
-        const display = document.getElementById('j-fondo-color-display');
-        const preview = document.getElementById('j-fondo-color-preview');
-        if (display) display.textContent = fondoActivo.dataset.color;
-        if (preview) preview.style.background = fondoActivo.dataset.color;
-    } else {
-        const primerFondo = document.querySelector('.j-fondo-swatch');
-        if (primerFondo) {
-            primerFondo.classList.add('active');
-            JuguemosState.fondoColor = primerFondo.dataset.color;
+    // 2. Color Fondo de Tabla (12 colores)
+    document.querySelectorAll(".j-fondo-swatch").forEach(swatch => {
+        swatch.addEventListener("click", function() {
+            document.querySelectorAll(".j-fondo-swatch").forEach(s => s.classList.remove("active"));
+            this.classList.add("active");
+            JuguemosState.fondoColor = this.dataset.color;
+            
+            // Actualizar indicador
             const display = document.getElementById('j-fondo-color-display');
             const preview = document.getElementById('j-fondo-color-preview');
-            if (display) display.textContent = primerFondo.dataset.color;
-            if (preview) preview.style.background = primerFondo.dataset.color;
-        }
+            if (display) display.textContent = this.dataset.color;
+            if (preview) preview.style.background = this.dataset.color;
+            
+            aplicarColores();
+            if (typeof updateOrderSummary === 'function') updateOrderSummary();
+            var event = new Event('gridChanged');
+            document.dispatchEvent(event);
+        });
+    });
+
+    // 3. Función para aplicar colores
+    function aplicarColores() {
+        document.documentElement.style.setProperty('--j-marco-color', JuguemosState.marcoColor || '#FA299C');
+        document.documentElement.style.setProperty('--j-fondo-color', JuguemosState.fondoColor || '#FA299C');
     }
 
-    aplicarColores();
-}
-
-inicializarColores();
-
-
-// ========== TOGGLE INCLUIR BARAJAS ==========
-const btnIncluir = document.getElementById("j-incluir-barajas");
-const toggleIcon = document.getElementById("j-toggle-icon");
-if (btnIncluir) {
-
-    const setActive = (active) => {
-        JuguemosState.barajasIncluidas = active;
-
-                const textSpan = btnIncluir.querySelector('.j-toggle-text');
-        if (textSpan) {
-            textSpan.textContent = active ? 'Incluir barajas' : 'No incluir barajas';
+    // 4. Inicializar colores al cargar
+    function inicializarColores() {
+        // Marco
+        const marcoActivo = document.querySelector('.j-color-swatch.active');
+        if (marcoActivo) {
+            JuguemosState.marcoColor = marcoActivo.dataset.color;
+            const display = document.getElementById('j-marco-color-display');
+            const preview = document.getElementById('j-marco-color-preview');
+            if (display) display.textContent = marcoActivo.dataset.color;
+            if (preview) preview.style.background = marcoActivo.dataset.color;
+        } else {
+            const primerMarco = document.querySelector('.j-color-swatch');
+            if (primerMarco) {
+                primerMarco.classList.add('active');
+                JuguemosState.marcoColor = primerMarco.dataset.color;
+                const display = document.getElementById('j-marco-color-display');
+                const preview = document.getElementById('j-marco-color-preview');
+                if (display) display.textContent = primerMarco.dataset.color;
+                if (preview) preview.style.background = primerMarco.dataset.color;
+            }
         }
-                toggleIcon.src =
-            `/wp-content/uploads/2026/07/incluir_${active ? "on" : "off"}.png`;
+
+        // Fondo
+        const fondoActivo = document.querySelector('.j-fondo-swatch.active');
+        if (fondoActivo) {
+            JuguemosState.fondoColor = fondoActivo.dataset.color;
+            const display = document.getElementById('j-fondo-color-display');
+            const preview = document.getElementById('j-fondo-color-preview');
+            if (display) display.textContent = fondoActivo.dataset.color;
+            if (preview) preview.style.background = fondoActivo.dataset.color;
+        } else {
+            const primerFondo = document.querySelector('.j-fondo-swatch');
+            if (primerFondo) {
+                primerFondo.classList.add('active');
+                JuguemosState.fondoColor = primerFondo.dataset.color;
+                const display = document.getElementById('j-fondo-color-display');
+                const preview = document.getElementById('j-fondo-color-preview');
+                if (display) display.textContent = primerFondo.dataset.color;
+                if (preview) preview.style.background = primerFondo.dataset.color;
+            }
+        }
+
+        aplicarColores();
+    }
+
+    inicializarColores();
+
+
+    const btnIncluir = document.getElementById("j-incluir-barajas");
+    const toggleIcon = document.getElementById("j-toggle-icon");
+    if (btnIncluir) {
+
+        const setActive = (active) => {
+            JuguemosState.barajasIncluidas = active;
+
+                    const textSpan = btnIncluir.querySelector('.j-toggle-text');
+            if (textSpan) {
+                textSpan.textContent = active ? 'Incluir barajas' : 'No incluir barajas';
+            }
+                    toggleIcon.src =
+                `/wp-content/uploads/2026/07/incluir_${active ? "on" : "off"}.png`;
+            
+            const statusText = document.getElementById("j-incluir-status");
+            if (statusText) {
+                statusText.style.display = 'none';
+            }
+            
+            updateOrderSummary();
+            if (typeof PrintPaper !== "undefined") {
+                setTimeout(() => PrintPaper.refresh(), 150);
+            }
+            var event = new Event('gridChanged');
+            document.dispatchEvent(event);
+        };
         
-        const statusText = document.getElementById("j-incluir-status");
-        if (statusText) {
-            statusText.style.display = 'none';
-        }
+        // Por defecto DESACTIVADO
+        setActive(false);
         
-        updateOrderSummary();
-        if (typeof PrintPaper !== "undefined") {
-            setTimeout(() => PrintPaper.refresh(), 150);
-        }
-        var event = new Event('gridChanged');
-        document.dispatchEvent(event);
-    };
-    
-    // Por defecto DESACTIVADO
-    setActive(false);
-    
-    btnIncluir.addEventListener("click", () => {
-        setActive(!JuguemosState.barajasIncluidas);
-    });
-}
+        btnIncluir.addEventListener("click", () => {
+            setActive(!JuguemosState.barajasIncluidas);
+        });
+    }
 
     // ========== SELECCIÓN ALEATORIA ==========
     const btnAleatoria = document.querySelector(".j-casilla-btn");
@@ -468,7 +529,6 @@ if (btnIncluir) {
                 alert('No se generaron cartas dobles. Intenta nuevamente.');
                 return;
             }
-            console.log('Cartas dobles generadas:', cartasDobles.length);
         }
 
         //  NUEVO: VALIDACIÓN GENERAL - Que haya un diseño seleccionado
@@ -496,7 +556,6 @@ if (btnIncluir) {
         if (typeof ejecutarLlenadoAleatorio === 'function') {
             ejecutarLlenadoAleatorio();
         } else {
-            console.error('ejecutarLlenadoAleatorio no está definido');
             return;
         }
 
@@ -579,7 +638,6 @@ if (btnIncluir) {
                 if (window.history?.replaceState) window.history.replaceState({}, document.title, window.location.pathname);
             }, 800);
         } else {
-            console.warn('No se encontró verificación de pago');
             setTimeout(() => window.location.href = '/juguemos', 2000);
         }
     }
@@ -688,11 +746,17 @@ if (btnIncluir) {
         if (aleatoriaOption) aleatoriaOption.style.display = '';
     }
 
-});
+    setTimeout(detectarPaisPorIP, 500);
+    
+    setTimeout(detectarGTranslate, 300);
 
-// =========================================================
-// FUNCIONES GLOBALES
-// =========================================================
+    setTimeout(() => {
+        if (JuguemosState.mode === 'dobles' && typeof window.DoblesManager !== 'undefined') {
+            window.DoblesManager.init();
+        }
+    }, 400);
+
+});
 
 function updatePrice() {
     if (typeof JuguemosAjax !== 'undefined' && typeof JuguemosState !== 'undefined') {
@@ -861,10 +925,6 @@ function drawGrid() {
     var event = new Event('gridChanged');
     document.dispatchEvent(event);
 }
-
-// =========================================================
-// POSICIONES FIJAS PARA FAVORITAS (ESTÁTICAS)
-// =========================================================
 
 function obtenerPosicionesFavoritasEstaticas(grid) {
     var total = getTotalCasillas(grid);
@@ -1388,31 +1448,12 @@ function regenerarTodasLasTablas() {
     document.dispatchEvent(event);
 }
 
-// =========================================================
-// PAÍS Y GTRANSLATE
-// =========================================================
 function cambiarIdiomaGTtranslate(lang) {
     const country = lang === 'en' ? 'USA' : 'Mexico';
     document.cookie = `juguemos_country=${country}; path=/; max-age=31536000`;
     const url = new URL(window.location.href);
     url.searchParams.set('lang', lang);
     window.location.href = url.toString();
-}
-
-function sincronizarPais() {
-    const lang = new URLSearchParams(window.location.search).get('lang');
-    const country = lang === 'en' ? 'USA' : lang === 'es' ? 'Mexico' : getCookie('juguemos_country') || 'Mexico';
-    document.querySelectorAll(".country").forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.country === country);
-    });
-    JuguemosState.country = country;
-    JuguemosState.currency = country === 'USA' ? 'USD' : 'MXN';
-    updatePaperOptions();
-    updatePrice();
-    updateOrderSummary();
-
-    var event = new Event('gridChanged');
-    document.dispatchEvent(event);
 }
 
 function getCookie(name) {
@@ -1481,7 +1522,6 @@ function llenarCasillasAutomatico() {
 
 function ejecutarLlenadoAleatorio() {
     if (!JuguemosState.barajas?.length) {
-        console.warn('ejecutarLlenadoAleatorio: No hay barajas');
         return;
     }
     
@@ -1945,16 +1985,5 @@ function distribuirFavoritasPorTablas(favoritas, totalTablas, maxPorTabla) {
     return resultado;
 }
 
-    document.addEventListener('dragstart', e => e.preventDefault());
-    document.addEventListener('contextmenu', e => e.preventDefault());
-
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(sincronizarPais, 100);
-    setTimeout(detectarGTranslate, 300);
-
-    setTimeout(() => {
-        if (JuguemosState.mode === 'dobles' && typeof window.DoblesManager !== 'undefined') {
-            window.DoblesManager.init();
-        }
-    }, 400);
-});
+document.addEventListener('dragstart', e => e.preventDefault());
+document.addEventListener('contextmenu', e => e.preventDefault());

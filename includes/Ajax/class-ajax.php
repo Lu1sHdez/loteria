@@ -69,7 +69,55 @@ class Juguemos_Ajax
         
         add_action('wp_ajax_juguemos_mark_paid', [$this, 'mark_paid']);
         add_action('wp_ajax_nopriv_juguemos_mark_paid', [$this, 'mark_paid']);
+        add_action(
+            'wp_ajax_juguemos_get_country',
+            [$this, 'get_country']
+        );
+        add_action(
+            'wp_ajax_nopriv_juguemos_get_country',
+            [$this, 'get_country']
+        );
     }
+    public function get_country()
+    {
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+        
+        // Si está en localhost, usar Mexico por defecto (para pruebas usa ?lang=en)
+        if ($ip === '127.0.0.1' || $ip === '::1') {
+            wp_send_json_success(['country' => 'Mexico', 'currency' => 'MXN']);
+            return;
+        }
+        
+        // Cachear por IP (1 hora)
+        $cache_key = 'juguemos_country_' . md5($ip);
+        $cached = get_transient($cache_key);
+        if ($cached !== false) {
+            wp_send_json_success($cached);
+            return;
+        }
+        
+        // Detectar por IP
+        $response = wp_remote_get("http://ip-api.com/json/{$ip}?fields=status,countryCode", [
+            'timeout' => 3
+        ]);
+        
+        if (!is_wp_error($response)) {
+            $data = json_decode(wp_remote_retrieve_body($response), true);
+            if ($data && $data['status'] === 'success') {
+                $country = $data['countryCode'] === 'US' ? 'USA' : 'Mexico';
+                $currency = $country === 'USA' ? 'USD' : 'MXN';
+                
+                $result = ['country' => $country, 'currency' => $currency];
+                set_transient($cache_key, $result, HOUR_IN_SECONDS);
+                wp_send_json_success($result);
+                return;
+            }
+        }
+        
+        // Fallback: Mexico
+        wp_send_json_success(['country' => 'Mexico', 'currency' => 'MXN']);
+    }
+
 
     public function categories()
     {
