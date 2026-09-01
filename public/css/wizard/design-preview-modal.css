@@ -129,7 +129,7 @@
 
 .j-design-preview-close:hover {
     color: #FA299C;
-    font-weight: 700px;
+    font-weight: 700;
     background: none;
 }
 
@@ -160,6 +160,42 @@
 
 .j-design-preview-body::-webkit-scrollbar-thumb:hover {
     background: #179B95;
+}
+
+/* =====================================================
+   ESTADO DE CARGA (LOADING)
+===================================================== */
+
+.j-design-preview-loading {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    gap: 16px;
+}
+
+.j-design-preview-loading p {
+    margin: 0;
+    font-family: 'Cairo', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1FAFB4;
+}
+
+.j-design-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #E8E8E8;
+    border-top: 4px solid #1FAFB4;
+    border-radius: 50%;
+    animation: jDesignSpin 1s linear infinite;
+}
+
+@keyframes jDesignSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 /* =====================================================
@@ -264,41 +300,6 @@
     justify-content: center;
 }
 
-/* =====================================================
-   LOADING Y EMPTY STATE
-===================================================== */
-
-.j-design-preview-loading {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 60px 20px;
-    grid-column: 1 / -1;
-}
-
-.j-design-preview-loading .j-spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid #E5E5E5;
-    border-top: 4px solid #1FAFB4;
-    border-radius: 50%;
-    animation: jDesignSpin 0.8s linear infinite;
-    margin-bottom: 15px;
-}
-
-@keyframes jDesignSpin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.j-design-preview-loading p {
-    font-family: 'Cairo', sans-serif;
-    color: #888;
-    font-size: 14px;
-    margin: 0;
-}
-
 .j-design-preview-empty {
     grid-column: 1 / -1;
     text-align: center;
@@ -379,4 +380,79 @@
     .j-design-preview-header h3 {
         font-size: 15px;
     }
+}
+
+/* Superposición de Marca de Agua Ultra Rápida por CSS */
+.j-design-preview-card-image {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #F8F8F8;
+    padding: 8px;
+    overflow: hidden;
+}
+
+.j-watermark-overlay {
+    position: absolute;
+    inset: 0;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    opacity: 1.0;
+    pointer-events: none; 
+    z-index: 2;
+}
+
+.j-design-preview-card-image img {
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+/* =====================================================
+   BOTÓN DE DESCARGA SOBRE LA TARJETA
+===================================================== */
+
+.j-design-preview-card-image {
+    position: relative;
+}
+
+.j-download-card-btn {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    z-index: 5;
+    background: #1FAFB4;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+    padding: 0;
+}
+
+.j-download-card-btn:hover {
+    background: #179B95;
+    transform: scale(1.1);
+}
+
+.j-download-card-btn:active {
+    transform: scale(0.95);
+}
+
+/* Spinner dentro del botón mientras fusiona la imagen */
+.j-btn-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #FFFFFF;
+    border-radius: 50%;
+    animation: jDesignSpin 0.6s linear infinite;
 }

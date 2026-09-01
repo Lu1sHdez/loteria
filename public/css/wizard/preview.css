@@ -201,7 +201,7 @@
 
 /* ===== VISTA PREVIA DE UBICACIÓN ===== */
 .j-preview-ubicacion-section {
-    margin-top: 120px;
+    margin-top: 10px;
     padding-top: 5px;
 }
 
@@ -226,7 +226,8 @@
 /* ===== VISTA PREVIA CASILLAS ===== */
 .j-preview-casillas-section {
     margin-top: 90px;
-    padding-top: 5px;
+    padding-top: 0px;
+    flex-direction: column;
 }
 
 .j-preview-casillas-title {
@@ -249,7 +250,7 @@
 
 /* ===== VISTA PREVIA MARCOS ===== */
 .j-preview-marcos-section {
-    margin-top: 20px;
+    margin-top: 1px;
     padding-top: 5px;
 }
 
@@ -284,14 +285,8 @@
     border-top: none;
 }
 
-/* ==========================================
-   POCITOS 3 - VISTA PREVIA CASILLAS (CORREGIDO)
-   ========================================== */
-/* ==========================================
-   POCITOS 3 - VISTA PREVIA CASILLAS (RECTÁNGULO)
-   ========================================== */
 
-   #j-casilla-preview-grid[data-grid="pocitos3"] {
+#j-casilla-preview-grid[data-grid="pocitos3"] {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;

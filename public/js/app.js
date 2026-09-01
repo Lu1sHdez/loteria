@@ -692,10 +692,17 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("tables-number").value = JuguemosState.quantity;
         document.getElementById("tables-range").value = JuguemosState.quantity;
         document.getElementById("tables-range").dispatchEvent(new Event("input"));
-        document.querySelectorAll(".j-step").forEach(s => s.classList.remove("active"));
-        document.getElementById("juguemos-design").classList.add("active");
-        document.querySelectorAll(".juguemos-step").forEach(s => s.classList.remove("active"));
-        document.querySelector('.juguemos-step[data-step="1"]')?.classList.add("active");
+
+        // 🔥 Ahora la configuración de tablas vive en el sub-paso 1 de "Personaliza"
+        if (typeof window.JuguemosMostrarPersonaliza === 'function') {
+            window.JuguemosMostrarPersonaliza(1);
+        } else {
+            // Fallback por si el script de personaliza aún no cargó
+            document.querySelectorAll(".j-step").forEach(s => s.classList.remove("active"));
+            document.getElementById("juguemos-design").classList.add("active");
+            document.querySelectorAll(".juguemos-step").forEach(s => s.classList.remove("active"));
+            document.querySelector('.juguemos-step[data-step="1"]')?.classList.add("active");
+        }
         window.scrollTo({ top: 0, behavior: "smooth" });
     });
 
@@ -1929,3 +1936,4 @@ function distribuirFavoritasPorTablas(favoritas, totalTablas, maxPorTabla) {
 
 document.addEventListener('dragstart', e => e.preventDefault());
 document.addEventListener('contextmenu', e => e.preventDefault());
+

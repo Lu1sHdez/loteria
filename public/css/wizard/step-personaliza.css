@@ -1,0 +1,37 @@
+/* =====================================================
+   ESPACIADO PARA SECCIONES DE PERSONALIZA
+   ===================================================== */
+
+/* 🔥 Clase para dar el mismo espaciado que en Estilo de lotería */
+.j-section-personaliza {
+    margin-bottom: 40px;
+}
+
+/* 🔥 Espacio extra para la sección de casillas */
+.j-section-casillas-definir {
+    margin-top: 10px;
+    padding-top: 25px;
+    border-top: 2px solid #f0f0f0;
+}
+
+/* 🔥 Espacio para los botones de navegación */
+.j-section-botones {
+    margin-top: 30px;
+    padding-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 2px solid #f0f0f0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .j-section-personaliza {
+        margin-bottom: 30px;
+    }
+    
+    .j-section-casillas-definir {
+        margin-top: 20px;
+        padding-top: 18px;
+    }
+}

@@ -1,10 +1,7 @@
 /**
  * =====================================================
- * DESIGN PREVIEW MODAL - Ver todas las barajas del diseño
+ * DESIGN PREVIEW MODAL - Carga Instantánea (Ultra Rápida)
  * =====================================================
- * Módulo independiente que no afecta otras funcionalidades
- * 
- * 🔥 VERSIÓN CORREGIDA: El botón siempre aparece al cambiar de diseño
  */
 
 (function() {
@@ -15,8 +12,8 @@
             this.modal = null;
             this.overlay = null;
             this.designId = null;
-            this.barajas = [];
             this.ultimoDiseno = null;
+            this.watermarkUrl = '/wp-content/uploads/2026/07/marca_agua.png';
             this.init();
         }
 
@@ -30,85 +27,50 @@
 
         setup() {
             this.createModalStructure();
-
-            // 🔥 MÉTODO PRINCIPAL: Observar cambios en JuguemosState.deck
             this.observarCambioDiseno();
-
-            // 🔥 OBSERVAR CAMBIOS EN LA VISTA PREVIA
             this.observeDesignPreview();
-
-            // 🔥 OBSERVAR CAMBIOS EN EL TÍTULO
             this.observeTitleChanges();
 
-            // Escuchar clicks en el botón
             document.addEventListener('click', (e) => {
                 if (e.target.matches('#j-view-full-design') || e.target.closest('#j-view-full-design')) {
                     this.openModal();
                 }
             });
 
-            // Cerrar modal con ESC
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && this.modal && this.modal.classList.contains('active')) {
                     this.closeModal();
                 }
             });
 
-            // 🔥 AGREGAR BOTÓN INICIAL
             setTimeout(() => this.addButtonToPreview(), 500);
         }
 
-        /**
-         * 🔥 OBSERVA CAMBIOS EN JuguemosState.deck
-         * Esta es la clave para que el botón aparezca al seleccionar otro diseño
-         */
         observarCambioDiseno() {
-            // Usar setInterval para monitorear cambios en el deck
             setInterval(() => {
                 const deckActual = JuguemosState?.deck || null;
-                
                 if (deckActual !== this.ultimoDiseno) {
                     this.ultimoDiseno = deckActual;
-                    console.log('🔄 Diseño cambiado a:', deckActual);
-                    
-                    // Esperar a que se cargue la vista previa
-                    setTimeout(() => {
-                        this.addButtonToPreview();
-                    }, 300);
+                    setTimeout(() => this.addButtonToPreview(), 300);
                 }
             }, 300);
 
-            // 🔥 También escuchar evento gridChanged
             document.addEventListener('gridChanged', () => {
-                console.log('🔄 gridChanged detectado');
-                setTimeout(() => {
-                    this.addButtonToPreview();
-                }, 200);
+                setTimeout(() => this.addButtonToPreview(), 200);
             });
         }
 
-        /**
-         * 🔥 OBSERVA CAMBIOS EN EL TÍTULO
-         */
         observeTitleChanges() {
             const previewTitle = document.querySelector('.j-preview-title');
             if (!previewTitle) return;
 
             const observer = new MutationObserver(() => {
-                console.log('🔄 Título cambiado');
                 setTimeout(() => this.addButtonToPreview(), 100);
             });
 
-            observer.observe(previewTitle, {
-                childList: true,
-                subtree: true,
-                characterData: true
-            });
+            observer.observe(previewTitle, { childList: true, subtree: true, characterData: true });
         }
 
-        /**
-         * Crea la estructura HTML del modal
-         */
         createModalStructure() {
             if (document.getElementById('j-design-preview-modal')) return;
 
@@ -120,12 +82,7 @@
                             <button id="j-design-preview-close" class="j-design-preview-close">×</button>
                         </div>
                         <div class="j-design-preview-body">
-                            <div id="j-design-preview-grid" class="j-design-preview-grid">
-                                <div class="j-design-preview-loading">
-                                    <div class="j-spinner"></div>
-                                    <p>Cargando barajas...</p>
-                                </div>
-                            </div>
+                            <div id="j-design-preview-grid" class="j-design-preview-grid"></div>
                         </div>
                         <div class="j-design-preview-footer">
                             <span id="j-design-preview-count">0 barajas</span>
@@ -148,24 +105,15 @@
             });
         }
 
-        /**
-         * Observa cambios en la vista previa del diseño (fallback)
-         */
         observeDesignPreview() {
             const previewContainer = document.getElementById('deck-preview');
             if (!previewContainer) return;
 
             const observer = new MutationObserver(() => {
-                console.log('🔄 deck-preview mutado');
                 setTimeout(() => this.addButtonToPreview(), 150);
             });
 
-            observer.observe(previewContainer, {
-                childList: true,
-                subtree: true,
-                characterData: true,
-                attributes: true
-            });
+            observer.observe(previewContainer, { childList: true, subtree: true, characterData: true, attributes: true });
         }
 
         addButtonToPreview() {
@@ -187,9 +135,7 @@
 
             const existingBtn = previewTitle.querySelector('#j-view-full-design');
             if (existingBtn) {
-                if (existingBtn.style.display === 'none') {
-                    existingBtn.style.display = '';
-                }
+                if (existingBtn.style.display === 'none') existingBtn.style.display = '';
                 return;
             }
 
@@ -205,7 +151,7 @@
         }
 
         /**
-         * Abre el modal con las barajas del diseño
+         * ABRE EL MODAL DE INMEDIATO
          */
         async openModal() {
             const designId = JuguemosState?.deck;
@@ -214,77 +160,80 @@
                 return;
             }
 
-            const barajas = JuguemosState?.barajas || [];
+            const designName = document.querySelector('.j-preview-title p')?.textContent || 'Diseño';
+            const title = document.getElementById('j-design-preview-title');
+            if (title) title.textContent = designName;
+
+            // 1. ABRIR VENTANA INMEDIATAMENTE
+            this.overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            let barajas = JuguemosState?.barajas || [];
+
+            // 2. Si no están en JS, traer por AJAX
             if (barajas.length === 0) {
+                const grid = document.getElementById('j-design-preview-grid');
+                if (grid) {
+                    grid.innerHTML = `
+                        <div class="j-design-preview-loading">
+                            <div class="j-design-spinner"></div>
+                            <p>Cargando información...</p>
+                        </div>
+                    `;
+                }
                 try {
-                    await this.loadBarajas(designId);
+                    barajas = await this.loadBarajas(designId);
                 } catch (error) {
-                    alert('No se pudieron cargar las barajas. Intenta nuevamente.');
+                    this.renderEmptyState('No se pudieron cargar las barajas.');
                     return;
                 }
             }
 
-            const designName = document.querySelector('.j-preview-title p')?.textContent || 'Diseño';
-            this.renderBarajas(designName);
-            this.overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
+            // 3. Renderizar al instante con marca de agua CSS
+            this.renderBarajasInstantly(designName, barajas);
         }
 
-        /**
-         * Carga las barajas del diseño
-         */
         loadBarajas(designId) {
             return new Promise((resolve, reject) => {
-                fetch(
-                    Juguemos.ajax_url +
-                    "?action=juguemos_barajas&design_id=" +
-                    encodeURIComponent(designId)
-                )
+                fetch(`${Juguemos.ajax_url}?action=juguemos_barajas&design_id=${encodeURIComponent(designId)}`)
                 .then(r => r.json())
                 .then(response => {
                     if (!response.success || !response.data.length) {
-                        reject(new Error('No hay barajas disponibles'));
+                        reject(new Error('No hay barajas'));
                         return;
                     }
                     JuguemosState.barajas = response.data;
                     resolve(response.data);
                 })
-                .catch(error => {
-                    reject(error);
-                });
+                .catch(reject);
             });
         }
 
         /**
-         * Renderiza las barajas en el modal
+         * Renderizado ultrafast: inserta el HTML en un solo golpe
+         * Usa overlay CSS para la marca de agua (evita canvas lento)
          */
-        renderBarajas(designName) {
+        renderBarajasInstantly(designName, barajas) {
             const grid = document.getElementById('j-design-preview-grid');
-            const title = document.getElementById('j-design-preview-title');
             const count = document.getElementById('j-design-preview-count');
 
             if (!grid) return;
-
-            const barajas = JuguemosState?.barajas || [];
-
-            if (title) title.textContent = `${designName}`;
             if (count) count.textContent = `${barajas.length} barajas`;
 
-            if (barajas.length === 0) {
-                grid.innerHTML = `
-                    <div class="j-design-preview-empty">
-                        <p>No hay barajas disponibles para este diseño.</p>
-                    </div>
-                `;
+            if (!barajas || barajas.length === 0) {
+                this.renderEmptyState('No hay barajas disponibles.');
                 return;
             }
 
+            // Construir todo el HTML directo
             let html = '';
-            barajas.forEach((baraja, index) => {    
+            for (let index = 0; index < barajas.length; index++) {
+                const baraja = barajas[index];
                 html += `
                     <div class="j-design-preview-card">
                         <div class="j-design-preview-card-image">
-                            <img src="${baraja.imagen || ''}" alt="${baraja.nombre || `Baraja ${index + 1}`}" loading="lazy">
+                            <img src="${baraja.imagen}" alt="${baraja.nombre || `Baraja ${index + 1}`}" loading="lazy">
+                            <div class="j-watermark-overlay" style="background-image: url('${this.watermarkUrl}');"></div>
                         </div>
                         <div class="j-design-preview-card-info">
                             <span class="j-design-preview-card-number">#${baraja.numero || index + 1}</span>
@@ -292,14 +241,21 @@
                         </div>
                     </div>
                 `;
-            });
+            }
 
             grid.innerHTML = html;
         }
 
-        /**
-         * Cierra el modal
-         */
+        renderEmptyState(mensaje) {
+            const grid = document.getElementById('j-design-preview-grid');
+            const count = document.getElementById('j-design-preview-count');
+            
+            if (count) count.textContent = '0 barajas';
+            if (grid) {
+                grid.innerHTML = `<div class="j-design-preview-empty"><p>${mensaje}</p></div>`;
+            }
+        }
+
         closeModal() {
             if (this.overlay) {
                 this.overlay.classList.remove('active');
@@ -307,10 +263,6 @@
             }
         }
     }
-
-    // =========================================================
-    // EXPOSICIÓN GLOBAL
-    // =========================================================
 
     let instance = null;
 
@@ -322,19 +274,12 @@
     }
 
     window.DesignPreviewModal = {
-        init: function() {
-            getInstance();
-        },
-        open: function() {
-            getInstance().openModal();
-        }
+        init: () => getInstance(),
+        open: () => getInstance().openModal()
     };
 
-    // Inicializar automáticamente
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-            window.DesignPreviewModal.init();
-        });
+        document.addEventListener('DOMContentLoaded', () => window.DesignPreviewModal.init());
     } else {
         window.DesignPreviewModal.init();
     }
