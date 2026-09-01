@@ -618,15 +618,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     });
-    // ========== OBSERVAR PASO 4 ==========
-    new MutationObserver(() => {
-        if (document.getElementById('juguemos-payment')?.classList.contains('active')) {
-            setTimeout(() => {
-                updateOrderSummary();
-                JuguemosPaymentInstance?.updatePaymentSummary();
-            }, 200);
-        }
-    }).observe(document.body, { attributes: true, subtree: true, attributeFilter: ['class'] });
 
     // ========== VERIFICAR PAGO ==========
     if (urlParams.get('download') === 'pdf') {
@@ -748,7 +739,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setTimeout(detectarPaisPorIP, 500);
     
-    setTimeout(detectarGTranslate, 300);
 
     setTimeout(() => {
         if (JuguemosState.mode === 'dobles' && typeof window.DoblesManager !== 'undefined') {
@@ -1447,54 +1437,6 @@ function regenerarTodasLasTablas() {
     var event = new Event('gridChanged');
     document.dispatchEvent(event);
 }
-
-function cambiarIdiomaGTtranslate(lang) {
-    const country = lang === 'en' ? 'USA' : 'Mexico';
-    document.cookie = `juguemos_country=${country}; path=/; max-age=31536000`;
-    const url = new URL(window.location.href);
-    url.searchParams.set('lang', lang);
-    window.location.href = url.toString();
-}
-
-function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    return parts.length === 2 ? parts.pop().split(';').shift() : null;
-}
-
-document.querySelectorAll(".country").forEach(button => {
-    button.addEventListener("click", function() {
-        document.querySelectorAll(".country").forEach(b => b.classList.remove("active"));
-        this.classList.add("active");
-        const country = this.dataset.country;
-        JuguemosState.country = country;
-        JuguemosState.currency = country === 'USA' ? 'USD' : 'MXN';
-        cambiarIdiomaGTtranslate(country === 'USA' ? 'en' : 'es');
-    });
-});
-
-function detectarGTranslate() {
-    const selector = document.querySelector('.goog-te-combo');
-    if (selector && !selector._listenerAdded) {
-        selector._listenerAdded = true;
-        selector.addEventListener('change', function() {
-            const lang = this.value;
-            const country = lang === 'en' ? 'USA' : 'Mexico';
-            JuguemosState.country = country;
-            JuguemosState.currency = country === 'USA' ? 'USD' : 'MXN';
-            document.cookie = `juguemos_country=${country}; path=/; max-age=31536000`;
-            document.querySelectorAll(".country").forEach(btn => btn.classList.toggle('active', btn.dataset.country === country));
-            updatePaperOptions();
-            updatePrice();
-            updateOrderSummary();
-        });
-    }
-}
-
-new MutationObserver(() => {
-    const selector = document.querySelector('.goog-te-combo');
-    if (selector && !selector._listenerAdded) detectarGTranslate();
-}).observe(document.body, { childList: true, subtree: true });
 function llenarCasillasAutomatico() {
     if (!JuguemosState.deck) return;
     

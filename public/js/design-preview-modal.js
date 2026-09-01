@@ -3,6 +3,8 @@
  * DESIGN PREVIEW MODAL - Ver todas las barajas del diseño
  * =====================================================
  * Módulo independiente que no afecta otras funcionalidades
+ * 
+ * 🔥 VERSIÓN CORREGIDA: El botón siempre aparece al cambiar de diseño
  */
 
 (function() {
@@ -14,11 +16,11 @@
             this.overlay = null;
             this.designId = null;
             this.barajas = [];
+            this.ultimoDiseno = null;
             this.init();
         }
 
         init() {
-            // Esperar a que el DOM esté listo
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', () => this.setup());
             } else {
@@ -27,13 +29,18 @@
         }
 
         setup() {
-            // Crear estructura del modal (una sola vez)
             this.createModalStructure();
 
-            // Observar cambios en la vista previa del diseño
+            // 🔥 MÉTODO PRINCIPAL: Observar cambios en JuguemosState.deck
+            this.observarCambioDiseno();
+
+            // 🔥 OBSERVAR CAMBIOS EN LA VISTA PREVIA
             this.observeDesignPreview();
 
-            // Escuchar clicks en el botón (delegación de eventos)
+            // 🔥 OBSERVAR CAMBIOS EN EL TÍTULO
+            this.observeTitleChanges();
+
+            // Escuchar clicks en el botón
             document.addEventListener('click', (e) => {
                 if (e.target.matches('#j-view-full-design') || e.target.closest('#j-view-full-design')) {
                     this.openModal();
@@ -46,13 +53,63 @@
                     this.closeModal();
                 }
             });
+
+            // 🔥 AGREGAR BOTÓN INICIAL
+            setTimeout(() => this.addButtonToPreview(), 500);
+        }
+
+        /**
+         * 🔥 OBSERVA CAMBIOS EN JuguemosState.deck
+         * Esta es la clave para que el botón aparezca al seleccionar otro diseño
+         */
+        observarCambioDiseno() {
+            // Usar setInterval para monitorear cambios en el deck
+            setInterval(() => {
+                const deckActual = JuguemosState?.deck || null;
+                
+                if (deckActual !== this.ultimoDiseno) {
+                    this.ultimoDiseno = deckActual;
+                    console.log('🔄 Diseño cambiado a:', deckActual);
+                    
+                    // Esperar a que se cargue la vista previa
+                    setTimeout(() => {
+                        this.addButtonToPreview();
+                    }, 300);
+                }
+            }, 300);
+
+            // 🔥 También escuchar evento gridChanged
+            document.addEventListener('gridChanged', () => {
+                console.log('🔄 gridChanged detectado');
+                setTimeout(() => {
+                    this.addButtonToPreview();
+                }, 200);
+            });
+        }
+
+        /**
+         * 🔥 OBSERVA CAMBIOS EN EL TÍTULO
+         */
+        observeTitleChanges() {
+            const previewTitle = document.querySelector('.j-preview-title');
+            if (!previewTitle) return;
+
+            const observer = new MutationObserver(() => {
+                console.log('🔄 Título cambiado');
+                setTimeout(() => this.addButtonToPreview(), 100);
+            });
+
+            observer.observe(previewTitle, {
+                childList: true,
+                subtree: true,
+                characterData: true
+            });
         }
 
         /**
          * Crea la estructura HTML del modal
          */
         createModalStructure() {
-            // Evitar duplicados
             if (document.getElementById('j-design-preview-modal')) return;
 
             const modalHTML = `
@@ -80,11 +137,9 @@
 
             document.body.insertAdjacentHTML('beforeend', modalHTML);
 
-            // Referencias a elementos
             this.overlay = document.getElementById('j-design-preview-overlay');
             this.modal = document.getElementById('j-design-preview-modal');
 
-            // Eventos de cierre
             document.getElementById('j-design-preview-close').addEventListener('click', () => this.closeModal());
             document.getElementById('j-design-preview-close-btn').addEventListener('click', () => this.closeModal());
             
@@ -94,44 +149,50 @@
         }
 
         /**
-         * Observa cambios en la vista previa del diseño
-         * para agregar el botón cuando se cargue un diseño
+         * Observa cambios en la vista previa del diseño (fallback)
          */
         observeDesignPreview() {
-            // Escuchar cambios en el contenedor deck-preview
             const previewContainer = document.getElementById('deck-preview');
             if (!previewContainer) return;
 
-            // Usar MutationObserver para detectar cuando se actualiza la vista previa
             const observer = new MutationObserver(() => {
-                this.addButtonToPreview();
+                console.log('🔄 deck-preview mutado');
+                setTimeout(() => this.addButtonToPreview(), 150);
             });
 
             observer.observe(previewContainer, {
                 childList: true,
                 subtree: true,
-                characterData: true
+                characterData: true,
+                attributes: true
             });
-
-            // También intentar agregar el botón inicialmente
-            setTimeout(() => this.addButtonToPreview(), 500);
         }
 
-        /**
-         * Agrega el botón "Ver diseño completo" debajo del nombre del diseño
-         */
         addButtonToPreview() {
-            const previewTitle = document.querySelector('.j-preview-title');
+            const desktopContainer = document.getElementById('deck-preview');
+            if (!desktopContainer) return;
+
+            const previewTitle = desktopContainer.querySelector('.j-preview-title');
             if (!previewTitle) return;
 
-            // Verificar si el botón ya existe
-            if (document.getElementById('j-view-full-design')) return;
-
-            // Verificar que hay un diseño cargado (tiene un p con texto)
             const titleText = previewTitle.querySelector('p');
-            if (!titleText || !titleText.textContent.trim()) return;
+            if (!titleText || !titleText.textContent.trim()) {
+                const existingBtn = previewTitle.querySelector('#j-view-full-design');
+                if (existingBtn) existingBtn.remove();
+                return;
+            }
 
-            // Crear botón
+            const barajas = JuguemosState?.barajas || [];
+            if (barajas.length === 0) return;
+
+            const existingBtn = previewTitle.querySelector('#j-view-full-design');
+            if (existingBtn) {
+                if (existingBtn.style.display === 'none') {
+                    existingBtn.style.display = '';
+                }
+                return;
+            }
+
             const button = document.createElement('button');
             button.id = 'j-view-full-design';
             button.className = 'j-view-full-design-btn';
@@ -140,7 +201,6 @@
                 Ver diseño completo
             `;
 
-            // Insertar después del título
             previewTitle.appendChild(button);
         }
 
@@ -148,17 +208,14 @@
          * Abre el modal con las barajas del diseño
          */
         async openModal() {
-            // Obtener el diseño actual
             const designId = JuguemosState?.deck;
             if (!designId) {
                 alert('Primero selecciona un diseño.');
                 return;
             }
 
-            // Obtener las barajas
             const barajas = JuguemosState?.barajas || [];
             if (barajas.length === 0) {
-                // Intentar cargar barajas si no están disponibles
                 try {
                     await this.loadBarajas(designId);
                 } catch (error) {
@@ -167,17 +224,14 @@
                 }
             }
 
-            // Obtener el nombre del diseño
             const designName = document.querySelector('.j-preview-title p')?.textContent || 'Diseño';
-
-            // Mostrar modal
             this.renderBarajas(designName);
             this.overlay.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
 
         /**
-         * Carga las barajas del diseño si no están disponibles
+         * Carga las barajas del diseño
          */
         loadBarajas(designId) {
             return new Promise((resolve, reject) => {
@@ -213,13 +267,9 @@
 
             const barajas = JuguemosState?.barajas || [];
 
-            // Actualizar título
             if (title) title.textContent = `${designName}`;
-
-            // Actualizar contador
             if (count) count.textContent = `${barajas.length} barajas`;
 
-            // Si no hay barajas, mostrar mensaje
             if (barajas.length === 0) {
                 grid.innerHTML = `
                     <div class="j-design-preview-empty">
@@ -229,7 +279,6 @@
                 return;
             }
 
-            // Generar grid de barajas
             let html = '';
             barajas.forEach((baraja, index) => {    
                 html += `
