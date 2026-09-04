@@ -12,9 +12,6 @@ $marco_colores = [
 
 <div class="j-color-style">
 
-    <!-- ==========================================
-         COLOR DE MARCO Y RELLENO DE BARAJA
-         ========================================== -->
     <p class="text-p-personalizada">Color de Marco y Relleno de Baraja</p>
 
     <div class="j-marco-colores">

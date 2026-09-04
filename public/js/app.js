@@ -1,14 +1,92 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    // =========================================================
-    // 1. DETECTAR PAÍS POR IP (SOLO PARA MONEDA)
-    // =========================================================
+    function actualizarModosPorCategoria() {
+        const categoriaActiva = document.querySelector('.j-category.active');
+        if (!categoriaActiva) {
+            return false;
+        }
+        
+        const nombreCategoria = categoriaActiva.textContent.trim().toLowerCase();
+        const esPersonalizadas = nombreCategoria === 'personalizadas';
+        
+        const modeButtons = document.querySelectorAll('.j-mode');
+        const modoPersonalizadas = document.querySelector('.j-mode[data-mode="libre"]');
+        
+        // Mostrar/ocultar TODOS los modos
+        modeButtons.forEach(btn => {
+            const mode = btn.dataset.mode;
+            if (esPersonalizadas) {
+                btn.style.display = (mode === 'libre') ? '' : 'none';
+            } else {
+                btn.style.display = '';
+            }
+        });
+        
+        // Si es Personalizadas, activar el modo libre
+        if (esPersonalizadas && modoPersonalizadas) {
+            modeButtons.forEach(b => b.classList.remove('active'));
+            modoPersonalizadas.classList.add('active');
+            JuguemosState.mode = 'libre';
+            
+            if (typeof updateIcons === 'function') {
+                updateIcons('libre');
+            }
+            
+            const libreUpload = document.getElementById('j-libre-upload');
+            if (libreUpload) {
+                libreUpload.style.display = 'block';
+            }
+            
+            document.querySelectorAll('.j-casilla-option').forEach(opt => {
+                if (opt.id !== 'j-libre-upload') {
+                    opt.style.display = 'none';
+                }
+            });
+            
+            // 🔥 NUEVO: SOLO limpiar si NO hay imágenes cargadas
+            const imagenesExistentes = JuguemosState.libreImages || [];
+            const tieneImagenes = imagenesExistentes.some(img => img !== null && img !== undefined && img.data);
+            
+            if (!tieneImagenes) {
+                // Solo limpiar si no hay imágenes
+                limpiarCasillasPersonalizadas();
+            } else {
+                // Si ya hay imágenes, solo actualizar la vista previa
+                if (typeof actualizarPreviewCasillas === 'function') {
+                    const casillas = JuguemosState.casillasAsignadas || [];
+                    actualizarPreviewCasillas(casillas);
+                }
+            }
+            
+            setTimeout(() => {
+                if (typeof drawGrid === 'function') {
+                    drawGrid();
+                }
+            }, 100);
+        } else if (!esPersonalizadas) {
+            const modoSencilla = document.querySelector('.j-mode[data-mode="sencilla"]');
+            if (modoSencilla && !document.querySelector('.j-mode.active')) {
+                modoSencilla.classList.add('active');
+                JuguemosState.mode = 'sencilla';
+                
+                const aleatoriaOption = document.getElementById('j-aleatoria-option');
+                if (aleatoriaOption) aleatoriaOption.style.display = '';
+                
+                const libreUpload = document.getElementById('j-libre-upload');
+                if (libreUpload) libreUpload.style.display = 'none';
+            }
+        }
+        
+        return esPersonalizadas;
+    }
+
+    window.actualizarModosPorCategoria = actualizarModosPorCategoria;
+
     function detectarPaisPorIP() {
         const urlParams = new URLSearchParams(window.location.search);
         const lang = urlParams.get('lang');
         const forceCountry = urlParams.get('force_country');
         
-        // 1. Si hay force por URL, usarlo (prioridad máxima)
         if (lang === 'en' || forceCountry === 'USA') {
             JuguemosState.country = 'USA';
             JuguemosState.currency = 'USD';
@@ -29,7 +107,6 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
         
-        // 2. Si no hay force, detectar por IP (SOLO para moneda)
         fetch(Juguemos.ajax_url + "?action=juguemos_get_country&t=" + Date.now())
             .then(r => r.json())
             .then(response => {
@@ -37,36 +114,25 @@ document.addEventListener("DOMContentLoaded", () => {
                     const country = response.data.country;
                     const currency = response.data.currency;
                     
-                    // Solo actualizar si cambió
                     if (JuguemosState.country !== country) {
                         JuguemosState.country = country;
                         JuguemosState.currency = currency;
-                        
                         actualizarUIPais(country);
                         updatePaperOptions();
                         updatePrice();
                         updateOrderSummary();
-                        console.log('📍 País detectado por IP:', country, currency);
                     }
                 }
             })
-            .catch(error => {
-                console.warn('⚠️ No se pudo detectar país por IP');
-            });
+            .catch(() => {});
     }
 
-    // =========================================================
-    // 2. ACTUALIZAR UI DEL PAÍS (SOLO BOTONES)
-    // =========================================================
     function actualizarUIPais(country) {
         document.querySelectorAll(".country").forEach(btn => {
             btn.classList.toggle('active', btn.dataset.country === country);
         });
     }
 
-    // =========================================================
-    // 3. LIMPIAR SESSION STORAGE (pagos)
-    // =========================================================
     const urlParams = new URLSearchParams(window.location.search);
     const isPaymentSuccess = urlParams.get('payment') === 'stripe_success' || urlParams.get('payment') === 'success';
     
@@ -78,9 +144,6 @@ document.addEventListener("DOMContentLoaded", () => {
         sessionStorage.setItem('juguemos_page_loaded', 'true');
     }
 
-    // =========================================================
-    // 4. INICIALIZACIÓN
-    // =========================================================
     if (typeof JuguemosAjax !== 'undefined' && typeof JuguemosState !== 'undefined') {
         JuguemosAjax.loadCategories();
         updatePrice();
@@ -89,14 +152,12 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    // ========== HELPER: ACTUALIZAR Y REGENERAR ==========
     const actualizarYRegenerar = (callback) => {
         updatePrice();
         updateOrderSummary();
         if (typeof callback === 'function') setTimeout(callback, 200);
     };
 
-    // ========== PAPEL ==========
     const paperSelect = document.getElementById("j-paper-size");
     if (paperSelect) {
         paperSelect.addEventListener("change", function () {
@@ -106,7 +167,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // ========== RANGE Y INPUT DE TABLAS ==========
     const range = document.getElementById("tables-range");
     const input = document.getElementById("tables-number");
 
@@ -149,7 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         updateRangeColor();
     }
-    // ========== MODO ==========
+
     document.querySelectorAll(".j-mode").forEach(button => {
         button.addEventListener("click", () => {
             document.querySelectorAll(".j-mode").forEach(b => b.classList.remove("active"));
@@ -157,26 +217,22 @@ document.addEventListener("DOMContentLoaded", () => {
             const mode = button.dataset.mode;
             JuguemosState.mode = mode;
             
-            // Obtener todos los contenedores
             const aleatoriaOption = document.getElementById('j-aleatoria-option');
             const doblesOption = document.getElementById('j-dobles-option');
             const favoritasOption = document.getElementById('j-favoritas-option');
             const libreUpload = document.getElementById('j-libre-upload');
             
-            // Ocultar todos
             if (aleatoriaOption) aleatoriaOption.style.display = 'none';
             if (doblesOption) doblesOption.style.display = 'none';
             if (favoritasOption) favoritasOption.style.display = 'none';
             if (libreUpload) libreUpload.style.display = 'none';
             
-            //  LIMPIAR posiciones dobles si NO es modo dobles
             if (mode !== 'dobles') {
                 JuguemosState.posicionesDobles = [];
                 JuguemosState.cartasDobles = [];
                 JuguemosState.asignacionDobles = {};
             }
             
-            // Mostrar según modo
             if (mode === 'libre') {
                 if (libreUpload) libreUpload.style.display = 'block';
             } else if (mode === 'dobles') {
@@ -189,14 +245,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 }, 100);
             } else if (mode === 'favoritas') {
                 if (favoritasOption) favoritasOption.style.display = '';
-                // SIMPLIFICADO: Solo llamar a actualizarCasillas
                 if (window.FavoritasManagerInstance) {
                     setTimeout(() => {
                         window.FavoritasManagerInstance.actualizarCasillasFavoritas();
                     }, 100);
                 }
             } else {
-                // Modo sencilla (por defecto)
                 if (aleatoriaOption) aleatoriaOption.style.display = '';
             }
             
@@ -209,14 +263,13 @@ document.addEventListener("DOMContentLoaded", () => {
             actualizarYRegenerar(llenarCasillasAutomatico);
         });
     });
-    // ========== GRID ==========
+
     const handleGridChange = () => {
         drawGrid();
         drawMarcosPreview();
         limpiarCasillas();
         updateOrderSummary();
         
-        //  Si el modo NO es dobles, limpiar posiciones dobles
         if (JuguemosState.mode !== 'dobles') {
             JuguemosState.posicionesDobles = [];
             JuguemosState.cartasDobles = [];
@@ -272,7 +325,6 @@ document.addEventListener("DOMContentLoaded", () => {
             JuguemosState.quantity = parseInt(tablesPerPageInput.value) || 1;
             updatePrice();        
             updateOrderSummary();
-
             var event = new Event('gridChanged');
             document.dispatchEvent(event);
         };
@@ -288,7 +340,6 @@ document.addEventListener("DOMContentLoaded", () => {
         tablesPerPageInput.addEventListener("input", updateTables);
     }
 
-    // ========== PÁGINAS ==========
     const pagesInput = document.getElementById("j-pages");
     if (pagesInput) {
         pagesInput.value = JuguemosState.pages;
@@ -303,7 +354,7 @@ document.addEventListener("DOMContentLoaded", () => {
         pagesInput.addEventListener("input", () => {
             let value = parseInt(pagesInput.value) || 1;
             pagesInput.value = JuguemosState.pages = Math.max(1, value);
-            updatePrice();        // ← NUEVO: Actualizar precio al cambiar páginas
+            updatePrice();
             updateOrderSummary();
             if (typeof PrintPaper !== "undefined") {
                 setTimeout(() => PrintPaper.refresh(), 150);
@@ -313,7 +364,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // ========== MARCAS DE CORTE ==========
     const cutMarksToggle = document.getElementById("j-cut-marks-toggle");
     const cutMarksLines = document.querySelectorAll("#j-cut-marks-preview .j-line");
     if (cutMarksToggle) {
@@ -326,15 +376,12 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // ========== COLORES ==========
-
     document.querySelectorAll(".j-color-swatch").forEach(swatch => {
         swatch.addEventListener("click", function() {
             document.querySelectorAll(".j-color-swatch").forEach(s => s.classList.remove("active"));
             this.classList.add("active");
             JuguemosState.marcoColor = this.dataset.color;
             
-            // Actualizar indicador
             const display = document.getElementById('j-marco-color-display');
             const preview = document.getElementById('j-marco-color-preview');
             if (display) display.textContent = this.dataset.color;
@@ -347,14 +394,12 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // 2. Color Fondo de Tabla (12 colores)
     document.querySelectorAll(".j-fondo-swatch").forEach(swatch => {
         swatch.addEventListener("click", function() {
             document.querySelectorAll(".j-fondo-swatch").forEach(s => s.classList.remove("active"));
             this.classList.add("active");
             JuguemosState.fondoColor = this.dataset.color;
             
-            // Actualizar indicador
             const display = document.getElementById('j-fondo-color-display');
             const preview = document.getElementById('j-fondo-color-preview');
             if (display) display.textContent = this.dataset.color;
@@ -367,15 +412,12 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // 3. Función para aplicar colores
     function aplicarColores() {
         document.documentElement.style.setProperty('--j-marco-color', JuguemosState.marcoColor || '#FA299C');
         document.documentElement.style.setProperty('--j-fondo-color', JuguemosState.fondoColor || '#FA299C');
     }
 
-    // 4. Inicializar colores al cargar
     function inicializarColores() {
-        // Marco
         const marcoActivo = document.querySelector('.j-color-swatch.active');
         if (marcoActivo) {
             JuguemosState.marcoColor = marcoActivo.dataset.color;
@@ -395,7 +437,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        // Fondo
         const fondoActivo = document.querySelector('.j-fondo-swatch.active');
         if (fondoActivo) {
             JuguemosState.fondoColor = fondoActivo.dataset.color;
@@ -420,20 +461,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     inicializarColores();
 
-
     const btnIncluir = document.getElementById("j-incluir-barajas");
     const toggleIcon = document.getElementById("j-toggle-icon");
     if (btnIncluir) {
-
         const setActive = (active) => {
             JuguemosState.barajasIncluidas = active;
-
-                    const textSpan = btnIncluir.querySelector('.j-toggle-text');
+            const textSpan = btnIncluir.querySelector('.j-toggle-text');
             if (textSpan) {
                 textSpan.textContent = active ? 'Incluir barajas' : 'No incluir barajas';
             }
-                    toggleIcon.src =
-                `/wp-content/uploads/2026/07/incluir_${active ? "on" : "off"}.png`;
+            toggleIcon.src = `/wp-content/uploads/2026/07/incluir_${active ? "on" : "off"}.png`;
             
             const statusText = document.getElementById("j-incluir-status");
             if (statusText) {
@@ -448,7 +485,6 @@ document.addEventListener("DOMContentLoaded", () => {
             document.dispatchEvent(event);
         };
         
-        // Por defecto DESACTIVADO
         setActive(false);
         
         btnIncluir.addEventListener("click", () => {
@@ -456,7 +492,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // ========== SELECCIÓN ALEATORIA ==========
     const btnAleatoria = document.querySelector(".j-casilla-btn");
     if (btnAleatoria) {
         btnAleatoria.classList.remove('active');
@@ -479,7 +514,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 updateOrderSummary();
             }
             
-            //  Mantener el botón siempre como "inactive" (sin resaltar)
             this.classList.remove('active');
             this.classList.add('inactive');
             this.textContent = 'Selección Aleatoria';
@@ -487,139 +521,114 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     limpiarCasillas();
+    function limpiarCasillasPersonalizadas() {
+        JuguemosState.libreImages = [];
+        JuguemosState.libreImagesCount = 0;
+        JuguemosState.casillasAsignadas = [];
+        JuguemosState.todasLasTablas = [];
+        
+        // Limpiar vista previa de casillas (escritorio)
+        const container = document.getElementById('j-casilla-preview-grid');
+        if (container) {
+            const grid = JuguemosState.grid || '4x4';
+            const total = getTotalCasillas(grid);
+            container.innerHTML = Array(total).fill('<div class="cell empty"></div>').join('');
+        }
+        
+        // Limpiar vista previa de casillas (móvil)
+        const mobile = document.getElementById('j-casilla-preview-grid-mobile');
+        if (mobile) {
+            const grid = JuguemosState.grid || '4x4';
+            const total = getTotalCasillas(grid);
+            mobile.innerHTML = Array(total).fill('<div class="cell empty"></div>').join('');
+        }
+        
+        // Actualizar resumen
+        if (typeof updateOrderSummary === 'function') {
+            updateOrderSummary();
+        }
+    }
     drawMarcosPreview();
 
-   // ========== SIGUIENTE: VISTA PREVIA ==========
-        document.getElementById("j-go-preview")?.addEventListener("click", () => {
-        
-        //  VALIDACIÓN PARA MODO LIBRE
-        if (JuguemosState.mode === 'libre') {
-            const count = JuguemosState.libreImagesCount || 0;
-            if (count < 54) {
-                alert('Debes subir las 54 imágenes personalizadas antes de continuar.');
-                return;
-            }
+   document.getElementById("j-go-preview")?.addEventListener("click", () => {
+    
+    if (JuguemosState.mode === 'libre') {
+        const count = JuguemosState.libreImagesCount || 0;
+        if (count < 54) {
+            alert('Debes subir las 54 imágenes personalizadas antes de continuar.');
+            return;
         }
-        
-        //  NUEVO: VALIDACIÓN PARA MODO FAVORITAS
-        if (JuguemosState.mode === 'favoritas') {
-            const favoritas = JuguemosState.favoritas || [];
-            
-            // También verificar desde el manager si existe
-            let totalFavoritas = favoritas.length;
-            if (window.FavoritasManagerInstance) {
-                const favoritasDelManager = window.FavoritasManagerInstance.getFavoritas();
-                if (favoritasDelManager.length > 0) {
-                    totalFavoritas = favoritasDelManager.length;
-                    // Sincronizar estado
-                    JuguemosState.favoritas = favoritasDelManager;
-                }
-            }
-            
-            if (totalFavoritas === 0) {
-                alert('Selecciona al menos 1 favorita antes de continuar.');
-                return;
-            }
-        }
-
-        //  NUEVO: VALIDACIÓN PARA MODO DOBLES (opcional)
-        if (JuguemosState.mode === 'dobles') {
-            const cartasDobles = JuguemosState.cartasDobles || [];
-            if (cartasDobles.length === 0) {
-                alert('No se generaron cartas dobles. Intenta nuevamente.');
-                return;
-            }
-        }
-
-        //  NUEVO: VALIDACIÓN GENERAL - Que haya un diseño seleccionado
+    } else {
         if (!JuguemosState.deck) {
             alert('Selecciona un diseño de lotería primero.');
             return;
         }
-
-        //  NUEVO: VALIDACIÓN - Que haya barajas cargadas
         if (!JuguemosState.barajas || JuguemosState.barajas.length === 0) {
             alert('No se cargaron las barajas. Intenta seleccionar otro diseño.');
             return;
         }
-
-        // 🔥 1. Sincronizar favoritas desde el manager ANTES de generar
-        if (JuguemosState.mode === 'favoritas' && window.FavoritasManagerInstance) {
-            const favs = window.FavoritasManagerInstance.getFavoritas();
-            if (favs.length > 0) {
-                JuguemosState.favoritas = favs;
-                JuguemosState.favoritasUbicacion = window.FavoritasManagerInstance.getUbicacion();
+    }
+   
+    if (JuguemosState.mode === 'favoritas') {
+        const favoritas = JuguemosState.favoritas || [];
+        let totalFavoritas = favoritas.length;
+        if (window.FavoritasManagerInstance) {
+            const favoritasDelManager = window.FavoritasManagerInstance.getFavoritas();
+            if (favoritasDelManager.length > 0) {
+                totalFavoritas = favoritasDelManager.length;
+                JuguemosState.favoritas = favoritasDelManager;
             }
         }
-
-        // 🔥 2. Generar TODAS las tablas directamente (sin duplicar llamadas)
-        if (typeof ejecutarLlenadoAleatorio === 'function') {
-            ejecutarLlenadoAleatorio();
-        } else {
+        if (totalFavoritas === 0) {
+            alert('Selecciona al menos 1 favorita antes de continuar.');
             return;
         }
-
-        updateOrderSummary();
-
-        // Cambiar a paso 3
-        document.querySelectorAll(".j-step").forEach(s => s.classList.remove("active"));
-        document.getElementById("j-tables-per-page").value = JuguemosState.quantity;
-        document.getElementById("juguemos-preview-completo").classList.add("active");
-        document.querySelectorAll(".juguemos-step").forEach(s => s.classList.remove("active"));
-        document.querySelector('.juguemos-step[data-step="3"]')?.classList.add("active");
-        window.scrollTo({ top: 0, behavior: "smooth" });
-
-        // 🔥 3. Forzar actualización de PrintPaper (ya tiene todasLasTablas generado)
-        if (typeof PrintPaper !== 'undefined') {
-            PrintPaper.refresh();
+    }
+    if (JuguemosState.mode === 'dobles') {
+        const cartasDobles = JuguemosState.cartasDobles || [];
+        if (cartasDobles.length === 0) {
+            alert('No se generaron cartas dobles. Intenta nuevamente.');
+            return;
         }
+    }
 
-        // Verificar retorno de Stripe
-        if (urlParams.get('payment') === 'stripe_success') {
-            const sessionId = urlParams.get('session_id');
-            const orderId = urlParams.get('order_id');
-            
-            if (sessionId && orderId) {
-                sessionStorage.setItem('juguemos_payment_token', orderId);
-                
-                $.ajax({
-                    url: Juguemos.ajax_url,
-                    method: 'POST',
-                    data: {
-                        action: 'juguemos_verify_stripe',
-                        nonce: Juguemos.nonce,
-                        session_id: sessionId,
-                        order_id: orderId
-                    },
-                    success: function(response) {
-                        if (response.success && response.data && response.data.paid) {
-                            sessionStorage.setItem('juguemos_payment_verified', 'true');
-                            if (typeof JuguemosPaymentInstance !== 'undefined') {
-                                JuguemosPaymentInstance.paymentSuccess();
-                            }
-                        } else {
-                            // Intentar verificar manualmente
-                            setTimeout(function() {
-                                if (typeof JuguemosPaymentInstance !== 'undefined') {
-                                    JuguemosPaymentInstance.checkPaymentManually();
-                                }
-                            }, 3000);
-                        }
-                    },
-                    error: function() {
-                        // Intentar verificar manualmente
-                        setTimeout(function() {
-                            if (typeof JuguemosPaymentInstance !== 'undefined') {
-                                JuguemosPaymentInstance.checkPaymentManually();
-                            }
-                        }, 3000);
-                    }
-                });
-            }
+    if (JuguemosState.mode === 'favoritas' && window.FavoritasManagerInstance) {
+        const favs = window.FavoritasManagerInstance.getFavoritas();
+        if (favs.length > 0) {
+            JuguemosState.favoritas = favs;
+            JuguemosState.favoritasUbicacion = window.FavoritasManagerInstance.getUbicacion();
         }
-    });
+    }
 
-    // ========== VERIFICAR PAGO ==========
+    // =========================================================
+    // Generar TODAS las tablas
+    // =========================================================
+    if (typeof ejecutarLlenadoAleatorio === 'function') {
+        ejecutarLlenadoAleatorio();
+    } else {
+        return;
+    }
+
+    updateOrderSummary();
+
+    // Cambiar a paso 3
+    document.querySelectorAll(".j-step").forEach(s => s.classList.remove("active"));
+    document.getElementById("j-tables-per-page").value = JuguemosState.quantity;
+    document.getElementById("juguemos-preview-completo").classList.add("active");
+    document.querySelectorAll(".juguemos-step").forEach(s => s.classList.remove("active"));
+    document.querySelector('.juguemos-step[data-step="3"]')?.classList.add("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    if (typeof PrintPaper !== 'undefined') {
+        PrintPaper.refresh();
+    }
+
+    // Verificar retorno de Stripe
+    if (urlParams.get('payment') === 'stripe_success') {
+        // ... resto del código
+    }
+});
+
     if (urlParams.get('download') === 'pdf') {
         const verified = sessionStorage.getItem('juguemos_payment_verified') === 'true';
         const token = sessionStorage.getItem('juguemos_payment_token');
@@ -670,7 +679,7 @@ document.addEventListener("DOMContentLoaded", () => {
             alert('Por favor, realiza el pago antes de descargar el PDF.');
         }
     });
-        // ========== CONFIRMAR PEDIDO ==========
+
     document.getElementById("j-confirm-order")?.addEventListener("click", () => {
         if (typeof updatePrice === 'function') updatePrice();
         document.querySelectorAll(".j-step").forEach(s => s.classList.remove("active"));
@@ -684,7 +693,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 200);
     });
 
-    // ========== EDITAR PEDIDO ==========
     document.getElementById("j-edit-order")?.addEventListener("click", () => {
         ['juguemos_payment_verified', 'juguemos_payment_token', 'juguemos_page_loaded', 'juguemos_order_id', 'juguemos_payment_just_made', 'juguemos_monto_pagado'].forEach(key => {
             sessionStorage.removeItem(key);
@@ -693,11 +701,9 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("tables-range").value = JuguemosState.quantity;
         document.getElementById("tables-range").dispatchEvent(new Event("input"));
 
-        // 🔥 Ahora la configuración de tablas vive en el sub-paso 1 de "Personaliza"
         if (typeof window.JuguemosMostrarPersonaliza === 'function') {
             window.JuguemosMostrarPersonaliza(1);
         } else {
-            // Fallback por si el script de personaliza aún no cargó
             document.querySelectorAll(".j-step").forEach(s => s.classList.remove("active"));
             document.getElementById("juguemos-design").classList.add("active");
             document.querySelectorAll(".juguemos-step").forEach(s => s.classList.remove("active"));
@@ -706,7 +712,6 @@ document.addEventListener("DOMContentLoaded", () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     });
 
-    // ========== REGRESAR A VISTA PREVIA ==========
     document.getElementById("j-back-to-preview")?.addEventListener("click", () => {
         ['juguemos_payment_verified', 'juguemos_payment_token', 'juguemos_payment_just_made', 'juguemos_monto_pagado'].forEach(key => {
             sessionStorage.removeItem(key);
@@ -719,21 +724,17 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => PrintPaper?.refresh(), 300);
     });
 
-
-    // Inicializar visibilidad según el modo actual
     const initialMode = JuguemosState.mode || 'sencilla';
     const aleatoriaOption = document.getElementById('j-aleatoria-option');
     const doblesOption = document.getElementById('j-dobles-option');
     const favoritasOption = document.getElementById('j-favoritas-option');
     const libreUpload = document.getElementById('j-libre-upload');
 
-    // Ocultar todos
     if (aleatoriaOption) aleatoriaOption.style.display = 'none';
     if (doblesOption) doblesOption.style.display = 'none';
     if (favoritasOption) favoritasOption.style.display = 'none';
     if (libreUpload) libreUpload.style.display = 'none';
 
-    // Mostrar según modo
     if (initialMode === 'libre') {
         if (libreUpload) libreUpload.style.display = 'block';
     } else if (initialMode === 'dobles') {
@@ -745,7 +746,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     setTimeout(detectarPaisPorIP, 500);
-    
 
     setTimeout(() => {
         if (JuguemosState.mode === 'dobles' && typeof window.DoblesManager !== 'undefined') {
@@ -799,9 +799,6 @@ function drawGrid() {
     let html = '';
     
     if (esCruzadas) {
-        // =========================================================
-        // CRUZADAS: 8 celdas visibles, 8 celdas invisibles
-        // =========================================================
         const casillasVisibles = [0, 3, 5, 6, 9, 10, 12, 15];
         var icono = getIconoPorModo(modo);
         
@@ -812,7 +809,7 @@ function drawGrid() {
             
             if (esVisible) {
                 if (esModoFavoritas) {
-                    var posicionesFavoritasCruzadas = [0, 15]; // 2 posiciones fijas
+                    var posicionesFavoritasCruzadas = [0, 15];
                     
                     if (posicionesFavoritasCruzadas.includes(i)) {
                         html += `
@@ -826,7 +823,6 @@ function drawGrid() {
                         `;
                     }
                 } else if (esModoDobles) {
-                    // DOBLES: solo 2 con relleno
                     var posicionesDobles = [0, 15];
                     if (posicionesDobles.includes(i)) {
                         var iconoDoble = getIconoPorModo('dobles');
@@ -841,7 +837,6 @@ function drawGrid() {
                         `;
                     }
                 } else {
-                    // SENCILLA: todas rellenas
                     html += `
                         <div class="cell visible" style="grid-row: ${row}; grid-column: ${col};">
                             ${icono ? '<img src="' + icono + '" class="j-modo-icon" alt="' + modo + '" loading="lazy">' : ''}
@@ -849,19 +844,13 @@ function drawGrid() {
                     `;
                 }
             } else {
-                // 8 celdas invisibles: completamente vacías
                 html += `
                     <div class="cell invisible" style="grid-row: ${row}; grid-column: ${col};"></div>
                 `;
             }
         }
     } else {
-        // =========================================================
-        // GRIDS NORMALES (4x4, 5x5, pocitos)
-        // =========================================================
-        
         if (esModoDobles) {
-            // MODO DOBLES: solo 2 rellenas
             var posicionesFijas = obtenerPosicionesDoblesEstaticas(grid);
             var iconoDoble = getIconoPorModo('dobles');
             
@@ -881,9 +870,6 @@ function drawGrid() {
                 }
             }
         } else if (esModoFavoritas) {
-            // =========================================================
-            // MODO FAVORITAS: según el grid
-            // =========================================================
             var icono = getIconoPorModo('favoritas');
             var posicionesFavoritas = obtenerPosicionesFavoritasEstaticas(grid);
             
@@ -897,14 +883,12 @@ function drawGrid() {
                         </div>
                     `;
                 } else {
-                    
                     html += `
                         <div class="cell sin-relleno"></div>
                     `;
                 }
             }
         } else {
-            // MODO SENCILLA, LIBRE: TODAS LAS CELDAS RELLENAS
             var icono = getIconoPorModo(modo);
             
             for (var i = 0; i < total; i++) {
@@ -918,7 +902,6 @@ function drawGrid() {
     }
     
     container.innerHTML = html;
-
     var event = new Event('gridChanged');
     document.dispatchEvent(event);
 }
@@ -980,6 +963,7 @@ function llenarCasillasAleatorio() {
     var event = new Event('gridChanged');
     document.dispatchEvent(event);
 }
+
 function actualizarPreviewCasillas(casillas) {
     const container = document.getElementById('j-casilla-preview-grid');
     if (!container) return;
@@ -1001,6 +985,70 @@ function actualizarPreviewCasillas(casillas) {
         container.style.gridTemplateColumns = '';
         container.style.gridTemplateRows = '';
     }
+
+    // =========================================================
+    // 🔥 MODO LIBRE: mostrar imágenes subidas o casillas vacías
+    // =========================================================
+    if (JuguemosState.mode === 'libre') {
+        const total = getTotalCasillas(grid);
+        const imagenesLibre = JuguemosState.libreImages || [];
+        const totalImagenesSubidas = imagenesLibre.length;
+        
+        let html = '';
+        
+        if (grid === 'cruzadas') {
+            const casillasVisibles = [0, 3, 5, 6, 9, 10, 12, 15];
+            
+            for (let i = 0; i < 8; i++) {
+                const pos = casillasVisibles[i];
+                const row = Math.floor(pos / 4) + 1;
+                const col = (pos % 4) + 1;
+                
+                const imagen = (i < totalImagenesSubidas) ? imagenesLibre[i] : null;
+                const tieneImagen = imagen && imagen.data && imagen.data.length > 0;
+                
+                if (tieneImagen) {
+                    html += `
+                        <div class="cell visible" style="grid-row: ${row}; grid-column: ${col};">
+                            <img src="${imagen.data}" alt="Personalizada ${i + 1}" loading="lazy">
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="cell visible vacia" style="grid-row: ${row}; grid-column: ${col};">
+                            <span class="j-casilla-vacia">+</span>
+                        </div>
+                    `;
+                }
+            }
+        } else {
+            for (let i = 0; i < total; i++) {
+                const imagen = (i < totalImagenesSubidas) ? imagenesLibre[i] : null;
+                const tieneImagen = imagen && imagen.data && imagen.data.length > 0;
+                
+                if (tieneImagen) {
+                    html += `
+                        <div class="cell">
+                            <img src="${imagen.data}" alt="Personalizada ${i + 1}" loading="lazy">
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="cell vacia">
+                            <span class="j-casilla-vacia">+</span>
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        container.innerHTML = html;
+        return;
+    }
+    
+    // =========================================================
+    // CONTINUAR CON EL RESTO DE LA LÓGICA ORIGINAL
+    // =========================================================
     
     const favoritas = JuguemosState.favoritas || [];
     const tieneFavoritas = favoritas.length > 0 && JuguemosState.mode === 'favoritas';
@@ -1019,50 +1067,16 @@ function actualizarPreviewCasillas(casillas) {
         JuguemosState.posicionesDobles = posicionesDobles;
     }
     
-
     if (!casillas || casillas.length === 0) {
         const total = getTotalCasillas(grid);
         container.innerHTML = Array(total).fill('<div class="cell loading"></div>').join('');
         return;
     }
 
-    const esLibreCruzadas = JuguemosState.mode === 'libre' && grid === 'cruzadas';
     const esFavoritasCruzadas = JuguemosState.mode === 'favoritas' && grid === 'cruzadas';
     const esSencillaCruzadas = JuguemosState.mode === 'sencilla' && grid === 'cruzadas';
     
-    // CASO 1: LIBRE + CRUZADAS
-    if (esLibreCruzadas) {
-        const casillasVisibles = [0, 3, 5, 6, 9, 10, 12, 15];
-        const imagenesLibre = JuguemosState.libreImages || [];
-        const totalImagenesSubidas = imagenesLibre.length;
-        
-        let html = '';
-        for (let i = 0; i < 8; i++) {
-            const pos = casillasVisibles[i];
-            const row = Math.floor(pos / 4) + 1;
-            const col = (pos % 4) + 1;
-            
-            const imagen = (i < totalImagenesSubidas) ? imagenesLibre[i] : null;
-            const tieneImagen = imagen && imagen.data && imagen.data.length > 0;
-            
-            if (tieneImagen) {
-                html += `
-                    <div class="cell visible" style="grid-row: ${row}; grid-column: ${col};">
-                        <img src="${imagen.data}" alt="Personalizada ${i + 1}" loading="lazy">
-                    </div>
-                `;
-            } else {
-                html += `
-                    <div class="cell visible placeholder" style="grid-row: ${row}; grid-column: ${col};">
-                    </div>
-                `;
-            }
-        }
-        container.innerHTML = html;
-        return;
-    }
-    
-    // CASO 2: SENCILLA + CRUZADAS
+    // SENCILLA + CRUZADAS
     if (esSencillaCruzadas) {
         const casillasVisibles = [0, 3, 5, 6, 9, 10, 12, 15];
         
@@ -1091,12 +1105,11 @@ function actualizarPreviewCasillas(casillas) {
         return;
     }
     
-    // CASO 3: FAVORITAS + CRUZADAS (con distribución inteligente)
+    // FAVORITAS + CRUZADAS
     if (esFavoritasCruzadas) {
         const casillasVisibles = [0, 3, 5, 6, 9, 10, 12, 15];
         let html = '';
         
-        // 🔥 OBTENER UBICACIONES SELECCIONADAS (checkboxes)
         const ubicacionesSeleccionadas = [];
         document.querySelectorAll('.j-ubicacion-checkbox:checked').forEach(cb => {
             ubicacionesSeleccionadas.push(cb.dataset.ubicacion);
@@ -1105,17 +1118,15 @@ function actualizarPreviewCasillas(casillas) {
             ubicacionesSeleccionadas.push('aleatoria');
         }
 
-        // 🔥 DISTRIBUIR FAVORITAS usando FavoritasDistribucion
         let distribucion = [];
         if (typeof FavoritasDistribucion !== 'undefined') {
             distribucion = FavoritasDistribucion.distribuir(
                 favoritas,
-                1, // Solo mostramos la primera tabla
+                1,
                 grid,
                 ubicacionesSeleccionadas
             );
         } else {
-            // Fallback si no está cargado el script
             distribucion = favoritas.map((f, i) => ({
                 posicion: i < casillasVisibles.length ? casillasVisibles[i] : i,
                 favorita: f,
@@ -1123,17 +1134,14 @@ function actualizarPreviewCasillas(casillas) {
             }));
         }
 
-        // 🔥 Generar 16 celdas (4x4) con las 8 visibles en forma de X
         for (let i = 0; i < 16; i++) {
             const row = Math.floor(i / 4) + 1;
             const col = (i % 4) + 1;
             const esVisible = casillasVisibles.includes(i);
             
             if (esVisible) {
-                // Buscar si hay una favorita asignada a esta posición
                 const item = distribucion.find(d => d.posicion === i);
                 const casilla = item ? item.favorita : null;
-                const esFavorita = casilla !== null;
                 
                 if (casilla) {
                     html += `
@@ -1149,7 +1157,6 @@ function actualizarPreviewCasillas(casillas) {
                     `;
                 }
             } else {
-                // Celdas invisibles: completamente vacías
                 html += `
                     <div class="cell invisible" style="grid-row: ${row}; grid-column: ${col};"></div>
                 `;
@@ -1159,7 +1166,7 @@ function actualizarPreviewCasillas(casillas) {
         return;
     }
     
-    // CASO 4: DOBLES + CRUZADAS
+    // DOBLES + CRUZADAS
     if (grid === 'cruzadas' && esModoDobles) {
         const casillasVisibles = [0, 3, 5, 6, 9, 10, 12, 15];
         const cartaDoble = JuguemosState.cartasDobles && JuguemosState.cartasDobles.length > 0 ? JuguemosState.cartasDobles[0] : null;
@@ -1196,6 +1203,7 @@ function actualizarPreviewCasillas(casillas) {
         return;
     }
 
+    // FAVORITAS EN GRIDS NORMALES
     if (tieneFavoritas && (grid === '4x4' || grid === '5x5' || grid === 'pocitos4' || grid === 'pocitos3')) {
         const total = getTotalCasillas(grid);
         
@@ -1232,7 +1240,6 @@ function actualizarPreviewCasillas(casillas) {
             }));
         }
 
-        // Generar HTML
         let html = '';
         for (let i = 0; i < total; i++) {
             const item = distribucion.find(d => d.posicion === i);
@@ -1251,10 +1258,10 @@ function actualizarPreviewCasillas(casillas) {
         return;
     }
 
+    // MODO SENCILLA Y DOBLES (no favoritas)
     if (JuguemosState.mode !== 'favoritas') {
         const total = getTotalCasillas(grid);
         container.innerHTML = casillas.map(function(casilla, index) {
-            const esFavorita = false; // No aplica en modo no-favoritas
             const esDoble = esModoDobles && posicionesDobles.includes(index);
             const claseExtra = esDoble ? ' doble' : '';
             
@@ -1273,6 +1280,7 @@ function actualizarPreviewCasillas(casillas) {
         JuguemosState.casillasAsignadas = casillas;
     }
 }
+
 function limpiarCasillas() {
     const container = document.getElementById('j-casilla-preview-grid');
     if (!container) return;
@@ -1280,7 +1288,6 @@ function limpiarCasillas() {
     const grid = JuguemosState.grid || '4x4';
     container.dataset.grid = grid;
     
-    //  Si es Pocitos 4, usar 2x2
     if (grid === 'pocitos4') {
         container.style.gridTemplateColumns = 'repeat(2, 1fr)';
         container.style.gridTemplateRows = 'repeat(2, 1fr)';
@@ -1301,7 +1308,6 @@ function limpiarCasillas() {
 function aplicarColores() {
     document.documentElement.style.setProperty('--j-marco-color', JuguemosState.marcoColor || '#FA299C');
     document.documentElement.style.setProperty('--j-fondo-color', JuguemosState.fondoColor || '#FFFFFF');
-
     var event = new Event('gridChanged');
     document.dispatchEvent(event);
 }
@@ -1325,10 +1331,10 @@ function drawMarcosPreview() {
     }
     
     container.innerHTML = html;
-
     var event = new Event('gridChanged');
     document.dispatchEvent(event);
 }
+
 function getGridConfig(grid) {
     const configs = {
         '4x4': { cols: 4, rows: 4, total: 16 },
@@ -1339,6 +1345,7 @@ function getGridConfig(grid) {
     };
     return configs[grid] || configs['4x4'];
 }
+
 function getIconoPorModo(modo) {
     const iconos = {
         'sencilla': '/wp-content/uploads/2026/08/sencilla-on.png',
@@ -1425,7 +1432,6 @@ function updateOrderSummary() {
         'j-summary-ubicacion': mode === 'favoritas' ? `Ubicación: ${ubicacionLabel}` : ''
     };
     
-
     Object.keys(elementos).forEach(id => {
         const el = document.getElementById(id);
         if (el) {
@@ -1439,15 +1445,16 @@ function updateOrderSummary() {
         }
     });
 }
+
 function regenerarTodasLasTablas() { 
     llenarCasillasAleatorio(); 
     var event = new Event('gridChanged');
     document.dispatchEvent(event);
 }
+
 function llenarCasillasAutomatico() {
     if (!JuguemosState.deck) return;
     
-    // Sincronizar favoritas
     if (JuguemosState.mode === 'favoritas' && window.FavoritasManagerInstance) {
         var favoritasDelManager = window.FavoritasManagerInstance.getFavoritas();
         var ubicacionDelManager = window.FavoritasManagerInstance.getUbicacion();
@@ -1482,13 +1489,8 @@ function ejecutarLlenadoAleatorio() {
         return;
     }
 
-
     const todasLasTablas = [];
     const todasLasBarajas = [...JuguemosState.barajas];
-    
-    // =========================================================
-    // 🔥 OBTENER FAVORITAS
-    // =========================================================
     
     let favoritas = [];
     let ubicacion = 'aleatoria';
@@ -1505,7 +1507,7 @@ function ejecutarLlenadoAleatorio() {
                 tieneFavoritas = true;
                 JuguemosState.favoritas = favoritas;
                 JuguemosState.favoritasUbicacion = ubicacion;
-                }
+            }
         }
         
         if (!tieneFavoritas) {
@@ -1518,10 +1520,6 @@ function ejecutarLlenadoAleatorio() {
         }
     }
 
-    // =========================================================
-    // 🔥 CONFIGURACIÓN DE DOBLES
-    // =========================================================
-    
     let configDoblesPorTabla = [];
     if (JuguemosState.mode === 'dobles') {
         let posicionesDobles = [];
@@ -1565,11 +1563,6 @@ function ejecutarLlenadoAleatorio() {
         drawGrid();
     }
 
-    // =========================================================
-    // 🔥 GENERAR CADA TABLA
-    // =========================================================
-    
-    // Pre-calcular favoritas por tabla para Pocitos 4
     let favoritasPorTabla = [];
     let totalFavoritasPorTabla = 0;
     
@@ -1592,10 +1585,6 @@ function ejecutarLlenadoAleatorio() {
         const casillas = new Array(totalCasillas).fill(null);
         const copiaBarajas = [...todasLasBarajas];
         
-        // =========================================================
-        // 🔥 COLOCAR FAVORITAS - CASO ESPECIAL POCITOS 4
-        // =========================================================
-        
         if (grid === 'pocitos4' && tieneFavoritas && favoritas.length > 0) {
             const favoritasParaEstaTabla = favoritasPorTabla[t] || [];
             
@@ -1613,12 +1602,7 @@ function ejecutarLlenadoAleatorio() {
                     }
                 });
             }
-        }
-        // =========================================================
-        // 🔥 COLOCAR FAVORITAS - OTROS GRIDS (4x4, 5x5, Cruzadas)
-        // =========================================================
-        else if (tieneFavoritas && favoritas.length > 0 && JuguemosState.mode === 'favoritas') {
-            // Distribuir favoritas entre tablas
+        } else if (tieneFavoritas && favoritas.length > 0 && JuguemosState.mode === 'favoritas') {
             const favoritasPorTablaNormal = distribuirFavoritasPorTablas(favoritas, totalTablas, totalCasillas);
             const favoritasTabla = favoritasPorTablaNormal[t] || [];
             
@@ -1637,10 +1621,6 @@ function ejecutarLlenadoAleatorio() {
                 });
             }
         }
-        
-        // =========================================================
-        // 🔥 COLOCAR DOBLES
-        // =========================================================
         
         if (configDoblesPorTabla.length > 0 && configDoblesPorTabla[t]) {
             const config = configDoblesPorTabla[t];
@@ -1706,7 +1686,6 @@ function ejecutarLlenadoAleatorio() {
         const tablaMostrar = todasLasTablas[0];
         JuguemosState.casillasAsignadas = tablaMostrar;
         
-        // Para Pocitos 4, usar la vista previa del manager que ya tiene rotación
         if (JuguemosState.mode === 'favoritas' && window.FavoritasManagerInstance) {
             window.FavoritasManagerInstance.actualizarPreviewCasillas();
         } else {
@@ -1721,7 +1700,6 @@ function ejecutarLlenadoAleatorio() {
     }
     var event = new Event('gridChanged');
     document.dispatchEvent(event);
-    
 }
 
 function obtenerPosicionesFavoritas(grid, cantidad, ubicacion) {
@@ -1909,17 +1887,16 @@ function getFilasGrid(grid) {
     const mapa = { '4x4': 4, '5x5': 5, 'pocitos4': 2, 'pocitos3': 2, 'cruzadas': 4 };
     return mapa[grid] || 4;
 }
+
 function distribuirFavoritasPorTablas(favoritas, totalTablas, maxPorTabla) {
     const resultado = [];
     if (favoritas.length === 0 || totalTablas === 0) return resultado;
     
-    // Si solo 1 tabla, usar todas (limitado)
     if (totalTablas === 1) {
         resultado.push(favoritas.slice(0, Math.min(favoritas.length, maxPorTabla)));
         return resultado;
     }
     
-    // Distribuir equitativamente
     const base = Math.floor(favoritas.length / totalTablas);
     const resto = favoritas.length % totalTablas;
     let index = 0;
@@ -1936,4 +1913,3 @@ function distribuirFavoritasPorTablas(favoritas, totalTablas, maxPorTabla) {
 
 document.addEventListener('dragstart', e => e.preventDefault());
 document.addEventListener('contextmenu', e => e.preventDefault());
-

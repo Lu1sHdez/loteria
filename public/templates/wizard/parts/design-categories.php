@@ -1,13 +1,7 @@
-<!-- ==========================================
-     CATEGORÍAS
-     ========================================== -->
 <div id="juguemos-categories">
     Cargando categorías...
 </div>
 
-<!-- ==========================================
-     DISEÑOS (GRID NORMAL)
-     ========================================== -->
 <div id="juguemos-decks">
     Cargando diseños...
 </div>
@@ -17,9 +11,6 @@
     Ver todos los diseños
 </button>
 
-<!-- ==========================================
-     MODAL - VER TODOS LOS DISEÑOS
-     ========================================== -->
 <div class="j-decks-modal" id="j-decks-modal">
     <div class="j-decks-modal-content">
         

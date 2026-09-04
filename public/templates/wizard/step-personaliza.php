@@ -85,7 +85,6 @@ if (!defined('ABSPATH')) {
                     </div>
                 </div>
 
-                <!-- 🔥 BOTONES DE NAVEGACIÓN -->
                 <div class="j-section j-section-botones">
                     <button type="button" id="j-personaliza-back-2" class="j-btn-back">
                         <span>←</span> <span>Regresar</span>
@@ -174,11 +173,21 @@ document.addEventListener('DOMContentLoaded', function() {
     var btnGoPersonaliza = document.getElementById('j-go-personaliza');
     if (btnGoPersonaliza) {
         btnGoPersonaliza.addEventListener('click', function() {
-            if (!JuguemosState.deck) {
+            var categoriaActiva = document.querySelector('.j-category.active');
+            var esPersonalizadas = categoriaActiva && 
+                categoriaActiva.textContent.trim().toLowerCase() === 'personalizadas';
+            
+            if (!esPersonalizadas && !JuguemosState.deck) {
                 alert('Selecciona un diseño de lotería primero.');
                 return;
             }
+            
             mostrarPersonaliza(1);
+            setTimeout(function() {
+                if (typeof actualizarModosPorCategoria === 'function') {
+                    actualizarModosPorCategoria();
+                }
+            }, 100);
         });
     }
 
@@ -214,8 +223,6 @@ document.addEventListener('DOMContentLoaded', function() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     }
-
-    // Exponer función para que "Editar pedido" (paso Vista Previa) pueda regresar directo aquí
     window.JuguemosMostrarPersonaliza = mostrarPersonaliza;
 });
 </script>
