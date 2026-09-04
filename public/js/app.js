@@ -525,7 +525,7 @@ document.addEventListener("DOMContentLoaded", () => {
         JuguemosState.libreImages = [];
         JuguemosState.libreImagesCount = 0;
         JuguemosState.casillasAsignadas = [];
-        JuguemosState.todasLasTablas = [];
+        //JuguemosState.todasLasTablas = [];
         
         // Limpiar vista previa de casillas (escritorio)
         const container = document.getElementById('j-casilla-preview-grid');
