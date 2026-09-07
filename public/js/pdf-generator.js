@@ -198,7 +198,6 @@ window.JuguemosPDF = {
             const nombreArchivo = 'loteria-la-dama-' + Date.now() + '.pdf';
             pdf.save(nombreArchivo);
     
-            // Limpiar session storage
             sessionStorage.removeItem('juguemos_payment_verified');
             sessionStorage.removeItem('juguemos_payment_token');
             sessionStorage.removeItem('juguemos_page_loaded');
@@ -210,7 +209,7 @@ window.JuguemosPDF = {
             if (statusText) statusText.textContent = 'Completado';
     
             setTimeout(function() {
-                window.location.href = '/juguemos';
+                window.location.href = '/gracias-por-tu-compra/';
             }, 2000);
     
         } catch (error) {
